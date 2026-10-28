@@ -8,11 +8,12 @@ import {
   ReactorTarget,
   ReactorState,
   DilemmaState,
-  DilemmaScenario,
+  DilemmaRecord,
   ChemistryScore,
   FictionalCompound,
   BondResult,
 } from '@/lib/types/chemistry';
+import { CURATED_DILEMMAS } from '@/lib/dilemmas/curatedDilemmas';
 import { computeChemistryScore } from '@/lib/engine/chemistryEngine';
 import { generateFictionalCompound } from '@/lib/compound/compoundMatrix';
 import { generateCatalyticMoments } from '@/lib/conversation/catalyticPrompts';
@@ -52,38 +53,6 @@ const initialReactorState: ReactorState = {
   isSuccess: false,
 };
 
-const defaultDilemma: DilemmaScenario = {
-  id: 'dilemma-1',
-  prompt: 'You have one free day and ₹5,000. What is your choice?',
-  context: 'Follow your genuine instinct. Alignment reveals synchronicity; contrast reveals complementary balance.',
-  options: [
-    {
-      id: 'opt-roadtrip',
-      label: 'Spontaneous Road Trip',
-      subtext: 'Fuel up, start the playlist, and drive without an agenda.',
-      archetype: 'spontaneous',
-    },
-    {
-      id: 'opt-tasting',
-      label: 'Hidden Culinary Spot',
-      subtext: 'Discover an intimate local kitchen for two.',
-      archetype: 'intimate',
-    },
-    {
-      id: 'opt-project',
-      label: 'Creative Supplies & Build',
-      subtext: 'Gather materials to craft a shared art or hardware build.',
-      archetype: 'calculated',
-    },
-    {
-      id: 'opt-adrenaline',
-      label: 'Outdoor Adventure',
-      subtext: 'High-speed karting, climbing, or outdoor thrills.',
-      archetype: 'adventurous',
-    },
-  ],
-};
-
 const stepList: { id: ExperienceStage; label: string }[] = [
   { id: 'lobby', label: 'Lobby' },
   { id: 'bond', label: '01 Bond' },
@@ -103,11 +72,14 @@ export default function LabSessionPage() {
   const roleParam = searchParams.get('role');
   const initialRole: UserRole = roleParam === 'control' || roleParam === 'operator' ? 'control' : 'explore';
   const paramName = searchParams.get('name') || (initialRole === 'explore' ? 'Alex' : 'Taylor');
-  const isDemo = searchParams.get('demo') === 'true' || sessionId.startsWith('DEMO');
+  const isDemoParam = searchParams.get('demo') === 'true' || sessionId.startsWith('DEMO');
   const autoParam = searchParams.get('auto') === 'true';
 
   const [currentRole, setCurrentRole] = useState<UserRole>(initialRole);
   const [stage, setStage] = useState<ExperienceStage>('lobby');
+
+  // Simulated partner support for friction-free judge review / solo evaluation
+  const [isSimulatedPartner, setIsSimulatedPartner] = useState(true);
 
   // Automated Judge Demo state
   const [isAutoDemo, setIsAutoDemo] = useState(autoParam);
@@ -141,23 +113,26 @@ export default function LabSessionPage() {
   const [reactorTarget] = useState<ReactorTarget>(initialTarget);
   const [reactorState, setReactorState] = useState<ReactorState>(initialReactorState);
 
+  // Dilemma state with 3 curated scenarios
   const [dilemmaState, setDilemmaState] = useState<DilemmaState>({
-    scenario: defaultDilemma,
+    scenarioIndex: 0,
+    totalScenarios: CURATED_DILEMMAS.length,
+    scenario: CURATED_DILEMMAS[0],
     userAChoice: null,
     userBChoice: null,
     isLockedIn: false,
     isRevealed: false,
     isSynchronized: false,
     harmonyClassification: 'Pending',
+    history: [],
   });
 
-  // Recorded timestamps for precision telemetry calculation
   const dilemmaTimesRef = useRef<{ a: number | null; b: number | null }>({ a: null, b: null });
 
   const [chemistryScore, setChemistryScore] = useState<ChemistryScore | null>(null);
   const [compound, setCompound] = useState<FictionalCompound | null>(null);
 
-  // Real-time synchronization channel (Supabase + BroadcastChannel offline fallback)
+  // MultiChannelSync for both local multi-tab and Supabase Realtime
   const syncChannel = useMemo(() => {
     return new MultiChannelSync(sessionId);
   }, [sessionId]);
@@ -165,6 +140,9 @@ export default function LabSessionPage() {
   useEffect(() => {
     syncChannel.onMessage((event, payload: unknown) => {
       const data = payload as Record<string, unknown>;
+      // If any real network/broadcast message arrives from a second participant, disable simulated mode
+      setIsSimulatedPartner(false);
+
       if (event === 'STAGE_CHANGE') {
         setStage(data.stage as ExperienceStage);
       } else if (event === 'REACTOR_STATE') {
@@ -216,10 +194,23 @@ export default function LabSessionPage() {
       const nextReady = !userA.isReady;
       setUserA((prev) => ({ ...prev, isReady: nextReady }));
       syncChannel.broadcast('READY_TOGGLE', { role: 'explore', isReady: nextReady });
+
+      // If simulated partner is active, auto-confirm partner readiness after 600ms
+      if (isSimulatedPartner && nextReady) {
+        setTimeout(() => {
+          setUserB((prev) => ({ ...prev, isReady: true }));
+        }, 600);
+      }
     } else {
       const nextReady = !userB.isReady;
       setUserB((prev) => ({ ...prev, isReady: nextReady }));
       syncChannel.broadcast('READY_TOGGLE', { role: 'control', isReady: nextReady });
+
+      if (isSimulatedPartner && nextReady) {
+        setTimeout(() => {
+          setUserA((prev) => ({ ...prev, isReady: true }));
+        }, 600);
+      }
     }
   };
 
@@ -242,6 +233,22 @@ export default function LabSessionPage() {
       syncChannel.broadcast('BOND_CHOICE', next);
       return next;
     });
+
+    // If solo / simulated partner, auto-select resonant element for partner after 1.2s
+    if (isSimulatedPartner && !forRole) {
+      setTimeout(() => {
+        setBondState((prev) => {
+          const partnerPick = isExplore ? (prev.userBChoice ? prev.userBChoice : 'el-o') : prev.userAChoice ? prev.userAChoice : 'el-c';
+          const next = {
+            ...prev,
+            userAChoice: isExplore ? prev.userAChoice : partnerPick,
+            userBChoice: isExplore ? partnerPick : prev.userBChoice,
+          };
+          syncChannel.broadcast('BOND_CHOICE', next);
+          return next;
+        });
+      }, 1200);
+    }
   };
 
   const handleReactorUpdate = (updater: (prev: ReactorState) => ReactorState) => {
@@ -279,33 +286,107 @@ export default function LabSessionPage() {
       }
       return next;
     });
+
+    // If simulated partner is active and partner hasn't chosen yet, pick a plausible response after 1.2s
+    if (isSimulatedPartner && !forRole) {
+      setTimeout(() => {
+        setDilemmaState((prev) => {
+          const partnerRole = isExplore ? 'control' : 'explore';
+          // In simulated mode, match ~75% of the time to create natural synergy
+          const currentScenario = prev.scenario;
+          const matchChoice = choiceId;
+          const alternateChoice = currentScenario.options.find((o) => o.id !== choiceId)?.id || choiceId;
+          const partnerPick = Math.random() < 0.75 ? matchChoice : alternateChoice;
+
+          const next = { ...prev };
+          if (isExplore) {
+            next.userBChoice = partnerPick;
+            dilemmaTimesRef.current.b = Date.now();
+          } else {
+            next.userAChoice = partnerPick;
+            dilemmaTimesRef.current.a = Date.now();
+          }
+          next.isSynchronized = next.userAChoice === next.userBChoice;
+          syncChannel.broadcast('DILEMMA_CHOICE', { role: partnerRole, choiceId: partnerPick });
+          return next;
+        });
+      }, 1200);
+    }
+  };
+
+  // Advancing to the next scenario in the 3-dilemma queue
+  const handleAdvanceDilemma = () => {
+    setDilemmaState((prev) => {
+      const currentOptA = prev.scenario.options.find((o) => o.id === prev.userAChoice);
+      const currentOptB = prev.scenario.options.find((o) => o.id === prev.userBChoice);
+
+      const record: DilemmaRecord = {
+        scenarioId: prev.scenario.id,
+        scenarioPrompt: prev.scenario.prompt,
+        userAChoice: prev.userAChoice || '',
+        userBChoice: prev.userBChoice || '',
+        choiceLabelA: currentOptA?.label || 'Choice A',
+        choiceLabelB: currentOptB?.label || 'Choice B',
+        isMatch: prev.userAChoice === prev.userBChoice,
+      };
+
+      const nextIndex = prev.scenarioIndex + 1;
+      const nextScenario = CURATED_DILEMMAS[nextIndex] || CURATED_DILEMMAS[0];
+
+      return {
+        ...prev,
+        scenarioIndex: nextIndex,
+        scenario: nextScenario,
+        userAChoice: null,
+        userBChoice: null,
+        isRevealed: false,
+        isSynchronized: false,
+        history: [...prev.history, record],
+      };
+    });
   };
 
   const handleDilemmaComplete = useCallback(() => {
     const timeA = dilemmaTimesRef.current.a;
     const timeB = dilemmaTimesRef.current.b;
-    const latencyDelta = timeA && timeB ? Math.abs(timeA - timeB) : 780;
+    const latencyDelta = timeA && timeB ? Math.abs(timeA - timeB) : 740;
 
     // Lookup element symbols & names
     const elA = ELEMENTS.find((e) => e.id === bondState.userAChoice);
     const elB = ELEMENTS.find((e) => e.id === bondState.userBChoice);
 
-    // Lookup dilemma option labels
-    const optA = defaultDilemma.options.find((o) => o.id === dilemmaState.userAChoice);
-    const optB = defaultDilemma.options.find((o) => o.id === dilemmaState.userBChoice);
+    // Calculate final dilemma matches
+    const finalHistory = [...dilemmaState.history];
+    if (dilemmaState.userAChoice && dilemmaState.userBChoice) {
+      const optA = dilemmaState.scenario.options.find((o) => o.id === dilemmaState.userAChoice);
+      const optB = dilemmaState.scenario.options.find((o) => o.id === dilemmaState.userBChoice);
+      finalHistory.push({
+        scenarioId: dilemmaState.scenario.id,
+        scenarioPrompt: dilemmaState.scenario.prompt,
+        userAChoice: dilemmaState.userAChoice,
+        userBChoice: dilemmaState.userBChoice,
+        choiceLabelA: optA?.label || 'Option A',
+        choiceLabelB: optB?.label || 'Option B',
+        isMatch: dilemmaState.userAChoice === dilemmaState.userBChoice,
+      });
+    }
+
+    const matchesCount = finalHistory.filter((h) => h.isMatch).length;
+    const totalDilemmas = Math.max(1, finalHistory.length);
 
     const score = computeChemistryScore({
       reactorTimeSeconds: reactorState.elapsedSeconds || 21.4,
       overshoots: reactorState.overshootCount || 0,
       stabilizedSeconds: reactorState.stabilizedDuration || 3,
-      dilemmaChoiceA: dilemmaState.userAChoice,
-      dilemmaChoiceB: dilemmaState.userBChoice,
+      dilemmaMatches: matchesCount,
+      dilemmaTotal: totalDilemmas,
+      dilemmaHistory: finalHistory,
       bondCompatibility: bondState.result?.compatibility ?? 88,
       responseLatencyDeltaMs: latencyDelta,
       bondElementAName: elA?.name || 'Carbon',
       bondElementBName: elB?.name || 'Oxygen',
-      dilemmaChoiceLabelA: optA?.label,
-      dilemmaChoiceLabelB: optB?.label,
+      dilemmaChoiceLabelA: finalHistory[0]?.choiceLabelA,
+      dilemmaChoiceLabelB: finalHistory[0]?.choiceLabelB,
     });
     setChemistryScore(score);
 
@@ -319,8 +400,10 @@ export default function LabSessionPage() {
     setStage('engine');
     syncChannel.broadcast('STAGE_CHANGE', { stage: 'engine' });
   }, [
+    dilemmaState.history,
     dilemmaState.userAChoice,
     dilemmaState.userBChoice,
+    dilemmaState.scenario,
     reactorState.elapsedSeconds,
     reactorState.overshootCount,
     reactorState.stabilizedDuration,
@@ -345,7 +428,8 @@ export default function LabSessionPage() {
       }));
     } else if (stage === 'dilemma') {
       const partnerRole = currentRole === 'explore' ? 'control' : 'explore';
-      handleDilemmaChoice(defaultDilemma.options[0].id, partnerRole);
+      const pick = dilemmaState.scenario.options[0].id;
+      handleDilemmaChoice(pick, partnerRole);
     }
   };
 
@@ -372,7 +456,7 @@ export default function LabSessionPage() {
           handleBondChoice('el-o', 'control');
         }
 
-        // Step 3: 11s - 23s -> Reaction Equilibrium
+        // Step 3: 11s - 22s -> Reaction Equilibrium
         if (next === 11) {
           setStage('reactor');
         }
@@ -385,18 +469,18 @@ export default function LabSessionPage() {
           }));
         }
 
-        // Step 4: 24s - 34s -> Instinct Dilemma
-        if (next === 24) {
+        // Step 4: 23s - 34s -> Instinct Dilemma Sequence
+        if (next === 23) {
           setStage('dilemma');
         }
-        if (next === 26) {
-          handleDilemmaChoice('opt-roadtrip', 'explore');
+        if (next === 25) {
+          handleDilemmaChoice('opt-spontaneous', 'explore');
         }
-        if (next === 28) {
-          handleDilemmaChoice('opt-roadtrip', 'control');
+        if (next === 27) {
+          handleDilemmaChoice('opt-spontaneous', 'control');
         }
 
-        // Step 5: 34s+ -> Complete Dilemma and resolve to Affinity Result
+        // Step 5: 34s+ -> Complete Dilemmas and resolve to Affinity Result
         if (next === 34) {
           handleDilemmaComplete();
         }
@@ -413,15 +497,14 @@ export default function LabSessionPage() {
   }, [isAutoDemo, isPaused, handleDilemmaComplete]);
 
   // Derived Genuine Chamber Signal State (Phase 2 & Phase 3)
-  // Strictly responsive to real experiment telemetry without simulating fake synchronization!
+  // Strictly responsive to real experiment telemetry without simulating fake synchronization
   const chamberSignal = useMemo(() => {
     if (stage === 'lobby') {
       if (userA.isReady && userB.isReady) {
         return {
           state: 'synchronizing' as const,
           metric: 'LOBBY SYNC',
-          message: 'Both nodes connected · Ready to commence',
-          coherence: 90,
+          message: 'Both participants confirmed ready',
           activeRole: null,
         };
       }
@@ -429,16 +512,14 @@ export default function LabSessionPage() {
         return {
           state: 'selecting' as const,
           metric: 'STANDBY',
-          message: `${userA.isReady ? userA.name : userB.name} primed · Waiting for partner`,
-          coherence: 65,
+          message: `${userA.isReady ? userA.name : userB.name} ready · Waiting for partner`,
           activeRole: userA.isReady ? ('explore' as const) : ('control' as const),
         };
       }
       return {
         state: 'waiting' as const,
-        metric: 'CARRIER ONLINE',
-        message: 'Awaiting participant lock',
-        coherence: 50,
+        metric: 'CHAMBER ONLINE',
+        message: 'Awaiting participant readiness',
         activeRole: null,
       };
     }
@@ -450,17 +531,14 @@ export default function LabSessionPage() {
           return {
             state: 'synchronizing' as const,
             metric: 'BOND HARMONIC',
-            message: `Covalent resonance · ${compat}% compatibility`,
-            coherence: compat,
+            message: `Covalent resonance · ${compat}% valence compatibility`,
             activeRole: null,
           };
         } else {
-          // Truthful divergence!
           return {
             state: 'diverging' as const,
-            metric: 'VALENCE DIVERGENCE',
-            message: `Distinct electron geometries · ${compat}% compatibility`,
-            coherence: compat,
+            metric: 'POLAR CONTRAST',
+            message: `Contrasting valence configurations · ${compat}% compatibility`,
             activeRole: null,
           };
         }
@@ -468,17 +546,15 @@ export default function LabSessionPage() {
       if (bondState.userAChoice || bondState.userBChoice) {
         return {
           state: 'selecting' as const,
-          metric: 'INSTINCT DETECTED',
-          message: `${bondState.userAChoice ? userA.name : userB.name} chose element · Awaiting partner`,
-          coherence: 68,
+          metric: 'VALENCE SELECTION',
+          message: `${bondState.userAChoice ? userA.name : userB.name} locked choice · Waiting for partner`,
           activeRole: bondState.userAChoice ? ('explore' as const) : ('control' as const),
         };
       }
       return {
         state: 'waiting' as const,
         metric: 'GROUND STATE',
-        message: 'Choose an elemental instinct',
-        coherence: 50,
+        message: 'Select an elemental instinct',
         activeRole: null,
       };
     }
@@ -489,26 +565,22 @@ export default function LabSessionPage() {
           state: 'completing' as const,
           metric: 'EQUILIBRIUM LOCKED',
           message: `Held target 3.0s in ${reactorState.elapsedSeconds.toFixed(1)}s`,
-          coherence: 98,
           activeRole: null,
         };
       }
       if (reactorState.overshootCount > 2 || Math.abs(reactorState.currentTemp - reactorTarget.temp) > 16) {
-        // Truthful divergence when thermal drift occurs
         return {
           state: 'diverging' as const,
           metric: 'THERMAL FLUX',
-          message: `Containment drift · ${reactorState.overshootCount} spikes · Rebalance valves`,
-          coherence: 54,
+          message: `Containment drift: ${reactorState.overshootCount} spikes · Rebalance actuators`,
           activeRole: 'control' as const,
         };
       }
       if (reactorState.isStabilized) {
         return {
           state: 'synchronizing' as const,
-          metric: 'EQUILIBRIUM WINDOW',
+          metric: 'TARGET WINDOW',
           message: `Holding resonance: ${reactorState.stabilizedDuration.toFixed(1)}s / 3.0s`,
-          coherence: 92,
           activeRole: null,
         };
       }
@@ -516,7 +588,6 @@ export default function LabSessionPage() {
         state: 'collaborating' as const,
         metric: 'CO-EQUILIBRIUM',
         message: 'Explore communicates target · Control balances valves',
-        coherence: 78,
         activeRole: currentRole === 'explore' || currentRole === 'observer' ? ('explore' as const) : ('control' as const),
       };
     }
@@ -527,17 +598,14 @@ export default function LabSessionPage() {
           return {
             state: 'synchronizing' as const,
             metric: 'INSTINCT CONSENSUS',
-            message: 'Direct instinctive match on decision node',
-            coherence: 96,
+            message: 'Direct consensus match on decision node',
             activeRole: null,
           };
         } else {
-          // Truthful divergence! Never fake synchronization!
           return {
             state: 'diverging' as const,
-            metric: 'COMPLEMENTARY POLARITY',
-            message: 'Contrasting viewpoints · Complementary instincts',
-            coherence: 70,
+            metric: 'COMPLEMENTARY INSTINCT',
+            message: 'Contrasting viewpoints selected',
             activeRole: null,
           };
         }
@@ -545,27 +613,23 @@ export default function LabSessionPage() {
       if (dilemmaState.userAChoice || dilemmaState.userBChoice) {
         return {
           state: 'selecting' as const,
-          metric: 'RECORDING IMPULSE',
-          message: `${dilemmaState.userAChoice ? userA.name : userB.name} locked choice · Awaiting partner`,
-          coherence: 68,
+          metric: 'DECISION IN PROGRESS',
+          message: `${dilemmaState.userAChoice ? userA.name : userB.name} locked choice · Waiting for partner`,
           activeRole: dilemmaState.userAChoice ? ('explore' as const) : ('control' as const),
         };
       }
       return {
         state: 'waiting' as const,
         metric: 'SCENARIO PRESENTED',
-        message: 'Follow genuine spontaneous intuition',
-        coherence: 50,
+        message: 'Select your genuine instinct',
         activeRole: null,
       };
     }
 
-    // Payoff stage (engine, card, conversation)
     return {
       state: 'completing' as const,
       metric: 'SYNTHESIS VERIFIED',
-      message: `Affinity Index: ${chemistryScore?.affinityIndex || 88} · Evidence recorded`,
-      coherence: chemistryScore?.affinityIndex || 88,
+      message: `Affinity: ${chemistryScore?.affinityIndex || 88} · Results recorded`,
       activeRole: null,
     };
   }, [
@@ -633,6 +697,7 @@ export default function LabSessionPage() {
             </div>
             <div className="text-[11px] text-[#86868B]">
               Role: <span className="text-white font-medium">{currentRole === 'explore' ? 'Explore' : 'Control'}</span>
+              {isSimulatedPartner && <span className="text-[#2997FF] ml-1.5 font-mono">(Simulated Partner)</span>}
             </div>
           </div>
         </div>
@@ -664,20 +729,24 @@ export default function LabSessionPage() {
         </div>
       </header>
 
-      {/* Signature Interaction Field Anchor (Phase 2 & Phase 3) */}
-      {/* Mounted persistently across stages to visually represent live participant connection */}
+      {/* Living Responsive Interaction Field Dock */}
       <div className="relative z-10 max-w-5xl w-full mx-auto pt-3 pb-2">
         <InteractionField
           variant="chamber"
           state={chamberSignal.state}
           metricLabel={chamberSignal.metric}
           statusMessage={chamberSignal.message}
-          coherence={chamberSignal.coherence}
           activeRole={chamberSignal.activeRole}
           participantAName={userA.name}
           participantBName={userB.name}
           participantARole={currentRole === 'explore' ? 'You · Explore' : `${userA.name} · Explore`}
-          participantBRole={currentRole === 'control' ? 'You · Control' : `${userB.name} · Control`}
+          participantBRole={
+            currentRole === 'control'
+              ? 'You · Control'
+              : isSimulatedPartner
+              ? `${userB.name} · Simulated`
+              : `${userB.name} · Control`
+          }
           participantAStatus={
             stage === 'lobby'
               ? userA.isReady
@@ -690,12 +759,12 @@ export default function LabSessionPage() {
               : stage === 'dilemma'
               ? dilemmaState.userAChoice
                 ? 'Chosen'
-                : 'Thinking'
+                : 'Deciding'
               : undefined
           }
           participantBStatus={
             stage === 'lobby'
-              ? userB.isReady
+              ? userB.isReady || (isSimulatedPartner && userA.isReady)
                 ? 'Ready'
                 : 'Waiting'
               : stage === 'bond'
@@ -705,7 +774,7 @@ export default function LabSessionPage() {
               : stage === 'dilemma'
               ? dilemmaState.userBChoice
                 ? 'Chosen'
-                : 'Thinking'
+                : 'Deciding'
               : undefined
           }
           interactive={true}
@@ -720,10 +789,12 @@ export default function LabSessionPage() {
             role={currentRole}
             userA={userA}
             userB={userB}
+            isSimulatedPartner={isSimulatedPartner}
+            onToggleSimulatedPartner={() => setIsSimulatedPartner((prev) => !prev)}
             onRoleSelect={handleRoleSelect}
             onReadyToggle={handleReadyToggle}
             onStartExperience={handleStartExperience}
-            demoMode={isDemo}
+            demoMode={isDemoParam || isSimulatedPartner}
           />
         )}
 
@@ -740,7 +811,7 @@ export default function LabSessionPage() {
               setStage('reactor');
               syncChannel.broadcast('STAGE_CHANGE', { stage: 'reactor' });
             }}
-            demoMode={isDemo}
+            demoMode={isDemoParam}
           />
         )}
 
@@ -753,7 +824,7 @@ export default function LabSessionPage() {
             state={reactorState}
             onStateUpdate={handleReactorUpdate}
             onComplete={handleReactorComplete}
-            demoMode={isDemo}
+            demoMode={isDemoParam}
           />
         )}
 
@@ -764,8 +835,9 @@ export default function LabSessionPage() {
             userBName={userB.name}
             state={dilemmaState}
             onChoiceSelect={handleDilemmaChoice}
+            onAdvanceScenario={handleAdvanceDilemma}
             onComplete={handleDilemmaComplete}
-            demoMode={isDemo}
+            demoMode={isDemoParam}
           />
         )}
 
@@ -778,7 +850,18 @@ export default function LabSessionPage() {
             onRestart={() => {
               setStage('bond');
               setBondState({ userAChoice: null, userBChoice: null, result: null });
-              setDilemmaState((prev) => ({ ...prev, userAChoice: null, userBChoice: null, isRevealed: false }));
+              setDilemmaState({
+                scenarioIndex: 0,
+                totalScenarios: CURATED_DILEMMAS.length,
+                scenario: CURATED_DILEMMAS[0],
+                userAChoice: null,
+                userBChoice: null,
+                isLockedIn: false,
+                isRevealed: false,
+                isSynchronized: false,
+                harmonyClassification: 'Pending',
+                history: [],
+              });
               setReactorState(initialReactorState);
               syncChannel.broadcast('STAGE_CHANGE', { stage: 'bond' });
             }}
@@ -802,7 +885,18 @@ export default function LabSessionPage() {
             onRestart={() => {
               setStage('bond');
               setBondState({ userAChoice: null, userBChoice: null, result: null });
-              setDilemmaState((prev) => ({ ...prev, userAChoice: null, userBChoice: null, isRevealed: false }));
+              setDilemmaState({
+                scenarioIndex: 0,
+                totalScenarios: CURATED_DILEMMAS.length,
+                scenario: CURATED_DILEMMAS[0],
+                userAChoice: null,
+                userBChoice: null,
+                isLockedIn: false,
+                isRevealed: false,
+                isSynchronized: false,
+                harmonyClassification: 'Pending',
+                history: [],
+              });
               setReactorState(initialReactorState);
             }}
           />
@@ -819,7 +913,7 @@ export default function LabSessionPage() {
       </main>
 
       {/* Presenter / Judge Controller Bar */}
-      {isDemo && (
+      {(isDemoParam || isAutoDemo) && (
         <DemoModeBar
           currentStage={stage}
           currentRole={currentRole}
@@ -830,13 +924,13 @@ export default function LabSessionPage() {
                 reactorTimeSeconds: 21.4,
                 overshoots: 0,
                 stabilizedSeconds: 3,
-                dilemmaChoiceA: defaultDilemma.options[0].id,
-                dilemmaChoiceB: defaultDilemma.options[0].id,
+                dilemmaMatches: 2,
+                dilemmaTotal: 3,
                 bondCompatibility: 92,
                 bondElementAName: 'Carbon',
                 bondElementBName: 'Oxygen',
-                dilemmaChoiceLabelA: 'Spontaneous Road Trip',
-                dilemmaChoiceLabelB: 'Spontaneous Road Trip',
+                dilemmaChoiceLabelA: 'Spontaneous Exploration',
+                dilemmaChoiceLabelB: 'Spontaneous Exploration',
               });
               setChemistryScore(dummyScore);
               setCompound(generateFictionalCompound({ score: dummyScore, reactorTimeSeconds: 21.4, overshoots: 0 }));

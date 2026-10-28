@@ -26,7 +26,6 @@ interface InteractionFieldProps {
   participantAStatus?: string;
   participantBStatus?: string;
   activeRole?: 'explore' | 'control' | 'observer' | 'operator' | null;
-  coherence?: number; // 0 - 100
   statusMessage?: string;
   metricLabel?: string;
   interactive?: boolean;
@@ -43,7 +42,6 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
   participantAStatus,
   participantBStatus,
   activeRole = null,
-  coherence,
   statusMessage,
   metricLabel,
   interactive = true,
@@ -76,15 +74,15 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
         case 'waiting':
           return 0.025; // Gentle ambient baseline
         case 'selecting':
-          return 0.065; // Higher frequency excitation
+          return 0.06; // Active input excitation
         case 'diverging':
-          return 0.045; // Dissonant tension speed
+          return 0.04; // Out-of-phase tension speed
         case 'synchronizing':
-          return 0.055; // Coherent resonant flow
+          return 0.05; // Coherent harmonic flow
         case 'collaborating':
-          return 0.08; // High active interaction velocity
+          return 0.075; // Active joint manipulation speed
         case 'completing':
-          return 0.03; // Serene quiet standing wave
+          return 0.025; // Calm standing wave
       }
     };
 
@@ -110,7 +108,7 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
     setMouseOffset({ x: 0, y: 0 });
   };
 
-  // Canvas / SVG Dimensions
+  // Dimensions
   const isCompact = variant === 'compact';
   const isChamber = variant === 'chamber';
   const width = isCompact ? 280 : isChamber ? 380 : 340;
@@ -119,15 +117,16 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
   const endX = width - 40;
   const midY = height / 2 + mouseOffset.y * 0.35;
 
-  // Color & Visual Styling per State (strictly Apple HIG palette)
+  // Visual Styling per State (Apple HIG palette: #000000 background, #FFFFFF text, restrained #2997FF, #34C759, #FF9F0A)
   const stateConfig = {
     waiting: {
-      color: 'rgba(255, 255, 255, 0.35)',
+      color: 'rgba(255, 255, 255, 0.3)',
       glow: 'none',
       badgeBg: 'bg-white/5',
       badgeText: 'text-[#86868B]',
-      label: 'AWAITING RESONANCE',
-      subtext: statusMessage || 'Both nodes in ground state',
+      label: 'AWAITING CHOICES',
+      subtext: statusMessage || 'Waiting for participant actions',
+      detail: 'Channel Idle',
       nodeAColor: 'border-white/20',
       nodeBColor: 'border-white/20',
     },
@@ -136,60 +135,64 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
       glow: 'drop-shadow(0 0 6px rgba(41, 151, 255, 0.4))',
       badgeBg: 'bg-[#2997FF]/10',
       badgeText: 'text-[#2997FF]',
-      label: 'SIGNAL EXCITATION',
-      subtext: statusMessage || `${activeRole === 'control' ? participantBName : participantAName} selecting instinct`,
-      nodeAColor: activeRole === 'explore' ? 'border-[#2997FF] shadow-[0_0_12px_rgba(41,151,255,0.4)]' : 'border-white/30',
-      nodeBColor: activeRole === 'control' ? 'border-[#2997FF] shadow-[0_0_12px_rgba(41,151,255,0.4)]' : 'border-white/30',
+      label: 'CHOICE IN PROGRESS',
+      subtext: statusMessage || `${activeRole === 'control' ? participantBName : participantAName} selecting`,
+      detail: 'Input Active',
+      nodeAColor: activeRole === 'explore' ? 'border-[#2997FF] shadow-[0_0_10px_rgba(41,151,255,0.35)]' : 'border-white/30',
+      nodeBColor: activeRole === 'control' ? 'border-[#2997FF] shadow-[0_0_10px_rgba(41,151,255,0.35)]' : 'border-white/30',
     },
     diverging: {
-      // Dissonance / phase offset: restrained warm amber (contrast without neon red)
+      // Truthful divergence when choices differ: restrained Apple Amber
       color: '#FF9F0A', // Apple Amber
       glow: 'drop-shadow(0 0 6px rgba(255, 159, 10, 0.35))',
       badgeBg: 'bg-[#FF9F0A]/10',
       badgeText: 'text-[#FF9F0A]',
-      label: 'PHASE OFFSET DETECTED',
-      subtext: statusMessage || 'Divergent polarity · Complementary instincts',
-      nodeAColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.3)]',
-      nodeBColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.3)]',
+      label: 'DISTINCT CHOICES',
+      subtext: statusMessage || 'Contrasting viewpoints selected',
+      detail: 'Phase Split',
+      nodeAColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.25)]',
+      nodeBColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.25)]',
     },
     synchronizing: {
       color: '#34C759', // Apple Green
-      glow: 'drop-shadow(0 0 8px rgba(52, 199, 89, 0.45))',
+      glow: 'drop-shadow(0 0 8px rgba(52, 199, 89, 0.4))',
       badgeBg: 'bg-[#34C759]/10',
       badgeText: 'text-[#34C759]',
-      label: 'HARMONIC LOCK',
-      subtext: statusMessage || 'Constructive interference · Resonance 92%',
-      nodeAColor: 'border-[#34C759] shadow-[0_0_12px_rgba(52,199,89,0.35)]',
-      nodeBColor: 'border-[#34C759] shadow-[0_0_12px_rgba(52,199,89,0.35)]',
+      label: 'CONSENSUS MATCH',
+      subtext: statusMessage || 'Both choices aligned',
+      detail: 'Resonant Lock',
+      nodeAColor: 'border-[#34C759] shadow-[0_0_10px_rgba(52,199,89,0.3)]',
+      nodeBColor: 'border-[#34C759] shadow-[0_0_10px_rgba(52,199,89,0.3)]',
     },
     collaborating: {
       color: '#30D158', // Apple Mint/Cyan
-      glow: 'drop-shadow(0 0 7px rgba(48, 209, 88, 0.4))',
+      glow: 'drop-shadow(0 0 7px rgba(48, 209, 88, 0.35))',
       badgeBg: 'bg-[#30D158]/10',
       badgeText: 'text-[#30D158]',
-      label: 'CO-EQUILIBRIUM FLUX',
-      subtext: statusMessage || 'Reciprocal adjustment active',
+      label: 'RECIPROCAL STEERING',
+      subtext: statusMessage || 'Balancing temperature & pressure controls',
+      detail: 'Live Adjustment',
       nodeAColor: 'border-[#2997FF]',
       nodeBColor: 'border-[#30D158]',
     },
     completing: {
       color: '#64D2FF', // Apple Cyan
-      glow: 'drop-shadow(0 0 10px rgba(100, 210, 255, 0.5))',
+      glow: 'drop-shadow(0 0 10px rgba(100, 210, 255, 0.45))',
       badgeBg: 'bg-[#64D2FF]/10',
       badgeText: 'text-[#64D2FF]',
       label: 'EQUILIBRIUM ACHIEVED',
-      subtext: statusMessage || 'Field convergence stabilized',
-      nodeAColor: 'border-[#64D2FF] shadow-[0_0_14px_rgba(100,210,255,0.4)]',
-      nodeBColor: 'border-[#64D2FF] shadow-[0_0_14px_rgba(100,210,255,0.4)]',
+      subtext: statusMessage || 'Stage complete · Results recorded',
+      detail: 'Verified Hold',
+      nodeAColor: 'border-[#64D2FF] shadow-[0_0_12px_rgba(100,210,255,0.35)]',
+      nodeBColor: 'border-[#64D2FF] shadow-[0_0_12px_rgba(100,210,255,0.35)]',
     },
   }[normalizedState];
 
-  // Construct mathematical wave path
+  // Mathematical wave generation with windowing envelope (tapers cleanly to anchor points)
   const points = 32;
   let primaryPath = `M ${startX} ${midY}`;
   let secondaryPath = `M ${startX} ${midY}`;
 
-  // Amplitudes
   const baseAmp =
     normalizedState === 'waiting'
       ? 5
@@ -206,43 +209,27 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
   for (let i = 1; i <= points; i++) {
     const t = i / points;
     const x = startX + t * (endX - startX);
-    const envelope = Math.sin(t * Math.PI); // Windowing envelope so wave tapers to zero at both node anchors
+    const envelope = Math.sin(t * Math.PI);
 
     if (normalizedState === 'diverging') {
-      // Destructive interference: Primary wave and opposing secondary wave with 180° phase dissonance
+      // Dissonance pattern: Two anti-phase wave lines showing divergence without faking sync
       const y1 = midY + Math.sin(t * Math.PI * 4 + phase) * baseAmp * envelope;
       const y2 = midY + Math.sin(t * Math.PI * 4 - phase + Math.PI) * (baseAmp * 0.85) * envelope;
       primaryPath += ` L ${x.toFixed(1)} ${y1.toFixed(1)}`;
       secondaryPath += ` L ${x.toFixed(1)} ${y2.toFixed(1)}`;
     } else if (normalizedState === 'collaborating') {
-      // Dual harmonic carrier lines representing bidirectional steering
+      // Dual carrier lines showing reciprocal input
       const y1 = midY + Math.sin(t * Math.PI * 3 + phase) * baseAmp * envelope;
       const y2 = midY + Math.sin(t * Math.PI * 5 - phase * 0.7) * (baseAmp * 0.6) * envelope;
       primaryPath += ` L ${x.toFixed(1)} ${y1.toFixed(1)}`;
       secondaryPath += ` L ${x.toFixed(1)} ${y2.toFixed(1)}`;
     } else {
-      // Coherent harmonic standing wave
+      // Smooth standing harmonic wave
       const harmonics = normalizedState === 'selecting' ? 5 : 3;
       const y = midY + Math.sin(t * Math.PI * harmonics + phase) * baseAmp * envelope;
       primaryPath += ` L ${x.toFixed(1)} ${y.toFixed(1)}`;
     }
   }
-
-  // Calculated coherence percentage if not provided
-  const displayCoherence =
-    typeof coherence === 'number'
-      ? coherence
-      : normalizedState === 'synchronizing'
-      ? 94
-      : normalizedState === 'completing'
-      ? 98
-      : normalizedState === 'collaborating'
-      ? 86
-      : normalizedState === 'selecting'
-      ? 74
-      : normalizedState === 'diverging'
-      ? 58
-      : 50;
 
   return (
     <div
@@ -282,14 +269,14 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
           )}
         </div>
 
-        {/* Central Field Instrument SVG */}
+        {/* Central Live Waveform Visualization */}
         <div className="flex-1 px-1 sm:px-2 flex flex-col items-center justify-center relative min-h-[64px]">
           <svg
             className="w-full h-full overflow-visible"
             viewBox={`0 0 ${width} ${height}`}
             style={{ filter: stateConfig.glow }}
           >
-            {/* Ambient Reference Gridline */}
+            {/* Guide Gridline */}
             <line
               x1={startX}
               y1={height / 2}
@@ -300,19 +287,19 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
               strokeDasharray="2 3"
             />
 
-            {/* In Diverging / Collaborating state: Show the out-of-phase secondary wave */}
+            {/* Out-of-phase secondary wave for diverging / collaborating */}
             {(normalizedState === 'diverging' || normalizedState === 'collaborating') && (
               <path
                 d={secondaryPath}
                 fill="none"
-                stroke={normalizedState === 'diverging' ? 'rgba(255, 159, 10, 0.5)' : 'rgba(48, 209, 88, 0.4)'}
+                stroke={normalizedState === 'diverging' ? 'rgba(255, 159, 10, 0.45)' : 'rgba(48, 209, 88, 0.4)'}
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeDasharray={normalizedState === 'diverging' ? '4 3' : undefined}
               />
             )}
 
-            {/* Primary Signal Wave */}
+            {/* Primary Signal Waveform */}
             <path
               d={primaryPath}
               fill="none"
@@ -323,7 +310,7 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
               strokeLinecap="round"
             />
 
-            {/* Central Equilibrium Resonance Indicator */}
+            {/* Center Status Node */}
             {normalizedState === 'completing' ? (
               <g transform={`translate(${width / 2}, ${height / 2})`}>
                 <circle r="9" fill="none" stroke="#64D2FF" strokeWidth="1.5" className="animate-pulse" />
@@ -352,15 +339,15 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
             )}
           </svg>
 
-          {/* Precision Signal Metadata & State Badge */}
+          {/* Transparent Operational Status Pill (No invented coherence percentages) */}
           <div className="flex items-center gap-2 mt-1">
             <span
               className={`px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-semibold ${stateConfig.badgeBg} ${stateConfig.badgeText}`}
             >
               {metricLabel || stateConfig.label}
             </span>
-            <span className="text-[10px] text-[#86868B] font-mono tabular-nums">
-              {displayCoherence}% COH
+            <span className="text-[10px] text-[#86868B] font-mono">
+              {stateConfig.detail}
             </span>
           </div>
 

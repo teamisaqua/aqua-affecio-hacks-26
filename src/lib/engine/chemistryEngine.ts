@@ -1,11 +1,14 @@
-import { ChemistryScore, ExperimentTelemetry } from '../types/chemistry';
+import { ChemistryScore, ExperimentTelemetry, DilemmaRecord } from '../types/chemistry';
 
 interface EngineInput {
-  reactorTimeSeconds: number;      // e.g. 24.5s
+  reactorTimeSeconds: number;      // e.g. 21.4s
   overshoots: number;              // how many times temp or pressure flew past target
   stabilizedSeconds: number;       // total time held in target window
-  dilemmaChoiceA: string | null;
-  dilemmaChoiceB: string | null;
+  dilemmaChoiceA?: string | null;
+  dilemmaChoiceB?: string | null;
+  dilemmaMatches?: number;         // number of matched dilemmas
+  dilemmaTotal?: number;           // total dilemmas evaluated
+  dilemmaHistory?: DilemmaRecord[];
   bondCompatibility?: number;      // 70 - 98
   responseLatencyDeltaMs?: number; // delta in ms between User A and User B locks
   bondElementAName?: string;
@@ -20,55 +23,57 @@ function clamp(value: number, min: number, max: number): number {
 
 export function computeChemistryScore(input: EngineInput): ChemistryScore {
   const {
-    reactorTimeSeconds,
-    overshoots,
+    reactorTimeSeconds = 21.4,
+    overshoots = 0,
     dilemmaChoiceA,
     dilemmaChoiceB,
-    bondCompatibility = 86,
-    responseLatencyDeltaMs = 820,
+    dilemmaMatches = dilemmaChoiceA && dilemmaChoiceB && dilemmaChoiceA === dilemmaChoiceB ? 1 : 0,
+    dilemmaTotal = 1,
+    dilemmaHistory = [],
+    bondCompatibility = 88,
+    responseLatencyDeltaMs = 780,
     bondElementAName = 'Carbon',
     bondElementBName = 'Oxygen',
-    dilemmaChoiceLabelA,
-    dilemmaChoiceLabelB,
+    dilemmaChoiceLabelA = 'Spontaneous Exploration',
+    dilemmaChoiceLabelB = 'Spontaneous Exploration',
   } = input;
 
   // 1. CHEMICAL REASONING (25% weight)
-  // Evaluates element bond harmonic resonance + chamber calibration accuracy
+  // Evaluates element bond valence + reactor containment hold
   const overshootDeduction = overshoots * 4;
   const rawReasoning = bondCompatibility * 0.5 + (100 - overshootDeduction) * 0.5;
   const chemicalReasoning = clamp(rawReasoning, 65, 98);
   const reasoningReason = overshoots === 0
-    ? `Precision calibration held within ±3° target with zero containment loss`
-    : `Stabilized despite ${overshoots} thermal spikes through adaptive correction`;
+    ? `Precision calibration held within ±3° target with 0 containment losses`
+    : `Stabilized despite ${overshoots} thermal spike(s) through adaptive actuator compensation`;
 
   // 2. DECISION ALIGNMENT (30% weight)
-  // Evaluates dilemma consensus + cognitive instinct harmony
-  const isDirectMatch = dilemmaChoiceA && dilemmaChoiceB && dilemmaChoiceA === dilemmaChoiceB;
-  const syncPenalty = Math.min(10, Math.floor(responseLatencyDeltaMs / 500));
-  const rawAlignment = isDirectMatch ? 94 : 80;
-  const decisionAlignment = clamp(rawAlignment - syncPenalty, 64, 96);
-  const alignmentReason = isDirectMatch
-    ? 'Identical instinct on the Dilemma decision node without prior alignment'
-    : 'Complementary viewpoints creating dynamic balance rather than friction';
+  // Evaluates real dilemma consensus rate + decision latency delta
+  const matchRatio = dilemmaTotal > 0 ? dilemmaMatches / dilemmaTotal : 1;
+  const syncPenalty = Math.min(8, Math.floor(responseLatencyDeltaMs / 500));
+  const rawAlignment = 72 + matchRatio * 24 - syncPenalty;
+  const decisionAlignment = clamp(rawAlignment, 64, 96);
+  const alignmentReason = dilemmaMatches === dilemmaTotal
+    ? `Identical instincts across ${dilemmaMatches} of ${dilemmaTotal} decision challenges without prior discussion`
+    : `Balanced dynamic: ${dilemmaMatches} of ${dilemmaTotal} consensus matches with complementary perspectives`;
 
   // 3. REACTION TIMING (25% weight)
   // Evaluates velocity to achieve stable equilibrium under the 45s clock
-  // Fast (e.g. 15-25s) gets high score 88-96; slower gets 70-84
-  const timeFactor = Math.max(0, reactorTimeSeconds - 14) * 1.1;
+  const timeFactor = Math.max(0, reactorTimeSeconds - 14) * 1.05;
   const rawTiming = 98 - timeFactor;
   const reactionTiming = clamp(rawTiming, 66, 96);
   const timingReason = reactorTimeSeconds < 25
-    ? `Rapid equilibrium achieved in ${reactorTimeSeconds.toFixed(1)} seconds`
-    : `Calculated steady convergence holding 3-second equilibrium`;
+    ? `Rapid equilibrium achieved in ${reactorTimeSeconds.toFixed(1)}s (under 45.0s clock)`
+    : `Deliberate steady convergence holding 3-second equilibrium`;
 
   // 4. RISK COMPATIBILITY (20% weight)
-  // Evaluates boldness under pressure, catalyst valve usage, and stability hold
-  const latencyBalance = Math.min(12, Math.floor(responseLatencyDeltaMs / 450));
-  const rawRisk = 90 - latencyBalance + (overshoots > 0 ? 4 : 8);
+  // Evaluates reciprocal pacing and coordination balance
+  const latencyBalance = Math.min(10, Math.floor(responseLatencyDeltaMs / 450));
+  const rawRisk = 88 - latencyBalance + (overshoots === 0 ? 8 : 4);
   const riskCompatibility = clamp(rawRisk, 65, 95);
-  const riskReason = latencyBalance < 5
-    ? `High mutual trust with reciprocal response timing (${responseLatencyDeltaMs}ms delta)`
-    : `Distinct risk tolerances that balanced each other when adjusting actuators`;
+  const riskReason = responseLatencyDeltaMs < 1200
+    ? `Tight reciprocal pacing with an average decision delta of ${responseLatencyDeltaMs}ms`
+    : `Distinct pacing tolerances that balanced each other during critical flux`;
 
   // PROPRIETARY AFFINITY INDEX (0 to 100)
   // Weighted: 25% Reasoning + 30% Alignment + 25% Timing + 20% Risk
@@ -80,18 +85,23 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
 
   const affinityIndex = clamp(weightedAffinity, 70, 96);
 
-  const headline = affinityIndex >= 82
-    ? 'Your chemistry is strong.'
-    : 'Interesting reaction.';
+  const headline = affinityIndex >= 84
+    ? 'High Collaborative Synergy'
+    : affinityIndex >= 76
+    ? 'Complementary Dynamic'
+    : 'Distinct Polarities';
 
   const telemetry: ExperimentTelemetry = {
     bondSummary: `${bondElementAName} + ${bondElementBName} · ${bondCompatibility}% Resonance`,
     bondMatch: bondCompatibility >= 80,
     reactorElapsedSeconds: reactorTimeSeconds,
     reactorOvershoots: overshoots,
-    dilemmaMatch: Boolean(isDirectMatch),
-    dilemmaChoiceLabelA: dilemmaChoiceLabelA || 'Spontaneous Road Trip',
-    dilemmaChoiceLabelB: dilemmaChoiceLabelB || (isDirectMatch ? dilemmaChoiceLabelA || 'Spontaneous Road Trip' : 'Hidden Culinary Spot'),
+    dilemmaMatchCount: dilemmaMatches,
+    dilemmaTotalCount: dilemmaTotal,
+    dilemmaMatch: dilemmaMatches > 0,
+    dilemmaHistory,
+    dilemmaChoiceLabelA,
+    dilemmaChoiceLabelB,
     responseLatencyDeltaMs,
   };
 
@@ -109,13 +119,11 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
       alignmentReason,
       timingReason,
       riskReason,
-      // Backwards compatibility aliases
       syncReason: alignmentReason,
       teamworkReason: reasoningReason,
       adaptabilityReason: timingReason,
       balanceReason: riskReason,
     },
-    // Backwards compatibility aliases
     synchronization: decisionAlignment,
     teamwork: chemicalReasoning,
     adaptability: reactionTiming,

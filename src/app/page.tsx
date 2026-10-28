@@ -27,6 +27,12 @@ export default function HomePage() {
     return code;
   };
 
+  const handleStartExperimentDirectly = () => {
+    sound.playSuccessChime();
+    const code = generateRoomCode();
+    router.push(`/lab/${code}?name=Alex&role=explore`);
+  };
+
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
     sound.playSuccessChime();
@@ -121,7 +127,7 @@ export default function HomePage() {
             variant="primary"
             size="md"
             className="w-full sm:w-auto px-7"
-            onClick={() => setModalMode('create')}
+            onClick={handleStartExperimentDirectly}
           >
             <span>Start an Experiment</span>
             <ArrowRight className="w-4 h-4" />

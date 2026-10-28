@@ -78,7 +78,19 @@ export interface DilemmaScenario {
   options: [DilemmaOption, DilemmaOption, DilemmaOption, DilemmaOption];
 }
 
+export interface DilemmaRecord {
+  scenarioId: string;
+  scenarioPrompt: string;
+  userAChoice: string;
+  userBChoice: string;
+  choiceLabelA: string;
+  choiceLabelB: string;
+  isMatch: boolean;
+}
+
 export interface DilemmaState {
+  scenarioIndex: number;
+  totalScenarios: number;
   scenario: DilemmaScenario;
   userAChoice: string | null;
   userBChoice: string | null;
@@ -86,6 +98,7 @@ export interface DilemmaState {
   isRevealed: boolean;
   isSynchronized: boolean;
   harmonyClassification: string;
+  history: DilemmaRecord[];
 }
 
 export interface ExperimentTelemetry {
@@ -93,7 +106,10 @@ export interface ExperimentTelemetry {
   bondMatch: boolean;
   reactorElapsedSeconds: number;
   reactorOvershoots: number;
+  dilemmaMatchCount: number;
+  dilemmaTotalCount: number;
   dilemmaMatch: boolean;
+  dilemmaHistory: DilemmaRecord[];
   dilemmaChoiceLabelA?: string;
   dilemmaChoiceLabelB?: string;
   responseLatencyDeltaMs?: number;
