@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #04060d;
+  --foreground: #f8fafc;
+  --cyan-glow: rgba(0, 240, 255, 0.4);
+  --pink-glow: rgba(255, 42, 133, 0.4);
+  --purple-glow: rgba(157, 78, 221, 0.4);
+}
+
+body {
+  color: var(--foreground);
+  background-color: var(--background);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Atmospheric Liquid Mesh Glow */
+.liquid-mesh-background {
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(157, 78, 221, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(0, 240, 255, 0.10) 0%, transparent 50%),
+    radial-gradient(circle at 50% 80%, rgba(255, 42, 133, 0.08) 0%, transparent 50%),
+    #03050c;
+}
+
+/* Premium Liquid Glass Surface */
+.glass-panel {
+  background: rgba(18, 24, 38, 0.55);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 
+    0 16px 40px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-panel-interactive {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-interactive:hover {
+  background: rgba(26, 34, 52, 0.65);
+  border-color: rgba(255, 255, 255, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 20px 48px -12px rgba(0, 0, 0, 0.8),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Glass Buttons */
+.glass-btn {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.2s ease-out;
+}
+.glass-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.24);
+  transform: translateY(-1px);
+}
+.glass-btn:active {
+  transform: translateY(1px);
+}
+
+/* Subtle Glowing Accents */
+.border-glow-cyan {
+  border-color: rgba(0, 240, 255, 0.45);
+  box-shadow: 0 0 20px -2px rgba(0, 240, 255, 0.25);
+}
+.border-glow-pink {
+  border-color: rgba(255, 42, 133, 0.45);
+  box-shadow: 0 0 20px -2px rgba(255, 42, 133, 0.25);
+}
+
+/* Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(3, 5, 12, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
