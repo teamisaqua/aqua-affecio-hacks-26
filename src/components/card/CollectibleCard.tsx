@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ChemistryScore, FictionalCompound } from '@/lib/types/chemistry';
-import { Share2, MessageCircle, Check, Copy, Sparkles } from 'lucide-react';
+import { MessageCircle, Check, Copy, Sparkles } from 'lucide-react';
 import { sound } from '@/lib/sound/soundEffects';
 
 interface CollectibleCardProps {
@@ -55,8 +55,8 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
         <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
           Chemistry Card
         </h2>
-        <p className="text-xs text-slate-400">
-          Interactive verified certificate of synthesis · Tilt to view depth
+        <p className="text-xs text-[#A1A1A6]">
+          Verified synthesis record · Tilt card to inspect depth
         </p>
       </div>
 
@@ -69,17 +69,13 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
         <motion.div
           animate={{ rotateX, rotateY }}
           transition={{ type: 'spring', stiffness: 280, damping: 25 }}
-          className="relative w-full max-w-sm rounded-[1.75rem] p-7 overflow-hidden border border-white/[0.14] bg-[#12141c]/90 backdrop-blur-2xl shadow-apple-hover"
+          className="relative w-full max-w-sm rounded-[24px] p-7 overflow-hidden border border-white/10 bg-[#1C1C1E] shadow-apple-card"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Subtle Reflective Sheen Layer */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.04] via-transparent to-white/[0.08] pointer-events-none" />
-          <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
           {/* Card Header: Laboratory Pass info */}
-          <div className="flex items-center justify-between text-[11px] text-slate-400 tracking-wide uppercase pb-4 border-b border-white/[0.08]">
-            <span className="font-medium text-slate-300">Affecio Lab Record</span>
-            <span className="text-sky-400 font-semibold">{compound.formula}</span>
+          <div className="flex items-center justify-between text-[11px] text-[#A1A1A6] tracking-wide uppercase pb-4 border-b border-white/10">
+            <span className="font-medium text-white">Affecio Laboratory</span>
+            <span className="text-apple-blue font-semibold">{compound.formula}</span>
           </div>
 
           {/* Card Body: Molecule Name & Overall Score */}
@@ -87,7 +83,7 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
             <div className="text-2xl font-bold tracking-tight text-white">
               {compound.name}
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[#A1A1A6]">
               {compound.classification}
             </div>
 
@@ -95,42 +91,42 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
               <span className="text-6xl font-light text-white tracking-tight">
                 {score.overall}
               </span>
-              <span className="text-2xl text-slate-400 font-normal ml-1">%</span>
+              <span className="text-2xl text-[#A1A1A6] font-normal ml-1">%</span>
             </div>
-            <div className="text-[11px] uppercase tracking-wider text-slate-400">
-              {userAName} & {userBName}
+            <div className="text-[11px] uppercase tracking-wider text-[#A1A1A6]">
+              Synthesized by {userAName} & {userBName}
             </div>
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-4 gap-2 py-3 border-y border-white/[0.08] text-center">
+          <div className="grid grid-cols-4 gap-2 py-3 border-y border-white/10 text-center">
             <div>
-              <div className="text-[10px] text-slate-500 uppercase font-medium">Team</div>
+              <div className="text-[10px] text-[#A1A1A6] uppercase font-medium">Team</div>
               <div className="text-xs font-semibold text-white tabular-data mt-0.5">{score.teamwork}</div>
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 uppercase font-medium">Sync</div>
+              <div className="text-[10px] text-[#A1A1A6] uppercase font-medium">Sync</div>
               <div className="text-xs font-semibold text-white tabular-data mt-0.5">{score.synchronization}</div>
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 uppercase font-medium">Adapt</div>
+              <div className="text-[10px] text-[#A1A1A6] uppercase font-medium">Adapt</div>
               <div className="text-xs font-semibold text-white tabular-data mt-0.5">{score.adaptability}</div>
             </div>
             <div>
-              <div className="text-[10px] text-slate-500 uppercase font-medium">Balance</div>
+              <div className="text-[10px] text-[#A1A1A6] uppercase font-medium">Balance</div>
               <div className="text-xs font-semibold text-white tabular-data mt-0.5">{score.balance}</div>
             </div>
           </div>
 
           {/* Lore Quote */}
-          <div className="mt-4 text-xs text-slate-400 italic text-center leading-relaxed">
+          <div className="mt-4 text-xs text-[#A1A1A6] italic text-center leading-relaxed">
             &ldquo;{compound.loreDescription}&rdquo;
           </div>
 
           {/* Card Footer */}
-          <div className="mt-5 pt-3 border-t border-white/[0.08] flex items-center justify-between text-[11px] text-slate-500">
-            <span className="flex items-center gap-1 text-emerald-400">
-              <Sparkles className="w-3 h-3" /> Verified Synthesis
+          <div className="mt-5 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-[#A1A1A6]">
+            <span className="flex items-center gap-1 text-apple-green">
+              <Sparkles className="w-3 h-3" /> Verified Reaction
             </span>
             <span>Affecio MVP</span>
           </div>
@@ -143,7 +139,7 @@ export const CollectibleCard: React.FC<CollectibleCardProps> = ({
           onClick={handleCopyLink}
           className="apple-btn-secondary w-full sm:w-auto px-6 text-xs"
         >
-          {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+          {copied ? <Check className="w-4 h-4 text-apple-green" /> : <Copy className="w-4 h-4" />}
           <span>{copied ? 'Link Copied' : 'Copy Card Link'}</span>
         </button>
 

@@ -26,7 +26,7 @@ import { CollectibleCard } from '@/components/card/CollectibleCard';
 import { CatalyticChat } from '@/components/conversation/CatalyticChat';
 import { DemoModeBar } from '@/components/demo/DemoModeBar';
 import { sound } from '@/lib/sound/soundEffects';
-import { Atom, ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 
 const initialTarget: ReactorTarget = {
   temp: 72,
@@ -274,13 +274,13 @@ export default function LabSessionPage() {
   const currentStepIdx = stepList.findIndex((s) => s.id === stage);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between p-4 md:p-8">
-      {/* Top Header & Navigation Bar */}
+    <div className="relative min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black">
+      {/* Top Header & Apple Navigation Bar */}
       <header className="max-w-5xl w-full mx-auto flex items-center justify-between pb-6">
         <div className="flex items-center space-x-3">
           <button
             onClick={() => router.push('/')}
-            className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/[0.12] active:bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all"
+            className="w-10 h-10 rounded-full bg-[#1C1C1E] hover:bg-[#2C2C2E] active:bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-[#A1A1A6] hover:text-white transition-all duration-120"
             title="Return to Portal"
             aria-label="Return to Portal"
           >
@@ -289,33 +289,30 @@ export default function LabSessionPage() {
           <div>
             <div className="text-sm font-semibold tracking-tight text-white flex items-center gap-1.5">
               <span>Affecio Lab</span>
-              <span className="text-slate-500 font-normal">·</span>
-              <span className="text-xs text-slate-400 font-mono">{sessionId}</span>
+              <span className="text-[#A1A1A6]/40 font-normal">·</span>
+              <span className="text-xs text-[#A1A1A6] font-mono">{sessionId}</span>
             </div>
-            <div className="text-xs text-slate-400">
-              Role: <span className={currentRole === 'observer' ? 'text-sky-400 font-medium' : 'text-rose-400 font-medium'}>{currentRole === 'observer' ? 'Observer' : 'Operator'}</span>
+            <div className="text-xs text-[#A1A1A6]">
+              Role: <span className="text-apple-blue font-medium">{currentRole === 'observer' ? 'Observer' : 'Operator'}</span>
             </div>
           </div>
         </div>
 
-        {/* Apple-style Step Progress Strip */}
-        <nav aria-label="Experiment Progress" className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+        {/* Apple Segmented Step Progress Indicator */}
+        <nav aria-label="Experiment Progress" className="hidden md:flex items-center space-x-1 p-1 rounded-full bg-[#1C1C1E] border border-white/10">
           {stepList.map((st, i) => (
             <div key={st.id} className="flex items-center">
               <span
-                className={`text-xs px-2.5 py-0.5 rounded-full transition-colors ${
+                className={`text-xs px-3 py-1 rounded-full transition-all duration-150 ${
                   st.id === stage
-                    ? 'bg-white text-black font-semibold'
+                    ? 'bg-white text-black font-semibold shadow-sm'
                     : i < currentStepIdx
-                    ? 'text-slate-300 font-medium'
-                    : 'text-slate-500'
+                    ? 'text-white font-medium'
+                    : 'text-[#A1A1A6]'
                 }`}
               >
                 {st.label}
               </span>
-              {i < stepList.length - 1 && (
-                <span className="text-slate-600 text-xs mx-0.5">/</span>
-              )}
             </div>
           ))}
         </nav>

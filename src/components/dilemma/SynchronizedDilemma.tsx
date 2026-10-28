@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { DilemmaState, DilemmaOption, UserRole } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
-import { Compass, Flame, Heart, Zap, Check, Sparkles } from 'lucide-react';
+import { Compass, Flame, Heart, Zap, Sparkles } from 'lucide-react';
 
 interface SynchronizedDilemmaProps {
   role: UserRole;
@@ -74,43 +74,43 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   const getOptionIcon = (archetype: DilemmaOption['archetype']) => {
     switch (archetype) {
       case 'spontaneous':
-        return <Flame className="w-4 h-4 text-amber-400" strokeWidth={1.75} />;
+        return <Flame className="w-4 h-4 text-apple-amber" strokeWidth={1.75} />;
       case 'calculated':
-        return <Compass className="w-4 h-4 text-sky-400" strokeWidth={1.75} />;
+        return <Compass className="w-4 h-4 text-apple-blue" strokeWidth={1.75} />;
       case 'adventurous':
-        return <Zap className="w-4 h-4 text-rose-400" strokeWidth={1.75} />;
+        return <Zap className="w-4 h-4 text-apple-red" strokeWidth={1.75} />;
       case 'intimate':
-        return <Heart className="w-4 h-4 text-indigo-400" strokeWidth={1.75} />;
+        return <Heart className="w-4 h-4 text-purple-400" strokeWidth={1.75} />;
     }
   };
 
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
-      {/* Dilemma Header */}
+      {/* Strict Visual Hierarchy: Experiment Number -> Title -> Short Objective */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 text-slate-300 text-xs font-medium tracking-wide">
-          <span>Experiment 02</span>
-          <span className="text-slate-500">·</span>
-          <span>Synchronized Dilemma</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[#A1A1A6] text-xs font-medium uppercase tracking-wider">
+          <span>Experiment 02 of 02</span>
+          <span className="text-white/20">·</span>
+          <span>Intuitive Synchronization</span>
         </div>
-        <h2 className="text-2xl md:text-3xl font-semibold text-white tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
           {state.scenario.prompt}
         </h2>
-        <p className="text-sm text-slate-400 max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-md mx-auto leading-relaxed">
           {state.scenario.context}
         </p>
       </div>
 
-      {/* Countdown Presentation */}
+      {/* Countdown Reveal Presentation */}
       <AnimatePresence>
         {countdown !== null && countdown > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="p-8 text-center rounded-2xl apple-glass border-sky-500/30"
+            className="p-8 text-center rounded-[20px] bg-[#1C1C1E] border border-apple-blue/40"
           >
-            <div className="text-xs uppercase tracking-wider text-slate-400 mb-1">
+            <div className="text-xs uppercase tracking-wider text-[#A1A1A6] mb-1 font-medium">
               Revealing Selections
             </div>
             <div className="text-6xl font-light tabular-data text-white">
@@ -120,7 +120,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Options Grid */}
+      {/* Dilemma Option Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
         {state.scenario.options.map((option) => {
           const isMyPick = myChoice === option.id;
@@ -133,22 +133,22 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
               onClick={() => !isRevealed && handleSelect(option.id)}
               interactive={!isRevealed}
               className={`p-5 transition-all ${
-                isMyPick ? 'ring-2 ring-sky-400 bg-white/[0.08]' : ''
-              } ${isRevealed && isPartnerPick && !isMyPick ? 'ring-2 ring-rose-400/80' : ''}`}
+                isMyPick ? 'ring-2 ring-apple-blue bg-[#2C2C2E]' : 'bg-[#1C1C1E]'
+              } ${isRevealed && isPartnerPick && !isMyPick ? 'ring-2 ring-apple-green bg-[#2C2C2E]' : ''}`}
             >
               <div className="flex items-start justify-between">
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#2C2C2E] border border-white/10 flex items-center justify-center mb-3">
                   {getOptionIcon(option.archetype)}
                 </div>
 
                 <div className="flex items-center gap-1.5">
                   {isMyPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-sky-500/20 text-sky-300 text-[11px] font-medium border border-sky-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-medium border border-blue-500/30">
                       Your Choice
                     </span>
                   )}
                   {isRevealed && isPartnerPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[11px] font-medium border border-rose-500/30">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-medium border border-emerald-500/30">
                       {partnerName}&apos;s Choice
                     </span>
                   )}
@@ -158,7 +158,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
               <h3 className="text-base font-semibold text-white tracking-tight mb-1">
                 {option.label}
               </h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-[#A1A1A6] leading-relaxed">
                 {option.subtext}
               </p>
             </LiquidGlassPanel>
@@ -167,15 +167,15 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
       </div>
 
       {/* Lock-in Status Bar */}
-      <div className="p-4 rounded-2xl apple-glass flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center space-x-5 text-slate-300">
+      <div className="p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center space-x-5 text-white">
           <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+            <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-apple-green' : 'bg-slate-600'}`} />
             <span>You: {myChoice ? 'Locked In' : 'Selecting...'}</span>
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-emerald-400' : 'bg-slate-600'}`} />
+            <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-apple-green' : 'bg-slate-600'}`} />
             <span>{partnerName}: {partnerChoice ? 'Locked In' : 'Selecting...'}</span>
           </div>
         </div>
@@ -195,17 +195,17 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-6 rounded-2xl border text-center space-y-1.5 ${
+          className={`p-6 rounded-[20px] border text-center space-y-1.5 ${
             state.userAChoice === state.userBChoice
-              ? 'bg-emerald-950/20 border-emerald-500/30'
-              : 'bg-indigo-950/20 border-indigo-500/30'
+              ? 'bg-[#1C1C1E] border-apple-green/40'
+              : 'bg-[#1C1C1E] border-apple-blue/40'
           }`}
         >
           <div className="flex items-center justify-center gap-1.5 font-semibold text-white text-base">
-            <Sparkles className="w-4 h-4 text-sky-400" />
+            <Sparkles className="w-4 h-4 text-apple-blue" />
             <span>{state.userAChoice === state.userBChoice ? 'Synchronized Consensus' : 'Complementary Perspectives'}</span>
           </div>
-          <p className="text-xs text-slate-300 max-w-md mx-auto">
+          <p className="text-xs text-[#A1A1A6] max-w-md mx-auto">
             {state.userAChoice === state.userBChoice
               ? 'Direct instinctive alignment across both participants.'
               : 'Differing choices reflect balanced polarities and depth.'}

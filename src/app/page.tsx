@@ -55,18 +55,18 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 relative">
+    <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black relative">
       {/* Top Navbar */}
       <header className="max-w-5xl w-full mx-auto flex items-center justify-between pb-8">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/10 flex items-center justify-center text-sky-400">
+          <div className="w-10 h-10 rounded-full bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-apple-blue">
             <Atom className="w-5 h-5" strokeWidth={1.75} />
           </div>
           <div>
             <div className="text-sm font-semibold tracking-tight text-white">
               AFFECIO
             </div>
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-[#A1A1A6]">
               Chemistry Lab
             </div>
           </div>
@@ -78,13 +78,13 @@ export default function HomePage() {
       {/* Hero Body */}
       <div className="flex-1 max-w-3xl w-full mx-auto flex flex-col justify-center items-center text-center space-y-8 py-6">
         {/* Apple Pill Tag */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] border border-white/10 text-xs font-medium text-slate-300">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1C1E] border border-white/10 text-xs font-medium text-[#A1A1A6]">
           <span>Match</span>
-          <span className="text-slate-500">→</span>
+          <span className="text-white/20">→</span>
           <span>Experience</span>
-          <span className="text-slate-500">→</span>
+          <span className="text-white/20">→</span>
           <span>Collaborate</span>
-          <span className="text-slate-500">→</span>
+          <span className="text-white/20">→</span>
           <span className="text-white font-semibold">Connect</span>
         </div>
 
@@ -93,16 +93,16 @@ export default function HomePage() {
           <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-tight">
             Don&apos;t just match. Discover your chemistry.
           </h1>
-          <p className="text-slate-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+          <p className="text-[#A1A1A6] text-sm md:text-base max-w-xl mx-auto leading-relaxed">
             Connection is something you experience together. Enter a shared virtual laboratory to solve short collaborative challenges and measure real-time affinity.
           </p>
         </div>
 
         {/* Action Panel */}
-        <LiquidGlassPanel className="p-6 md:p-8 w-full max-w-lg text-left space-y-6">
+        <LiquidGlassPanel variant="hero" className="p-6 md:p-8 w-full max-w-lg text-left space-y-6 bg-[#1C1C1E]">
           <div className="space-y-4">
             <div>
-              <label htmlFor="handle-input" className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
+              <label htmlFor="handle-input" className="block text-xs font-medium text-[#A1A1A6] uppercase tracking-wide mb-2">
                 Your Name or Handle
               </label>
               <input
@@ -111,13 +111,13 @@ export default function HomePage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Aria"
-                className="w-full px-4 py-3 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400/50 text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] focus:outline-none focus:border-apple-blue/50 text-sm"
               />
             </div>
 
             {/* Role Selection (Apple Segmented Style) */}
             <div>
-              <span id="role-select-label" className="block text-xs font-medium text-slate-400 uppercase tracking-wide mb-2">
+              <span id="role-select-label" className="block text-xs font-medium text-[#A1A1A6] uppercase tracking-wide mb-2">
                 Starting Role
               </span>
               <div role="radiogroup" aria-labelledby="role-select-label" className="grid grid-cols-2 gap-2.5">
@@ -126,17 +126,17 @@ export default function HomePage() {
                   role="radio"
                   aria-checked={selectedRole === 'observer'}
                   onClick={() => setSelectedRole('observer')}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
+                  className={`p-3.5 rounded-[14px] border text-left transition-all duration-120 ${
                     selectedRole === 'observer'
-                      ? 'bg-sky-500/10 border-sky-500/40 text-white'
-                      : 'bg-white/[0.03] border-white/10 text-slate-400 hover:text-white'
+                      ? 'bg-[#2C2C2E] border-apple-blue/50 text-white ring-1 ring-apple-blue/40'
+                      : 'bg-[#2C2C2E]/50 border-white/10 text-[#A1A1A6] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue">
                     <Eye className="w-3.5 h-3.5" />
                     <span>Observer</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1">Holds target dials</div>
+                  <div className="text-[11px] text-[#A1A1A6] mt-1">Holds target dials</div>
                 </button>
 
                 <button
@@ -144,17 +144,17 @@ export default function HomePage() {
                   role="radio"
                   aria-checked={selectedRole === 'operator'}
                   onClick={() => setSelectedRole('operator')}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
+                  className={`p-3.5 rounded-[14px] border text-left transition-all duration-120 ${
                     selectedRole === 'operator'
-                      ? 'bg-rose-500/10 border-rose-500/40 text-white'
-                      : 'bg-white/[0.03] border-white/10 text-slate-400 hover:text-white'
+                      ? 'bg-[#2C2C2E] border-apple-blue/50 text-white ring-1 ring-apple-blue/40'
+                      : 'bg-[#2C2C2E]/50 border-white/10 text-[#A1A1A6] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-rose-400">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue">
                     <Wrench className="w-3.5 h-3.5" />
                     <span>Operator</span>
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-1">Controls the sliders</div>
+                  <div className="text-[11px] text-[#A1A1A6] mt-1">Controls the sliders</div>
                 </button>
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function HomePage() {
                 onChange={(e) => setRoomCode(e.target.value)}
                 placeholder="Code (e.g. LAB-482)"
                 aria-label="Chamber Code to Join"
-                className="w-32 px-3 py-2.5 rounded-full bg-white/[0.04] border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:border-sky-400/50 text-xs text-center uppercase"
+                className="w-32 px-3 py-2.5 rounded-full bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] focus:outline-none focus:border-apple-blue/50 text-xs text-center uppercase"
               />
               <button
                 onClick={handleJoinRoom}
@@ -189,7 +189,7 @@ export default function HomePage() {
           </div>
 
           {/* Hackathon Demo Launcher */}
-          <div className="pt-4 border-t border-white/[0.08] text-center">
+          <div className="pt-4 border-t border-white/10 text-center">
             <button
               onClick={handleLaunchDemo}
               className="apple-btn-tinted w-full"
@@ -197,7 +197,7 @@ export default function HomePage() {
               <Play className="w-3.5 h-3.5 fill-current" />
               <span>Launch Hackathon Demo Mode</span>
             </button>
-            <p className="text-[11px] text-slate-400 mt-2">
+            <p className="text-[11px] text-[#A1A1A6] mt-2">
               Pre-configured single-screen chamber with presenter controller and partner simulation.
             </p>
           </div>
@@ -206,17 +206,17 @@ export default function HomePage() {
         {/* 7 Experiences Overview Strip */}
         <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 w-full max-w-4xl">
           {experiences.map((exp) => (
-            <div key={exp.num} className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-center">
-              <div className="text-[10px] text-slate-400 font-mono">{exp.num}</div>
-              <div className="text-xs font-semibold text-slate-300 mt-0.5">{exp.title}</div>
-              <div className="text-[10px] text-slate-400 mt-0.5">{exp.desc}</div>
+            <div key={exp.num} className="p-3.5 rounded-[14px] bg-[#1C1C1E] border border-white/10 text-center">
+              <div className="text-[10px] text-[#A1A1A6] font-mono">{exp.num}</div>
+              <div className="text-xs font-semibold text-white mt-0.5">{exp.title}</div>
+              <div className="text-[10px] text-[#A1A1A6] mt-0.5">{exp.desc}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="max-w-5xl w-full mx-auto text-center py-4 text-xs text-slate-500 border-t border-white/[0.06]">
+      <footer className="max-w-5xl w-full mx-auto text-center py-4 text-xs text-[#A1A1A6] border-t border-white/10">
         AFFECIO CHEMISTRY LAB · Team Aqua
       </footer>
     </div>

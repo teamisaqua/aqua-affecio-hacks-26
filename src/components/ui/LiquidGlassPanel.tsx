@@ -2,37 +2,43 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface LiquidGlassPanelProps extends React.HTMLAttributes<HTMLDivElement> {
-  tint?: 'cyan' | 'rose' | 'emerald' | 'amber' | 'none';
+  variant?: 'primary' | 'secondary' | 'hero';
+  tint?: 'blue' | 'green' | 'amber' | 'red' | 'none';
   interactive?: boolean;
 }
 
 export const LiquidGlassPanel: React.FC<LiquidGlassPanelProps> = ({
   children,
   className,
+  variant = 'primary',
   tint = 'none',
   interactive = false,
   ...props
 }) => {
+  const variantClasses = {
+    hero: 'apple-card-hero',
+    primary: 'apple-card',
+    secondary: 'apple-card-secondary',
+  };
+
   const tintClasses = {
     none: '',
-    cyan: 'border-sky-500/25 bg-gradient-to-b from-sky-500/[0.04] to-transparent',
-    rose: 'border-rose-500/25 bg-gradient-to-b from-rose-500/[0.04] to-transparent',
-    emerald: 'border-emerald-500/25 bg-gradient-to-b from-emerald-500/[0.04] to-transparent',
-    amber: 'border-amber-500/25 bg-gradient-to-b from-amber-500/[0.04] to-transparent',
+    blue: 'border-apple-blue/30',
+    green: 'border-apple-green/30',
+    amber: 'border-apple-amber/30',
+    red: 'border-apple-red/30',
   };
 
   return (
     <div
       className={cn(
-        'apple-glass rounded-2xl relative overflow-hidden',
+        variantClasses[variant],
         tintClasses[tint],
-        interactive && 'apple-glass-interactive cursor-pointer',
+        interactive && 'transition-all duration-150 hover:bg-[#242426] cursor-pointer',
         className
       )}
       {...props}
     >
-      {/* Hairline top specular edge highlight */}
-      <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.15] to-transparent pointer-events-none" />
       {children}
     </div>
   );

@@ -82,13 +82,13 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
           try {
             confetti({
-              particleCount: 60,
+              particleCount: 50,
               spread: 60,
               origin: { y: 0.6 },
-              colors: ['#38bdf8', '#34c759', '#2997ff', '#fb7185'],
+              colors: ['#2997FF', '#34C759', '#38BDF8'],
             });
           } catch {
-            // ignore confetti error
+            // ignore confetti
           }
 
           setTimeout(() => {
@@ -136,32 +136,46 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Top Status Console */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl apple-glass">
-        {/* Timer */}
+      {/* Strict Visual Hierarchy: Experiment Number -> Title -> Short Objective */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[#A1A1A6] text-xs font-medium uppercase tracking-wider">
+          <span>Experiment 01 of 02</span>
+          <span className="text-white/20">·</span>
+          <span className="text-apple-blue font-semibold">Hero Challenge</span>
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
+          Asymmetric Reactor Calibration
+        </h2>
+        <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-lg mx-auto leading-relaxed">
+          Neither participant can solve this alone. The Observer directs while the Operator tunes instruments.
+        </p>
+      </div>
+
+      {/* Top Status Bar: Timer & Status */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/10 text-slate-300 flex items-center justify-center">
-            <Timer className="w-4 h-4 text-sky-400" strokeWidth={1.75} />
+          <div className="w-10 h-10 rounded-full bg-[#2C2C2E] border border-white/10 text-white flex items-center justify-center">
+            <Timer className="w-4 h-4 text-apple-blue" strokeWidth={1.75} />
           </div>
           <div>
-            <div className="text-[11px] font-medium text-slate-400 tracking-wide uppercase">
+            <div className="text-[11px] font-medium text-[#A1A1A6] uppercase tracking-wide">
               Time Remaining
             </div>
-            <div className={`text-xl font-semibold tabular-data ${timeLeft < 10 ? 'text-rose-400 animate-pulse' : 'text-white'}`}>
+            <div className={`text-xl font-semibold tabular-data ${timeLeft < 10 ? 'text-apple-red animate-pulse' : 'text-white'}`}>
               00:{timeLeft.toString().padStart(2, '0')}
             </div>
           </div>
         </div>
 
-        {/* Demo Mode Role Switcher (Apple-style Segmented Control) */}
+        {/* Demo Mode Role Switcher */}
         {demoMode && (
-          <div className="flex items-center p-1 rounded-full bg-black/40 border border-white/10">
+          <div className="flex items-center p-1 rounded-full bg-[#2C2C2E] border border-white/10">
             <button
               onClick={() => setActiveTabRole('observer')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 activeTabRole === 'observer'
                   ? 'bg-white text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-[#A1A1A6] hover:text-white'
               }`}
             >
               Observer
@@ -171,7 +185,7 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 activeTabRole === 'operator'
                   ? 'bg-white text-black shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  : 'text-[#A1A1A6] hover:text-white'
               }`}
             >
               Operator
@@ -179,25 +193,25 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
           </div>
         )}
 
-        {/* Status Badge */}
+        {/* Reaction Status Indicator */}
         <div className="flex items-center space-x-2 text-xs">
           {state.isSuccess ? (
-            <span className="flex items-center gap-1.5 text-emerald-400 font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+            <span className="flex items-center gap-1.5 text-apple-green font-medium bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/30">
               <CheckCircle2 className="w-3.5 h-3.5" /> Reaction Successful
             </span>
           ) : state.isStabilized ? (
-            <span className="flex items-center gap-1.5 text-sky-300 font-medium bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/30">
-              <Sparkles className="w-3.5 h-3.5 text-sky-400" /> Stabilizing ({state.stabilityPercentage}%)
+            <span className="flex items-center gap-1.5 text-apple-blue font-medium bg-blue-500/10 px-3.5 py-1 rounded-full border border-blue-500/30">
+              <Sparkles className="w-3.5 h-3.5" /> Stabilizing ({state.stabilityPercentage}%)
             </span>
           ) : (
-            <span className="text-slate-300 bg-white/[0.05] px-3 py-1 rounded-full border border-white/10">
+            <span className="text-[#A1A1A6] bg-[#2C2C2E] px-3.5 py-1 rounded-full border border-white/10">
               Awaiting Target Match
             </span>
           )}
         </div>
       </div>
 
-      {/* Central Glassware Visualizer */}
+      {/* Primary Visual Instrument (Reactor Vessel) */}
       <div className="py-2">
         <ReactorVessel
           currentTemp={state.currentTemp}
@@ -230,13 +244,13 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
       {/* Success Notification Banner */}
       {state.isSuccess && (
-        <div className="p-6 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-center space-y-1.5 animate-fadeIn">
-          <h2 className="text-lg md:text-xl font-semibold text-white tracking-tight flex items-center justify-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            Reaction Synthesis Achieved
-          </h2>
-          <p className="text-xs text-slate-300">
-            Chamber stabilized in {state.elapsedSeconds.toFixed(1)} seconds. Advancing to Synchronized Dilemma...
+        <div className="p-6 rounded-[20px] bg-[#1C1C1E] border border-apple-green/40 text-center space-y-1.5">
+          <h3 className="text-lg font-semibold text-white tracking-tight flex items-center justify-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-apple-green" />
+            Reaction Equilibrium Reached
+          </h3>
+          <p className="text-xs text-[#A1A1A6]">
+            Stabilized in {state.elapsedSeconds.toFixed(1)} seconds. Advancing to Synchronized Dilemma...
           </p>
         </div>
       )}
