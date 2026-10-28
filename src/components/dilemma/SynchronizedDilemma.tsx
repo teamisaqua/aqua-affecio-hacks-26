@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DilemmaState, DilemmaOption, UserRole } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
@@ -29,6 +29,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
 }) => {
   const [countdown, setCountdown] = useState<number | null>(null);
   const [revealed, setRevealed] = useState(false);
+  const isCountingDownRef = useRef(false);
 
   const isExplore = role === 'explore' || role === 'observer';
   const myChoice = isExplore ? state.userAChoice : state.userBChoice;
@@ -40,21 +41,29 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   const totalCount = state.totalScenarios ?? 3;
   const isFinalScenario = currentIndex >= totalCount - 1;
 
+  // Reset local state if scenarioIndex changes
+  useEffect(() => {
+    isCountingDownRef.current = false;
+    setCountdown(null);
+    setRevealed(false);
+  }, [state.scenarioIndex]);
+
   // When both users choose, start the 3-2-1 reveal countdown
   useEffect(() => {
-    if (bothSelected && !revealed && countdown === null) {
+    if (bothSelected && !revealed && !isCountingDownRef.current) {
+      isCountingDownRef.current = true;
       setCountdown(3);
       sound.playCountdownBeep(false);
 
       const timer3 = setTimeout(() => {
         setCountdown(2);
         sound.playCountdownBeep(false);
-      }, 900);
+      }, 750);
 
       const timer2 = setTimeout(() => {
         setCountdown(1);
         sound.playCountdownBeep(true);
-      }, 1800);
+      }, 1500);
 
       const timer1 = setTimeout(() => {
         setCountdown(0);
@@ -66,26 +75,22 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
           if (isFinalScenario) {
             onComplete();
           } else if (onAdvanceScenario) {
+            isCountingDownRef.current = false;
             setCountdown(null);
             setRevealed(false);
             onAdvanceScenario();
           }
-        }, 2800);
-      }, 2700);
+        }, 2400);
+      }, 2250);
 
       return () => {
         clearTimeout(timer3);
         clearTimeout(timer2);
         clearTimeout(timer1);
+        isCountingDownRef.current = false;
       };
     }
-  }, [bothSelected, revealed, countdown, isFinalScenario, onAdvanceScenario, onComplete]);
-
-  // Reset local state if scenarioIndex changes
-  useEffect(() => {
-    setCountdown(null);
-    setRevealed(false);
-  }, [state.scenarioIndex]);
+  }, [bothSelected, revealed, isFinalScenario, onAdvanceScenario, onComplete]);
 
   const handleSelect = (optionId: string) => {
     sound.playGlassClick();

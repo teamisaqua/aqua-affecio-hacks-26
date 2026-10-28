@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ELEMENTS, synthesizeBond } from '@/lib/compound/bondElements';
 import { BondResult, UserRole } from '@/lib/types/chemistry';
@@ -31,6 +31,7 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [bondResult, setBondResult] = useState<BondResult | null>(null);
+  const isCountingDownRef = useRef(false);
 
   const isExplore = role === 'explore' || role === 'observer';
   const myChoice = isExplore ? userAChoice : userBChoice;
@@ -46,28 +47,47 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
 
   // When both users have chosen, trigger the 3-2-1 countdown reveal
   useEffect(() => {
-    if (userAChoice && userBChoice && countdown === null && !bondResult) {
+    if (userAChoice && userBChoice && !bondResult && !isCountingDownRef.current) {
+      isCountingDownRef.current = true;
       setCountdown(3);
       sound.playCountdownBeep(false);
 
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev === null) return null;
-          if (prev <= 1) {
-            clearInterval(timer);
-            const synthesized = synthesizeBond(userAChoice, userBChoice);
-            setBondResult(synthesized);
-            sound.playSuccessChime();
-            return null;
-          }
-          sound.playCountdownBeep(prev === 2);
-          return prev - 1;
-        });
-      }, 900);
+      const t2 = setTimeout(() => {
+        setCountdown(2);
+        sound.playCountdownBeep(false);
+      }, 750);
 
-      return () => clearInterval(timer);
+      const t1 = setTimeout(() => {
+        setCountdown(1);
+        sound.playCountdownBeep(true);
+      }, 1500);
+
+      const t0 = setTimeout(() => {
+        setCountdown(null);
+        const synthesized = synthesizeBond(userAChoice, userBChoice);
+        setBondResult(synthesized);
+        sound.playSuccessChime();
+        isCountingDownRef.current = false;
+      }, 2250);
+
+      return () => {
+        clearTimeout(t2);
+        clearTimeout(t1);
+        clearTimeout(t0);
+        isCountingDownRef.current = false;
+      };
     }
-  }, [userAChoice, userBChoice, countdown, bondResult]);
+  }, [userAChoice, userBChoice, bondResult]);
+
+  // If in demoMode and bond is synthesized, automatically advance after brief viewing
+  useEffect(() => {
+    if (bondResult && demoMode) {
+      const t = setTimeout(() => {
+        onComplete(bondResult);
+      }, 2400);
+      return () => clearTimeout(t);
+    }
+  }, [bondResult, demoMode, onComplete]);
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6 select-none">

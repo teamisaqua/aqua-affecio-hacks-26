@@ -39,6 +39,7 @@ export const ChoiceVotingGame: React.FC<ChoiceVotingGameProps> = ({
   const [isRevealed, setIsRevealed] = useState(false);
   const [history, setHistory] = useState<{ prompt: string; choiceA: string; choiceB: string; isMatch: boolean }[]>([]);
   const startTimeRef = useRef(Date.now());
+  const isCountingDownRef = useRef(false);
 
   const currentPrompt = prompts[roundIdx] || prompts[0];
   const myChoice = isUserA ? userAChoice : userBChoice;
@@ -50,24 +51,26 @@ export const ChoiceVotingGame: React.FC<ChoiceVotingGameProps> = ({
 
   // Synchronized 3-2-1 Reveal Countdown
   useEffect(() => {
-    if (bothSelected && !isRevealed && countdown === null) {
+    if (bothSelected && !isRevealed && !isCountingDownRef.current) {
+      isCountingDownRef.current = true;
       setCountdown(3);
       sound.playCountdownBeep(false);
 
       const t2 = setTimeout(() => {
         setCountdown(2);
         sound.playCountdownBeep(false);
-      }, 900);
+      }, 750);
 
       const t1 = setTimeout(() => {
         setCountdown(1);
         sound.playCountdownBeep(true);
-      }, 1800);
+      }, 1500);
 
       const t0 = setTimeout(() => {
         setCountdown(0);
         setIsRevealed(true);
         sound.playSuccessChime();
+        isCountingDownRef.current = false;
 
         // Record history
         const optA = currentPrompt.options.find((o) => o.id === userAChoice)?.label || userAChoice || '';
@@ -81,15 +84,16 @@ export const ChoiceVotingGame: React.FC<ChoiceVotingGameProps> = ({
             isMatch: userAChoice === userBChoice,
           },
         ]);
-      }, 2700);
+      }, 2250);
 
       return () => {
         clearTimeout(t2);
         clearTimeout(t1);
         clearTimeout(t0);
+        isCountingDownRef.current = false;
       };
     }
-  }, [bothSelected, isRevealed, countdown, currentPrompt, userAChoice, userBChoice]);
+  }, [bothSelected, isRevealed, currentPrompt, userAChoice, userBChoice]);
 
   const handlePick = (optionId: string) => {
     sound.playGlassClick();
