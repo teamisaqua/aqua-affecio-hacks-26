@@ -45,28 +45,28 @@ export const ObserverView: React.FC<ObserverViewProps> = ({
         </div>
       </div>
 
-      {/* Target Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+      {/* Target Metric Cards Stack */}
+      <div className="flex flex-col gap-3">
         {/* Metric 1: Temperature */}
-        <LiquidGlassPanel className="p-5 flex flex-col justify-between" tint={isTempGood ? 'green' : 'none'}>
+        <LiquidGlassPanel className="p-4 flex flex-col justify-between" tint={isTempGood ? 'green' : 'none'}>
           <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
             <span className="flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-apple-blue" /> Target Temperature</span>
             <span className="text-white font-semibold tabular-data">{target.temp} °C</span>
           </div>
 
-          <div className="my-4 text-center">
-            <div className="text-3xl font-semibold text-white tracking-tight tabular-data">
-              {state.currentTemp} <span className="text-sm font-normal text-[#A1A1A6]">°C</span>
+          <div className="my-2.5 flex items-center justify-between">
+            <div className="text-2xl font-semibold text-white tracking-tight tabular-data">
+              {state.currentTemp} <span className="text-xs font-normal text-[#A1A1A6]">°C</span>
             </div>
-            <div className={`mt-1.5 text-xs font-medium flex items-center justify-center gap-1 ${
-              isTempGood ? 'text-apple-green' : 'text-apple-amber'
+            <div className={`text-xs font-medium flex items-center gap-1 px-2.5 py-1 rounded-full ${
+              isTempGood ? 'bg-emerald-500/15 text-apple-green border border-emerald-500/30' : 'bg-amber-500/15 text-apple-amber border border-amber-500/30'
             }`}>
               {isTempGood ? (
-                <> <Check className="w-3.5 h-3.5" /> Target Held (±{target.tolerance}°) </>
+                <> <Check className="w-3 h-3" /> In Zone (±{target.tolerance}°) </>
               ) : tempDiff > 0 ? (
-                <> <ArrowDown className="w-3.5 h-3.5" /> Tell partner: Lower by {Math.abs(tempDiff)}° </>
+                <> <ArrowDown className="w-3 h-3" /> Lower by {Math.abs(tempDiff)}° </>
               ) : (
-                <> <ArrowUp className="w-3.5 h-3.5" /> Tell partner: Raise by {Math.abs(tempDiff)}° </>
+                <> <ArrowUp className="w-3 h-3" /> Raise by {Math.abs(tempDiff)}° </>
               )}
             </div>
           </div>
@@ -80,25 +80,25 @@ export const ObserverView: React.FC<ObserverViewProps> = ({
         </LiquidGlassPanel>
 
         {/* Metric 2: Pressure */}
-        <LiquidGlassPanel className="p-5 flex flex-col justify-between" tint={isPressureGood ? 'green' : 'none'}>
+        <LiquidGlassPanel className="p-4 flex flex-col justify-between" tint={isPressureGood ? 'green' : 'none'}>
           <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
             <span className="flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-apple-blue" /> Target Pressure</span>
             <span className="text-white font-semibold tabular-data">{target.pressure} bar</span>
           </div>
 
-          <div className="my-4 text-center">
-            <div className="text-3xl font-semibold text-white tracking-tight tabular-data">
-              {state.currentPressure.toFixed(1)} <span className="text-sm font-normal text-[#A1A1A6]">bar</span>
+          <div className="my-2.5 flex items-center justify-between">
+            <div className="text-2xl font-semibold text-white tracking-tight tabular-data">
+              {state.currentPressure.toFixed(1)} <span className="text-xs font-normal text-[#A1A1A6]">bar</span>
             </div>
-            <div className={`mt-1.5 text-xs font-medium flex items-center justify-center gap-1 ${
-              isPressureGood ? 'text-apple-green' : 'text-apple-amber'
+            <div className={`text-xs font-medium flex items-center gap-1 px-2.5 py-1 rounded-full ${
+              isPressureGood ? 'bg-emerald-500/15 text-apple-green border border-emerald-500/30' : 'bg-amber-500/15 text-apple-amber border border-amber-500/30'
             }`}>
               {isPressureGood ? (
-                <> <Check className="w-3.5 h-3.5" /> Pressure Held </>
+                <> <Check className="w-3 h-3" /> In Zone </>
               ) : pressureDiff > 0 ? (
-                <> <ArrowDown className="w-3.5 h-3.5" /> Tell partner: Release -{Math.abs(pressureDiff).toFixed(1)} bar </>
+                <> <ArrowDown className="w-3 h-3" /> Release -{Math.abs(pressureDiff).toFixed(1)} bar </>
               ) : (
-                <> <ArrowUp className="w-3.5 h-3.5" /> Tell partner: Increase +{Math.abs(pressureDiff).toFixed(1)} bar </>
+                <> <ArrowUp className="w-3 h-3" /> Add +{Math.abs(pressureDiff).toFixed(1)} bar </>
               )}
             </div>
           </div>
@@ -112,23 +112,23 @@ export const ObserverView: React.FC<ObserverViewProps> = ({
         </LiquidGlassPanel>
 
         {/* Metric 3: Stabilization Window */}
-        <LiquidGlassPanel className="p-5 flex flex-col justify-between">
+        <LiquidGlassPanel className="p-4 flex flex-col justify-between">
           <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
-            <span>Fluid Phase</span>
+            <span>Fluid Phase Target</span>
             <span className="text-apple-blue font-semibold">{target.colorName}</span>
           </div>
 
-          <div className="my-4 text-center">
-            <div className="text-xl font-semibold text-white tracking-tight">
+          <div className="my-2.5 flex items-center justify-between">
+            <div className="text-sm font-semibold text-white tracking-tight">
               {state.isStabilized ? 'Equilibrium Phase' : 'Active Calibration'}
             </div>
-            <p className="text-xs text-[#A1A1A6] mt-1">
-              {state.isStabilized ? 'Holding equilibrium...' : 'Guide partner with clear verbal cues'}
-            </p>
+            <div className="text-[11px] font-mono text-[#A1A1A6]">
+              3.0s Hold Target
+            </div>
           </div>
 
-          <div className="px-3 py-2 rounded-[12px] bg-[#2C2C2E] border border-white/10 text-xs text-[#A1A1A6] flex items-center justify-center gap-1.5">
-            <span>Hold stable for 3 continuous seconds</span>
+          <div className="px-3 py-1.5 rounded-[10px] bg-[#2C2C2E] border border-white/10 text-xs text-[#A1A1A6] flex items-center justify-center gap-1.5">
+            <span>Direct {partnerName} using clear verbal cues</span>
           </div>
         </LiquidGlassPanel>
       </div>

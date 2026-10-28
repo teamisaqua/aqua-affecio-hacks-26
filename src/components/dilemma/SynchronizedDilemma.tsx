@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { DilemmaState, DilemmaOption, UserRole } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
-import { Compass, Flame, Heart, Zap, Sparkles } from 'lucide-react';
+import { Compass, Flame, Heart, Zap, Sparkles, Activity } from 'lucide-react';
 
 interface SynchronizedDilemmaProps {
   role: UserRole;
@@ -85,130 +85,138 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
-      {/* Strict Visual Hierarchy: Experiment Number -> Title -> Short Objective */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[#A1A1A6] text-xs font-medium uppercase tracking-wider">
-          <span>Experiment 02 of 02</span>
-          <span className="text-white/20">·</span>
-          <span>Intuitive Synchronization</span>
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      {/* Experiment Protocol Header */}
+      <div className="flex flex-col sm:flex-row items-center justify-between pb-3 border-b border-white/10 text-xs font-mono gap-2">
+        <div className="flex items-center space-x-2">
+          <span className="px-2.5 py-1 rounded bg-[#2C2C2E] text-white font-bold">EXPERIMENT 02</span>
+          <span className="text-white text-sm font-semibold tracking-wide">SYNCHRONIZED DILEMMA</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
+        <div className="flex items-center space-x-2 text-[#A1A1A6]">
+          <Activity className="w-3.5 h-3.5 text-apple-blue" />
+          <span>COGNITIVE HARMONY PROTOCOL</span>
+        </div>
+      </div>
+
+      {/* Large Typography Scenario Prompt */}
+      <div className="text-center space-y-2 py-4">
+        <h2 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight leading-snug max-w-2xl mx-auto">
           {state.scenario.prompt}
         </h2>
-        <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-md mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-md mx-auto">
           {state.scenario.context}
         </p>
       </div>
 
-      {/* Countdown Reveal Presentation */}
+      {/* Synchronous 3-2-1 Reveal Countdown */}
       <AnimatePresence>
         {countdown !== null && countdown > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="p-8 text-center rounded-[20px] bg-[#1C1C1E] border border-apple-blue/40"
+            className="p-8 text-center rounded-[24px] bg-[#1C1C1E] border border-apple-blue/50 shadow-apple-card max-w-sm mx-auto"
           >
-            <div className="text-xs uppercase tracking-wider text-[#A1A1A6] mb-1 font-medium">
-              Revealing Selections
+            <div className="text-[11px] font-mono uppercase tracking-widest text-[#A1A1A6] mb-1">
+              REVEALING HARMONY IN
             </div>
-            <div className="text-6xl font-light tabular-data text-white">
+            <div className="text-7xl font-light tabular-data text-white font-mono">
               {countdown}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Dilemma Option Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      {/* Decision Quadrant Options */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {state.scenario.options.map((option) => {
           const isMyPick = myChoice === option.id;
           const isPartnerPick = partnerChoice === option.id;
           const isRevealed = countdown === 0 || state.isRevealed;
 
           return (
-            <LiquidGlassPanel
+            <div
               key={option.id}
               onClick={() => !isRevealed && handleSelect(option.id)}
-              interactive={!isRevealed}
-              className={`p-5 transition-all ${
-                isMyPick ? 'ring-2 ring-apple-blue bg-[#2C2C2E]' : 'bg-[#1C1C1E]'
-              } ${isRevealed && isPartnerPick && !isMyPick ? 'ring-2 ring-apple-green bg-[#2C2C2E]' : ''}`}
+              className={`p-6 rounded-[20px] transition-all duration-150 border cursor-pointer ${
+                isMyPick
+                  ? 'bg-[#2C2C2E] border-apple-blue ring-1 ring-apple-blue/50'
+                  : 'bg-[#1C1C1E] border-white/10 hover:border-white/20'
+              } ${isRevealed && isPartnerPick && !isMyPick ? 'ring-1 ring-apple-green border-apple-green/60' : ''}`}
             >
-              <div className="flex items-start justify-between">
-                <div className="w-8 h-8 rounded-full bg-[#2C2C2E] border border-white/10 flex items-center justify-center mb-3">
+              <div className="flex items-start justify-between mb-3">
+                <div className="w-9 h-9 rounded-full bg-[#2C2C2E] border border-white/10 flex items-center justify-center">
                   {getOptionIcon(option.archetype)}
                 </div>
 
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 font-mono text-[10px]">
                   {isMyPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-medium border border-blue-500/30">
-                      Your Choice
+                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold border border-blue-500/30">
+                      YOUR LOCK
                     </span>
                   )}
                   {isRevealed && isPartnerPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[11px] font-medium border border-emerald-500/30">
-                      {partnerName}&apos;s Choice
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                      {partnerName.toUpperCase()}&apos;S LOCK
                     </span>
                   )}
                 </div>
               </div>
 
-              <h3 className="text-base font-semibold text-white tracking-tight mb-1">
+              <h3 className="text-lg font-semibold text-white tracking-tight mb-1">
                 {option.label}
               </h3>
               <p className="text-xs text-[#A1A1A6] leading-relaxed">
                 {option.subtext}
               </p>
-            </LiquidGlassPanel>
+            </div>
           );
         })}
       </div>
 
-      {/* Lock-in Status Bar */}
-      <div className="p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
-        <div className="flex items-center space-x-5 text-white">
+      {/* Lock Status Console */}
+      <div className="p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <div className="flex items-center space-x-6 text-white">
           <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-apple-green' : 'bg-slate-600'}`} />
-            <span>You: {myChoice ? 'Locked In' : 'Selecting...'}</span>
+            <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-apple-green' : 'bg-white/20'}`} />
+            <span>YOU: {myChoice ? 'LOCKED' : 'CALCULATING...'}</span>
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-apple-green' : 'bg-slate-600'}`} />
-            <span>{partnerName}: {partnerChoice ? 'Locked In' : 'Selecting...'}</span>
+            <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-apple-green' : 'bg-white/20'}`} />
+            <span>{partnerName.toUpperCase()}: {partnerChoice ? 'LOCKED' : 'CALCULATING...'}</span>
           </div>
         </div>
 
         {demoMode && !partnerChoice && (
           <button
             onClick={() => onChoiceSelect(state.scenario.options[0].id, role === 'observer' ? 'operator' : 'observer')}
-            className="apple-btn-secondary !min-h-[32px] !py-1 !px-3 !text-xs"
+            className="apple-btn-secondary !min-h-[32px] !py-1 !px-3 !text-xs font-mono"
           >
-            Simulate Partner Choice
+            [Demo] Auto-Lock Partner
           </button>
         )}
       </div>
 
-      {/* Reveal Outcome */}
+      {/* Reveal Outcome: Behavioral Relationship */}
       {(countdown === 0 || state.isRevealed) && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           className={`p-6 rounded-[20px] border text-center space-y-1.5 ${
             state.userAChoice === state.userBChoice
-              ? 'bg-[#1C1C1E] border-apple-green/40'
-              : 'bg-[#1C1C1E] border-apple-blue/40'
+              ? 'bg-[#1C1C1E] border-apple-green/50'
+              : 'bg-[#1C1C1E] border-apple-blue/50'
           }`}
         >
-          <div className="flex items-center justify-center gap-1.5 font-semibold text-white text-base">
+          <div className="flex items-center justify-center gap-2 font-semibold text-white text-base font-mono">
             <Sparkles className="w-4 h-4 text-apple-blue" />
-            <span>{state.userAChoice === state.userBChoice ? 'Synchronized Consensus' : 'Complementary Perspectives'}</span>
+            <span>{state.userAChoice === state.userBChoice ? 'HARMONIC CONVERGENCE' : 'DYNAMIC COMPLEMENTARY TENSION'}</span>
           </div>
           <p className="text-xs text-[#A1A1A6] max-w-md mx-auto">
             {state.userAChoice === state.userBChoice
-              ? 'Direct instinctive alignment across both participants.'
-              : 'Differing choices reflect balanced polarities and depth.'}
+              ? 'Identical instinctual frequency. High baseline decision alignment.'
+              : 'Complementary polarity: differing instinctual pathways produce balanced tension.'}
           </p>
         </motion.div>
       )}

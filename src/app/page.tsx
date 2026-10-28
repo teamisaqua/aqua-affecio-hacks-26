@@ -2,16 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LiquidGlassPanel } from '@/components/ui/LiquidGlassPanel';
+import { ReactionCanvas, ReactionFieldState } from '@/components/molecular/ReactionCanvas';
 import { SoundToggle } from '@/components/ui/SoundToggle';
 import { sound } from '@/lib/sound/soundEffects';
-import { Atom, ArrowRight, Play, Eye, Wrench } from 'lucide-react';
+import { Atom, ArrowRight, Play, Eye, Wrench, Shield, Activity } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [roomCode, setRoomCode] = useState('');
   const [selectedRole, setSelectedRole] = useState<'observer' | 'operator'>('observer');
+  const [fieldState, setFieldState] = useState<ReactionFieldState>('idle');
 
   const generateRoomCode = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -44,180 +45,184 @@ export default function HomePage() {
     router.push(`/lab/DEMO-26?demo=true&name=Presenter&role=observer`);
   };
 
-  const experiences = [
-    { num: '01', title: 'Shared Lobby', desc: 'Synchronous chamber for two' },
-    { num: '02', title: 'Asymmetric Reactor', desc: '45-second collaborative calibration' },
-    { num: '03', title: 'Synchronized Dilemma', desc: 'Instant 3-2-1 instinct reveal' },
-    { num: '04', title: 'Chemistry Engine', desc: 'Deterministic telemetry analysis' },
-    { num: '05', title: 'Dynamic Compound', desc: 'Unique procedural molecule synthesis' },
-    { num: '06', title: 'Chemistry Card', desc: 'Collectible holographic record' },
-    { num: '07', title: 'Catalytic Sparks', desc: 'Prompts born from real shared moments' },
-  ];
-
   return (
-    <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black relative">
-      {/* Top Navbar */}
-      <header className="max-w-5xl w-full mx-auto flex items-center justify-between pb-8">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-[#1C1C1E] border border-white/10 flex items-center justify-center text-apple-blue">
-            <Atom className="w-5 h-5" strokeWidth={1.75} />
+    <div className="min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black text-white relative">
+      {/* Top Laboratory Instrument Header */}
+      <header className="max-w-6xl w-full mx-auto flex items-center justify-between pb-4 border-b border-white/10 text-xs font-mono">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <span className="font-bold tracking-widest text-sm text-white">AFFECIO</span>
+            <span className="text-[#A1A1A6] text-[10px]">CHEMISTRY SPECIMEN LAB</span>
           </div>
-          <div>
-            <div className="text-sm font-semibold tracking-tight text-white">
-              AFFECIO
-            </div>
-            <div className="text-xs text-[#A1A1A6]">
-              Chemistry Lab
-            </div>
+          <span className="hidden sm:inline text-white/20">|</span>
+          <div className="hidden sm:flex items-center space-x-1.5 text-apple-green">
+            <span className="w-1.5 h-1.5 rounded-full bg-apple-green animate-pulse" />
+            <span>CORE: ONLINE</span>
           </div>
         </div>
 
-        <SoundToggle />
+        <div className="flex items-center space-x-4 text-[#A1A1A6]">
+          <div className="hidden md:flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-apple-blue" />
+            <span>REACTION PROTOCOL v2.6</span>
+          </div>
+          <SoundToggle />
+        </div>
       </header>
 
-      {/* Hero Body */}
-      <div className="flex-1 max-w-3xl w-full mx-auto flex flex-col justify-center items-center text-center space-y-8 py-6">
-        {/* Apple Pill Tag */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1C1E] border border-white/10 text-xs font-medium text-[#A1A1A6]">
-          <span>Match</span>
-          <span className="text-white/20">→</span>
-          <span>Experience</span>
-          <span className="text-white/20">→</span>
-          <span>Collaborate</span>
-          <span className="text-white/20">→</span>
-          <span className="text-white font-semibold">Connect</span>
+      {/* Main Laboratory Viewport */}
+      <main className="flex-1 max-w-4xl w-full mx-auto flex flex-col justify-center items-center py-6 space-y-6">
+        {/* Scientific Protocol Banner */}
+        <div className="flex items-center gap-2 text-[11px] font-mono tracking-widest uppercase text-[#A1A1A6] bg-[#1C1C1E] px-3.5 py-1.5 rounded-full border border-white/10">
+          <span>PERSON</span>
+          <span className="text-white/30">→</span>
+          <span>SIGNAL</span>
+          <span className="text-white/30">→</span>
+          <span>INTERACTION</span>
+          <span className="text-white/30">→</span>
+          <span>REACTION</span>
+          <span className="text-white/30">→</span>
+          <span className="text-apple-blue font-semibold">AFFINITY</span>
         </div>
 
-        {/* Large Headline */}
-        <div className="space-y-3 max-w-2xl">
-          <h1 className="text-4xl sm:text-6xl font-semibold tracking-tight text-white leading-tight">
-            Don&apos;t just match. Discover your chemistry.
-          </h1>
-          <p className="text-[#A1A1A6] text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Connection is something you experience together. Enter a shared virtual laboratory to solve short collaborative challenges and measure real-time affinity.
-          </p>
+        {/* Central Living Reaction Visualization (The Main Differentiator) */}
+        <div className="w-full relative">
+          <ReactionCanvas
+            state={fieldState}
+            participantAName={name.trim() || 'Participant Alpha'}
+            participantBName={selectedRole === 'observer' ? 'Beta (Operator)' : 'Alpha (Observer)'}
+          />
         </div>
 
-        {/* Action Panel */}
-        <LiquidGlassPanel variant="hero" className="p-6 md:p-8 w-full max-w-lg text-left space-y-6 bg-[#1C1C1E]">
+        {/* Docked Chamber Entry Instrument */}
+        <div className="w-full max-w-md apple-card p-6 space-y-5 bg-[#1C1C1E] border border-white/10 shadow-apple-card">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs font-mono">
+            <span className="font-semibold text-white tracking-wide uppercase">ENTER CHAMBER</span>
+            <span className="text-[#A1A1A6] text-[10px]">CHAMBER CALIBRATION</span>
+          </div>
+
           <div className="space-y-4">
+            {/* Handle Input */}
             <div>
-              <label htmlFor="handle-input" className="block text-xs font-medium text-[#A1A1A6] uppercase tracking-wide mb-2">
-                Your Name or Handle
+              <label htmlFor="handle-input" className="block text-[11px] font-mono uppercase tracking-wider text-[#A1A1A6] mb-1.5">
+                Participant Handle
               </label>
               <input
                 id="handle-input"
                 type="text"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onFocus={() => setFieldState('lobby')}
+                onBlur={() => !name && setFieldState('idle')}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setFieldState(e.target.value ? 'lobby' : 'idle');
+                }}
                 placeholder="e.g. Aria"
-                className="w-full px-4 py-3 rounded-xl bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] focus:outline-none focus:border-apple-blue/50 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] text-sm focus:outline-none focus:border-apple-blue font-mono"
               />
             </div>
 
-            {/* Role Selection (Apple Segmented Style) */}
+            {/* Role Assignment */}
             <div>
-              <span id="role-select-label" className="block text-xs font-medium text-[#A1A1A6] uppercase tracking-wide mb-2">
-                Starting Role
+              <span className="block text-[11px] font-mono uppercase tracking-wider text-[#A1A1A6] mb-1.5">
+                Chamber Station Role
               </span>
-              <div role="radiogroup" aria-labelledby="role-select-label" className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
-                  role="radio"
-                  aria-checked={selectedRole === 'observer'}
-                  onClick={() => setSelectedRole('observer')}
-                  className={`p-3.5 rounded-[14px] border text-left transition-all duration-120 ${
+                  onClick={() => {
+                    sound.playGlassClick();
+                    setSelectedRole('observer');
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all duration-120 ${
                     selectedRole === 'observer'
-                      ? 'bg-[#2C2C2E] border-apple-blue/50 text-white ring-1 ring-apple-blue/40'
+                      ? 'bg-[#2C2C2E] border-apple-blue text-white ring-1 ring-apple-blue/40'
                       : 'bg-[#2C2C2E]/50 border-white/10 text-[#A1A1A6] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue font-mono">
                     <Eye className="w-3.5 h-3.5" />
-                    <span>Observer</span>
+                    <span>Observer [α]</span>
                   </div>
-                  <div className="text-[11px] text-[#A1A1A6] mt-1">Holds target dials</div>
+                  <div className="text-[10px] text-[#A1A1A6] mt-0.5">Diagnostic targets</div>
                 </button>
 
                 <button
                   type="button"
-                  role="radio"
-                  aria-checked={selectedRole === 'operator'}
-                  onClick={() => setSelectedRole('operator')}
-                  className={`p-3.5 rounded-[14px] border text-left transition-all duration-120 ${
+                  onClick={() => {
+                    sound.playGlassClick();
+                    setSelectedRole('operator');
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all duration-120 ${
                     selectedRole === 'operator'
-                      ? 'bg-[#2C2C2E] border-apple-blue/50 text-white ring-1 ring-apple-blue/40'
+                      ? 'bg-[#2C2C2E] border-apple-blue text-white ring-1 ring-apple-blue/40'
                       : 'bg-[#2C2C2E]/50 border-white/10 text-[#A1A1A6] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-apple-blue font-mono">
                     <Wrench className="w-3.5 h-3.5" />
-                    <span>Operator</span>
+                    <span>Operator [β]</span>
                   </div>
-                  <div className="text-[11px] text-[#A1A1A6] mt-1">Controls the sliders</div>
+                  <div className="text-[10px] text-[#A1A1A6] mt-0.5">Physical actuators</div>
                 </button>
               </div>
             </div>
           </div>
 
           {/* Action Row */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+          <div className="pt-2 flex flex-col sm:flex-row items-center gap-2">
             <button
               onClick={handleCreateRoom}
-              className="apple-btn-primary w-full sm:flex-1"
+              className="apple-btn-primary w-full sm:flex-1 font-mono text-xs"
             >
-              <span>Create Chamber</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>Initialize Chamber</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
-            <div className="w-full sm:w-auto flex items-center gap-2">
+            <div className="w-full sm:w-auto flex items-center gap-1.5">
               <input
                 type="text"
                 value={roomCode}
                 onChange={(e) => setRoomCode(e.target.value)}
-                placeholder="Code (e.g. LAB-482)"
+                placeholder="LAB-KEY"
                 aria-label="Chamber Code to Join"
-                className="w-32 px-3 py-2.5 rounded-full bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] focus:outline-none focus:border-apple-blue/50 text-xs text-center uppercase"
+                className="w-24 px-2.5 py-2.5 rounded-full bg-[#2C2C2E] border border-white/10 text-white placeholder-[#A1A1A6] text-xs font-mono text-center uppercase focus:outline-none focus:border-apple-blue"
               />
               <button
                 onClick={handleJoinRoom}
-                className="apple-btn-secondary !px-4 !py-2.5 !min-h-[40px] text-xs"
+                className="apple-btn-secondary !min-h-[40px] !px-3 !py-2 text-xs font-mono"
               >
                 Join
               </button>
             </div>
           </div>
 
-          {/* Hackathon Demo Launcher */}
-          <div className="pt-4 border-t border-white/10 text-center">
+          {/* Instant Hackathon Judge Demo Link */}
+          <div className="pt-3 border-t border-white/10 text-center">
             <button
               onClick={handleLaunchDemo}
-              className="apple-btn-tinted w-full"
+              className="apple-btn-tinted w-full font-mono text-xs flex items-center justify-center gap-2"
             >
               <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Launch Hackathon Demo Mode</span>
+              <span>⚡ Enter Demo Chamber (Judge Presentation)</span>
             </button>
-            <p className="text-[11px] text-[#A1A1A6] mt-2">
-              Pre-configured single-screen chamber with presenter controller and partner simulation.
+            <p className="text-[10px] text-[#A1A1A6] mt-1.5 font-mono">
+              Direct access: Observer vs Operator instrument with simulated partner.
             </p>
           </div>
-        </LiquidGlassPanel>
-
-        {/* 7 Experiences Overview Strip */}
-        <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 w-full max-w-4xl">
-          {experiences.map((exp) => (
-            <div key={exp.num} className="p-3.5 rounded-[14px] bg-[#1C1C1E] border border-white/10 text-center">
-              <div className="text-[10px] text-[#A1A1A6] font-mono">{exp.num}</div>
-              <div className="text-xs font-semibold text-white mt-0.5">{exp.title}</div>
-              <div className="text-[10px] text-[#A1A1A6] mt-0.5">{exp.desc}</div>
-            </div>
-          ))}
         </div>
-      </div>
+      </main>
 
-      {/* Footer */}
-      <footer className="max-w-5xl w-full mx-auto text-center py-4 text-xs text-[#A1A1A6] border-t border-white/10">
-        AFFECIO CHEMISTRY LAB · Team Aqua
+      {/* Footer Instrument Status Strip */}
+      <footer className="max-w-6xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between py-3 border-t border-white/10 text-[11px] font-mono text-[#A1A1A6] gap-2">
+        <div className="flex items-center space-x-3">
+          <span>AFFECIO EXPERIMENTAL SPECIMEN</span>
+          <span>·</span>
+          <span>HACKATHON 2026</span>
+        </div>
+        <div>
+          <span>LIVE TELEMETRY DETERMINISTIC AFFINITY ENGINE</span>
+        </div>
       </footer>
     </div>
   );

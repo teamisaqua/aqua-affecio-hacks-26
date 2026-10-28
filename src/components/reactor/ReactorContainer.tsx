@@ -7,7 +7,7 @@ import { ReactorVessel } from './ReactorVessel';
 import { ObserverView } from './ObserverView';
 import { OperatorView } from './OperatorView';
 import { sound } from '@/lib/sound/soundEffects';
-import { Timer, CheckCircle2, Sparkles } from 'lucide-react';
+import { Timer, CheckCircle2, Sparkles, Activity, Shield } from 'lucide-react';
 
 interface ReactorContainerProps {
   role: UserRole;
@@ -30,13 +30,10 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   onComplete,
   demoMode = false,
 }) => {
-  const [activeTabRole, setActiveTabRole] = useState<UserRole>(role);
+  const [viewFilter, setViewFilter] = useState<'all' | 'observer' | 'vessel' | 'operator'>('all');
   const [timeLeft, setTimeLeft] = useState(45);
   const isCompletedRef = useRef(false);
 
-  useEffect(() => {
-    setActiveTabRole(role);
-  }, [role]);
 
   // 45-second countdown timer and stability evaluator loop
   useEffect(() => {
@@ -135,102 +132,155 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Strict Visual Hierarchy: Experiment Number -> Title -> Short Objective */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[#A1A1A6] text-xs font-medium uppercase tracking-wider">
-          <span>Experiment 01 of 02</span>
-          <span className="text-white/20">·</span>
-          <span className="text-apple-blue font-semibold">Hero Challenge</span>
+    <div className="w-full max-w-7xl mx-auto space-y-6">
+      {/* Hierarchy Step 1 & 2: Experiment Number & Title */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-white/10 text-xs font-mono">
+        <div className="flex items-center space-x-2">
+          <span className="px-2.5 py-1 rounded bg-[#2C2C2E] text-white font-bold">EXPERIMENT 01</span>
+          <span className="text-white text-sm font-semibold tracking-wide">ASYMMETRIC REACTOR CALIBRATION</span>
+          <span className="text-[#A1A1A6]">· 45s COOPERATIVE TIME PRESSURE</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight">
-          Asymmetric Reactor Calibration
-        </h2>
-        <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-lg mx-auto leading-relaxed">
-          Neither participant can solve this alone. The Observer directs while the Operator tunes instruments.
-        </p>
-      </div>
 
-      {/* Top Status Bar: Timer & Status */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-full bg-[#2C2C2E] border border-white/10 text-white flex items-center justify-center">
-            <Timer className="w-4 h-4 text-apple-blue" strokeWidth={1.75} />
+          {/* Reaction Stability Status */}
+          <div className="flex items-center space-x-2">
+            <span className="text-[#A1A1A6]">EQUILIBRIUM:</span>
+            <span className={`px-2.5 py-0.5 rounded-full font-bold tabular-data ${
+              state.isSuccess
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                : state.isStabilized
+                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                : 'bg-[#2C2C2E] text-[#A1A1A6]'
+            }`}>
+              {state.isSuccess ? '100% STABLE' : `${state.stabilityPercentage}%`}
+            </span>
           </div>
-          <div>
-            <div className="text-[11px] font-medium text-[#A1A1A6] uppercase tracking-wide">
-              Time Remaining
-            </div>
-            <div className={`text-xl font-semibold tabular-data ${timeLeft < 10 ? 'text-apple-red animate-pulse' : 'text-white'}`}>
-              00:{timeLeft.toString().padStart(2, '0')}
-            </div>
-          </div>
-        </div>
 
-        {/* Demo Mode Role Switcher */}
-        {demoMode && (
-          <div className="flex items-center p-1 rounded-full bg-[#2C2C2E] border border-white/10">
-            <button
-              onClick={() => setActiveTabRole('observer')}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                activeTabRole === 'observer'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-[#A1A1A6] hover:text-white'
-              }`}
-            >
-              Observer
-            </button>
-            <button
-              onClick={() => setActiveTabRole('operator')}
-              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                activeTabRole === 'operator'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-[#A1A1A6] hover:text-white'
-              }`}
-            >
-              Operator
-            </button>
+          {/* Time Remaining */}
+          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 tabular-data text-white font-bold">
+            <Timer className="w-3.5 h-3.5 text-apple-blue" />
+            <span>00:{timeLeft.toString().padStart(2, '0')}</span>
           </div>
-        )}
-
-        {/* Reaction Status Indicator */}
-        <div className="flex items-center space-x-2 text-xs">
-          {state.isSuccess ? (
-            <span className="flex items-center gap-1.5 text-apple-green font-medium bg-emerald-500/10 px-3.5 py-1 rounded-full border border-emerald-500/30">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Reaction Successful
-            </span>
-          ) : state.isStabilized ? (
-            <span className="flex items-center gap-1.5 text-apple-blue font-medium bg-blue-500/10 px-3.5 py-1 rounded-full border border-blue-500/30">
-              <Sparkles className="w-3.5 h-3.5" /> Stabilizing ({state.stabilityPercentage}%)
-            </span>
-          ) : (
-            <span className="text-[#A1A1A6] bg-[#2C2C2E] px-3.5 py-1 rounded-full border border-white/10">
-              Awaiting Target Match
-            </span>
-          )}
         </div>
       </div>
 
-      {/* Primary Visual Instrument (Reactor Vessel) */}
-      <div className="py-2">
-        <ReactorVessel
-          currentTemp={state.currentTemp}
-          currentPressure={state.currentPressure}
-          isStabilized={state.isStabilized}
-          isSuccess={state.isSuccess}
-          stabilityPercentage={state.stabilityPercentage}
-        />
+      {/* Mobile/Tablet View Segmented Switch */}
+      <div className="flex lg:hidden items-center justify-center">
+        <div className="inline-flex items-center p-1 rounded-full bg-[#1C1C1E] border border-white/10 text-xs">
+          <button
+            onClick={() => setViewFilter('all')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              viewFilter === 'all' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+            }`}
+          >
+            All Panels
+          </button>
+          <button
+            onClick={() => setViewFilter('observer')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              viewFilter === 'observer' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+            }`}
+          >
+            Alpha {role === 'observer' ? '(You)' : ''}
+          </button>
+          <button
+            onClick={() => setViewFilter('vessel')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              viewFilter === 'vessel' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+            }`}
+          >
+            Core
+          </button>
+          <button
+            onClick={() => setViewFilter('operator')}
+            className={`px-3 py-1 rounded-full transition-all ${
+              viewFilter === 'operator' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+            }`}
+          >
+            Beta {role === 'operator' ? '(You)' : ''}
+          </button>
+        </div>
       </div>
 
-      {/* Active Role Console (Observer or Operator) */}
-      <div className="transition-all duration-200">
-        {activeTabRole === 'observer' ? (
+      {/* Tri-Panel Scientific Instrument Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* LEFT CONSOLE: Participant A (Observer / Diagnostic) */}
+        <div className={`lg:col-span-4 apple-card p-5 space-y-4 bg-[#1C1C1E] border border-white/10 ${
+          viewFilter !== 'all' && viewFilter !== 'observer' ? 'hidden lg:block' : 'block'
+        }`}>
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs font-mono">
+            <div className="flex items-center space-x-2 text-apple-blue">
+              <span className="w-2 h-2 rounded-full bg-apple-blue" />
+              <span className="font-bold">STATION ALPHA [OBSERVER]</span>
+              {role === 'observer' && (
+                <span className="px-1.5 py-0.5 rounded bg-apple-blue/20 text-apple-blue border border-apple-blue/30 text-[9px] font-bold">
+                  YOU
+                </span>
+              )}
+            </div>
+            <span className="text-[#A1A1A6]">{userAName}</span>
+          </div>
+
           <ObserverView
             target={target}
             state={state}
             partnerName={userBName}
           />
-        ) : (
+        </div>
+
+        {/* CENTER STAGE: The Living Reaction Core Vessel */}
+        <div className={`lg:col-span-4 apple-card p-6 flex flex-col items-center justify-between bg-[#1C1C1E] border border-white/10 min-h-[460px] ${
+          viewFilter !== 'all' && viewFilter !== 'vessel' ? 'hidden lg:flex' : 'flex'
+        }`}>
+          <div className="w-full flex items-center justify-between pb-2 border-b border-white/10 text-[11px] font-mono text-[#A1A1A6]">
+            <span>REACTION VESSEL</span>
+            <span className="text-apple-green font-semibold">BOROSILICATE CORE</span>
+          </div>
+
+          {/* Graduated Glass Cylinder with Meniscus and Micro-Bubbles */}
+          <div className="my-auto py-2">
+            <ReactorVessel
+              currentTemp={state.currentTemp}
+              currentPressure={state.currentPressure}
+              isStabilized={state.isStabilized}
+              isSuccess={state.isSuccess}
+              stabilityPercentage={state.stabilityPercentage}
+            />
+          </div>
+
+          {/* Status Message */}
+          <div className="w-full pt-3 border-t border-white/10 text-center text-xs font-mono text-[#A1A1A6]">
+            {state.isSuccess ? (
+              <span className="text-apple-green font-bold flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4" /> REACTION EQUILIBRIUM ACHIEVED
+              </span>
+            ) : state.isStabilized ? (
+              <span className="text-apple-blue font-semibold animate-pulse flex items-center justify-center gap-1.5">
+                <Sparkles className="w-4 h-4" /> HOLDING EQUILIBRIUM ({state.stabilityPercentage}%)
+              </span>
+            ) : (
+              <span>STABILIZE WITHIN ±{target.tolerance}° FOR 3.0 SECONDS</span>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT CONSOLE: Participant B (Operator / Actuator Controls) */}
+        <div className={`lg:col-span-4 apple-card p-5 space-y-4 bg-[#1C1C1E] border border-white/10 ${
+          viewFilter !== 'all' && viewFilter !== 'operator' ? 'hidden lg:block' : 'block'
+        }`}>
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs font-mono">
+            <div className="flex items-center space-x-2 text-apple-blue">
+              <span className="w-2 h-2 rounded-full bg-apple-blue" />
+              <span className="font-bold">STATION BETA [OPERATOR]</span>
+              {role === 'operator' && (
+                <span className="px-1.5 py-0.5 rounded bg-apple-blue/20 text-apple-blue border border-apple-blue/30 text-[9px] font-bold">
+                  YOU
+                </span>
+              )}
+            </div>
+            <span className="text-[#A1A1A6]">{userBName}</span>
+          </div>
+
           <OperatorView
             state={state}
             partnerName={userAName}
@@ -239,18 +289,18 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
             onValveToggle={handleValveToggle}
             disabled={state.isSuccess}
           />
-        )}
+        </div>
       </div>
 
       {/* Success Notification Banner */}
       {state.isSuccess && (
-        <div className="p-6 rounded-[20px] bg-[#1C1C1E] border border-apple-green/40 text-center space-y-1.5">
-          <h3 className="text-lg font-semibold text-white tracking-tight flex items-center justify-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-apple-green" />
-            Reaction Equilibrium Reached
+        <div className="p-5 rounded-[18px] bg-[#1C1C1E] border border-apple-green/50 text-center space-y-1">
+          <h3 className="text-base font-semibold text-white tracking-tight flex items-center justify-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-apple-green" />
+            Reaction Calibration Complete
           </h3>
-          <p className="text-xs text-[#A1A1A6]">
-            Stabilized in {state.elapsedSeconds.toFixed(1)} seconds. Advancing to Synchronized Dilemma...
+          <p className="text-xs text-[#A1A1A6] font-mono">
+            Chamber stabilized in {state.elapsedSeconds.toFixed(1)}s with {state.overshootCount} overshoots. Advancing to Dilemma Experiment...
           </p>
         </div>
       )}

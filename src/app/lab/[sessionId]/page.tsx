@@ -25,6 +25,7 @@ import { CompoundVisualizer } from '@/components/compound/CompoundVisualizer';
 import { CollectibleCard } from '@/components/card/CollectibleCard';
 import { CatalyticChat } from '@/components/conversation/CatalyticChat';
 import { DemoModeBar } from '@/components/demo/DemoModeBar';
+import { ReactionCanvas, ReactionFieldState } from '@/components/molecular/ReactionCanvas';
 import { sound } from '@/lib/sound/soundEffects';
 import { ChevronLeft } from 'lucide-react';
 
@@ -273,10 +274,28 @@ export default function LabSessionPage() {
 
   const currentStepIdx = stepList.findIndex((s) => s.id === stage);
 
+  const molecularFieldState: ReactionFieldState = useMemo(() => {
+    if (stage === 'lobby') return 'lobby';
+    if (stage === 'reactor') {
+      if (reactorState.isSuccess) return 'stabilized';
+      if (reactorState.isStabilized) return 'calibrating';
+      if (reactorState.overshootCount > 2) return 'overheat';
+      return 'calibrating';
+    }
+    if (stage === 'dilemma') return 'calibrating';
+    if (stage === 'engine' || stage === 'compound' || stage === 'card') return 'signature';
+    return 'idle';
+  }, [stage, reactorState.isSuccess, reactorState.isStabilized, reactorState.overshootCount]);
+
   return (
-    <div className="relative min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black">
+    <div className="relative min-h-screen flex flex-col justify-between p-4 md:p-8 bg-black text-white overflow-x-hidden">
+      {/* Living Ambient Molecular Matrix */}
+      <div className="pointer-events-none fixed inset-0 opacity-20 z-0">
+        <ReactionCanvas state={molecularFieldState} />
+      </div>
+
       {/* Top Header & Apple Navigation Bar */}
-      <header className="max-w-5xl w-full mx-auto flex items-center justify-between pb-6">
+      <header className="relative z-10 max-w-5xl w-full mx-auto flex items-center justify-between pb-6">
         <div className="flex items-center space-x-3">
           <button
             onClick={() => router.push('/')}
@@ -323,7 +342,7 @@ export default function LabSessionPage() {
       </header>
 
       {/* Main Experience Router */}
-      <main className="flex-1 flex items-center justify-center py-4 w-full">
+      <main className="relative z-10 flex-1 flex items-center justify-center py-4 w-full">
         {stage === 'lobby' && (
           <LobbyView
             roomCode={sessionId}
