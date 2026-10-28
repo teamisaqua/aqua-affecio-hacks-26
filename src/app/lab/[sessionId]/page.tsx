@@ -76,7 +76,7 @@ const stepList: { id: ExperienceStage; label: string }[] = [
   { id: 'conversation', label: 'Sparks' },
 ];
 
-export default function LabSessionPage() {
+function LabSessionContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -323,6 +323,26 @@ export default function LabSessionPage() {
     }
 
     const activityDef = getActivityById(actId);
+    if (!activityDef) {
+      return (
+        <div className="p-8 rounded-2xl bg-[#121216] border border-white/10 text-center max-w-md mx-auto my-auto">
+          <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4 text-[#86868B]">
+            <Sparkles className="w-5 h-5 text-[#2997FF]" />
+          </div>
+          <h3 className="text-base font-semibold text-white mb-2">Activity Not Found</h3>
+          <p className="text-xs text-[#86868B] mb-6 leading-relaxed">
+            The requested activity &ldquo;{actId}&rdquo; was not recognized or is currently being updated.
+          </p>
+          <button
+            onClick={handleExitActivityToHub}
+            className="px-5 py-2 rounded-full bg-white text-black text-xs font-semibold hover:bg-white/90 transition-all cursor-pointer"
+          >
+            Return to Activity Hub
+          </button>
+        </div>
+      );
+    }
+
     const prompts = getQuestionsForActivity(actId, sessionId, 5);
 
     return (
@@ -1228,5 +1248,19 @@ export default function LabSessionPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function LabSessionPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-black flex items-center justify-center text-white/40 text-xs font-mono tracking-widest uppercase">
+          Initializing Chamber...
+        </div>
+      }
+    >
+      <LabSessionContent />
+    </React.Suspense>
   );
 }
