@@ -4,7 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { FictionalCompound } from '@/lib/types/chemistry';
-import { Atom, Sparkles, ArrowRight } from 'lucide-react';
+import { ArrowRight, Atom } from 'lucide-react';
 import { sound } from '@/lib/sound/soundEffects';
 
 interface CompoundVisualizerProps {
@@ -17,29 +17,30 @@ export const CompoundVisualizer: React.FC<CompoundVisualizerProps> = ({
   onContinue,
 }) => {
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-8">
-      {/* Visual Header */}
+    <div className="w-full max-w-2xl mx-auto space-y-6">
+      {/* Header */}
       <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lab-cyan/10 border border-lab-cyan/30 text-lab-cyan text-xs font-mono uppercase tracking-widest">
-          <Atom className="w-3.5 h-3.5" /> Compound Synthesized
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 text-slate-300 text-xs font-medium">
+          <Atom className="w-3.5 h-3.5 text-sky-400" />
+          <span>Synthesized Molecular Signature</span>
         </div>
-        <h2 className="text-3xl md:text-4xl font-extrabold font-mono tracking-tight text-white">
+        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white">
           {compound.name}
         </h2>
-        <div className="text-sm font-mono text-lab-pink font-semibold tracking-wider">
-          {compound.formula} · {compound.classification}
+        <div className="text-sm text-slate-400 font-medium">
+          {compound.formula} <span className="text-slate-600">·</span> {compound.classification}
         </div>
       </div>
 
       {/* Main Molecular Chamber Display */}
-      <LiquidGlassPanel className="p-8 md:p-12 text-center relative overflow-hidden" glow="cyan">
+      <LiquidGlassPanel className="p-8 md:p-10 text-center relative">
         {/* Animated Molecular Structure */}
-        <div className="relative w-64 h-64 mx-auto my-4 flex items-center justify-center">
-          {/* Pulsing Core Glow */}
+        <div className="relative w-56 h-56 mx-auto my-2 flex items-center justify-center select-none">
+          {/* Subtle Ambient Core Glow */}
           <div
-            className="absolute w-32 h-32 rounded-full blur-2xl opacity-40 animate-pulse-slow pointer-events-none"
+            className="absolute w-28 h-28 rounded-full blur-2xl opacity-25 pointer-events-none"
             style={{
-              background: `radial-gradient(circle, ${compound.colorGradient[0]}, ${compound.colorGradient[1]})`,
+              background: `radial-gradient(circle, ${compound.colorGradient[0]}, transparent)`,
             }}
           />
 
@@ -48,11 +49,11 @@ export const CompoundVisualizer: React.FC<CompoundVisualizerProps> = ({
             className="absolute inset-0 w-full h-full"
             viewBox="0 0 200 200"
             animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 32, ease: 'linear' }}
+            transition={{ repeat: Infinity, duration: 40, ease: 'linear' }}
           >
             {/* Center Nucleus */}
-            <circle cx="100" cy="100" r="16" fill="rgba(255, 255, 255, 0.9)" />
-            <circle cx="100" cy="100" r="22" fill="none" stroke={compound.colorGradient[0]} strokeWidth="1.5" opacity="0.6" />
+            <circle cx="100" cy="100" r="14" fill="#ffffff" opacity="0.9" />
+            <circle cx="100" cy="100" r="20" fill="none" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="1" />
 
             {/* Orbit paths & Nodes */}
             {compound.nodes.map((node, i) => (
@@ -62,24 +63,16 @@ export const CompoundVisualizer: React.FC<CompoundVisualizerProps> = ({
                   y1="100"
                   x2={node.x}
                   y2={node.y}
-                  stroke="rgba(255, 255, 255, 0.25)"
-                  strokeWidth="1.5"
-                  strokeDasharray="4 2"
+                  stroke="rgba(255, 255, 255, 0.15)"
+                  strokeWidth="1"
+                  strokeDasharray="3 3"
                 />
                 <circle
                   cx={node.x}
                   cy={node.y}
-                  r={node.size}
+                  r={node.size * 0.85}
                   fill={i % 2 === 0 ? compound.colorGradient[0] : compound.colorGradient[1]}
                   opacity="0.85"
-                />
-                <circle
-                  cx={node.x}
-                  cy={node.y}
-                  r={node.size + 4}
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.4)"
-                  strokeWidth="1"
                 />
               </g>
             ))}
@@ -87,22 +80,22 @@ export const CompoundVisualizer: React.FC<CompoundVisualizerProps> = ({
         </div>
 
         {/* Tagline & Synthesis Lore */}
-        <div className="max-w-xl mx-auto space-y-3 mt-6">
-          <div className="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-slate-300">
+        <div className="max-w-lg mx-auto space-y-2.5 mt-4">
+          <div className="inline-block px-3.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs font-medium text-slate-300">
             {compound.tagline}
           </div>
-          <p className="text-sm text-slate-300 leading-relaxed italic">
-            &ldquo;{compound.loreDescription}&rdquo;
+          <p className="text-xs text-slate-400 leading-relaxed max-w-md mx-auto">
+            {compound.loreDescription}
           </p>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-white/10 flex justify-center">
+        <div className="mt-8 pt-6 border-t border-white/[0.08] flex justify-center">
           <button
             onClick={() => {
               sound.playGlassClick();
               onContinue();
             }}
-            className="px-8 py-3.5 rounded-xl font-mono text-xs uppercase tracking-wider font-bold bg-white text-black hover:bg-slate-200 transition-all flex items-center gap-2 shadow-glass-md"
+            className="apple-btn-primary px-8"
           >
             <span>Mint Chemistry Card</span>
             <ArrowRight className="w-4 h-4" />

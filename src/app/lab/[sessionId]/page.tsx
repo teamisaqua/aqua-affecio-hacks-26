@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useParams, useSearchParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation';
 import {
   ExperienceStage,
   UserRole,
-  SessionData,
   ReactorTarget,
   ReactorState,
   DilemmaState,
@@ -27,13 +26,13 @@ import { CollectibleCard } from '@/components/card/CollectibleCard';
 import { CatalyticChat } from '@/components/conversation/CatalyticChat';
 import { DemoModeBar } from '@/components/demo/DemoModeBar';
 import { sound } from '@/lib/sound/soundEffects';
-import { Atom, Shield } from 'lucide-react';
+import { Atom, ChevronLeft } from 'lucide-react';
 
 const initialTarget: ReactorTarget = {
   temp: 72,
   pressure: 4.2,
-  colorName: 'Hyper-Cyan',
-  colorHex: '#00f0ff',
+  colorName: 'Equilibrium Cyan',
+  colorHex: '#38bdf8',
   tolerance: 3,
 };
 
@@ -51,39 +50,50 @@ const initialReactorState: ReactorState = {
 
 const defaultDilemma: DilemmaScenario = {
   id: 'dilemma-1',
-  prompt: 'You suddenly have one free day and ₹5,000. What do you do?',
-  context: 'Choose with pure instinct. Neither option is wrong — your chemistry is in how your polarities align.',
+  prompt: 'You have one free day and ₹5,000. What is your choice?',
+  context: 'Follow your genuine instinct. Alignment reveals synchronicity; contrast reveals complementary balance.',
   options: [
     {
       id: 'opt-roadtrip',
       label: 'Spontaneous Road Trip',
-      subtext: 'Tank of gas, playlist on shuffle, no map or destination.',
+      subtext: 'Fuel up, start the playlist, and drive without an agenda.',
       archetype: 'spontaneous',
     },
     {
       id: 'opt-tasting',
       label: 'Hidden Culinary Spot',
-      subtext: 'Intimate candlelit tasting menu at a secret hole-in-the-wall.',
+      subtext: 'Discover an intimate local kitchen for two.',
       archetype: 'intimate',
     },
     {
       id: 'opt-project',
-      label: 'Creative Gear & Build',
-      subtext: 'Supplies and tools to build something bold and creative together.',
+      label: 'Creative Supplies & Build',
+      subtext: 'Gather materials to craft a shared art or hardware build.',
       archetype: 'calculated',
     },
     {
       id: 'opt-adrenaline',
-      label: 'Adrenaline Rush',
-      subtext: 'High-speed go-karting, rock climbing, or outdoor thrills.',
+      label: 'Outdoor Adventure',
+      subtext: 'High-speed karting, climbing, or outdoor thrills.',
       archetype: 'adventurous',
     },
   ],
 };
 
+const stepList: { id: ExperienceStage; label: string }[] = [
+  { id: 'lobby', label: 'Lobby' },
+  { id: 'reactor', label: 'Reactor' },
+  { id: 'dilemma', label: 'Dilemma' },
+  { id: 'engine', label: 'Analysis' },
+  { id: 'compound', label: 'Compound' },
+  { id: 'card', label: 'Card' },
+  { id: 'conversation', label: 'Sparks' },
+];
+
 export default function LabSessionPage() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const sessionId = (params?.sessionId as string) || 'DEMO-482';
   const initialRole: UserRole = searchParams.get('role') === 'operator' ? 'operator' : 'observer';
@@ -128,7 +138,6 @@ export default function LabSessionPage() {
     return new MultiChannelSync(sessionId);
   }, [sessionId]);
 
-  // Synchronize state across both browser tabs or Supabase Realtime
   useEffect(() => {
     syncChannel.onMessage((event, payload: unknown) => {
       const data = payload as Record<string, unknown>;
@@ -191,8 +200,7 @@ export default function LabSessionPage() {
     });
   };
 
-  const handleReactorComplete = useCallback((stats: { timeTaken: number; overshoots: number }) => {
-    // Advance to Dilemma
+  const handleReactorComplete = useCallback(() => {
     setStage('dilemma');
     syncChannel.broadcast('STAGE_CHANGE', { stage: 'dilemma' });
   }, [syncChannel]);
@@ -214,7 +222,6 @@ export default function LabSessionPage() {
   };
 
   const handleDilemmaComplete = useCallback(() => {
-    // Compute deterministic chemistry score
     const score = computeChemistryScore({
       reactorTimeSeconds: reactorState.elapsedSeconds || 24,
       overshoots: reactorState.overshootCount || 0,
@@ -224,7 +231,6 @@ export default function LabSessionPage() {
     });
     setChemistryScore(score);
 
-    // Generate fictional compound
     const newCompound = generateFictionalCompound({
       score,
       reactorTimeSeconds: reactorState.elapsedSeconds || 24,
@@ -236,7 +242,6 @@ export default function LabSessionPage() {
     syncChannel.broadcast('STAGE_CHANGE', { stage: 'engine' });
   }, [dilemmaState.userAChoice, dilemmaState.userBChoice, reactorState.elapsedSeconds, reactorState.overshootCount, reactorState.stabilizedDuration, syncChannel]);
 
-  // Demo simulation helper for live presentation
   const handleSimulatePartner = () => {
     if (stage === 'lobby') {
       if (currentRole === 'observer') {
@@ -245,7 +250,6 @@ export default function LabSessionPage() {
         setUserA((prev) => ({ ...prev, isReady: true }));
       }
     } else if (stage === 'reactor') {
-      // Operator simulator: adjusts sliders directly into target
       setReactorState((prev) => ({
         ...prev,
         currentTemp: reactorTarget.temp,
@@ -267,40 +271,62 @@ export default function LabSessionPage() {
     });
   }, [reactorState, dilemmaState, userA.name, userB.name]);
 
+  const currentStepIdx = stepList.findIndex((s) => s.id === stage);
+
   return (
     <div className="relative min-h-screen flex flex-col justify-between p-4 md:p-8">
-      {/* Top Laboratory Navigation Bar */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between pb-6">
+      {/* Top Header & Navigation Bar */}
+      <header className="max-w-5xl w-full mx-auto flex items-center justify-between pb-6">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-lab-cyan via-purple-600 to-lab-pink p-[1px] shadow-glow-cyan">
-            <div className="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center">
-              <Atom className="w-5 h-5 text-lab-cyan" />
-            </div>
-          </div>
+          <button
+            onClick={() => router.push('/')}
+            className="w-10 h-10 rounded-full bg-white/[0.06] hover:bg-white/[0.12] active:bg-white/[0.04] border border-white/10 flex items-center justify-center text-slate-300 hover:text-white transition-all"
+            title="Return to Portal"
+            aria-label="Return to Portal"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
           <div>
-            <div className="text-sm font-black tracking-widest uppercase font-mono text-white">
-              AFFECIO
+            <div className="text-sm font-semibold tracking-tight text-white flex items-center gap-1.5">
+              <span>Affecio Lab</span>
+              <span className="text-slate-500 font-normal">·</span>
+              <span className="text-xs text-slate-400 font-mono">{sessionId}</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono tracking-wider">
-              CHEMISTRY LAB · {sessionId}
+            <div className="text-xs text-slate-400">
+              Role: <span className={currentRole === 'observer' ? 'text-sky-400 font-medium' : 'text-rose-400 font-medium'}>{currentRole === 'observer' ? 'Observer' : 'Operator'}</span>
             </div>
           </div>
         </div>
 
-        {/* Global Controls */}
-        <div className="flex items-center space-x-3">
-          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-slate-300">
-              Role: <strong className={currentRole === 'observer' ? 'text-lab-cyan' : 'text-lab-pink'}>{currentRole.toUpperCase()}</strong>
-            </span>
-          </div>
+        {/* Apple-style Step Progress Strip */}
+        <nav aria-label="Experiment Progress" className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+          {stepList.map((st, i) => (
+            <div key={st.id} className="flex items-center">
+              <span
+                className={`text-xs px-2.5 py-0.5 rounded-full transition-colors ${
+                  st.id === stage
+                    ? 'bg-white text-black font-semibold'
+                    : i < currentStepIdx
+                    ? 'text-slate-300 font-medium'
+                    : 'text-slate-500'
+                }`}
+              >
+                {st.label}
+              </span>
+              {i < stepList.length - 1 && (
+                <span className="text-slate-600 text-xs mx-0.5">/</span>
+              )}
+            </div>
+          ))}
+        </nav>
+
+        <div className="flex items-center space-x-2">
           <SoundToggle />
         </div>
       </header>
 
-      {/* Main Experience Stage Router */}
-      <main className="flex-1 flex items-center justify-center py-6 w-full">
+      {/* Main Experience Router */}
+      <main className="flex-1 flex items-center justify-center py-4 w-full">
         {stage === 'lobby' && (
           <LobbyView
             roomCode={sessionId}
@@ -382,7 +408,7 @@ export default function LabSessionPage() {
         )}
       </main>
 
-      {/* Demo Controller Presenter Bar (Visible in Demo mode) */}
+      {/* Presenter Controller Bar */}
       {isDemo && (
         <DemoModeBar
           currentStage={stage}

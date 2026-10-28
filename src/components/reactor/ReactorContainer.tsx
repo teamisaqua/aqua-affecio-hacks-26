@@ -7,7 +7,7 @@ import { ReactorVessel } from './ReactorVessel';
 import { ObserverView } from './ObserverView';
 import { OperatorView } from './OperatorView';
 import { sound } from '@/lib/sound/soundEffects';
-import { Timer, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Timer, CheckCircle2, Sparkles } from 'lucide-react';
 
 interface ReactorContainerProps {
   role: UserRole;
@@ -34,7 +34,6 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   const [timeLeft, setTimeLeft] = useState(45);
   const isCompletedRef = useRef(false);
 
-  // Sync prop role
   useEffect(() => {
     setActiveTabRole(role);
   }, [role]);
@@ -52,7 +51,6 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
         return prev - 1;
       });
 
-      // Telemetry evaluation
       onStateUpdate((current) => {
         if (current.isSuccess) return current;
 
@@ -63,7 +61,6 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
         let nextStabilized = current.stabilizedDuration;
         let nextOvershoots = current.overshootCount;
 
-        // Check if overheating/overshooting
         if (current.currentTemp > target.temp + 15 || current.currentPressure > target.pressure + 2.5) {
           if (!current.isStabilized && Math.random() < 0.05) {
             nextOvershoots += 1;
@@ -79,21 +76,19 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
         const stabilityPct = Math.min(100, Math.round((nextStabilized / 3.0) * 100));
 
-        // Check for victory
         if (nextStabilized >= 3.0 && !isCompletedRef.current) {
           isCompletedRef.current = true;
           sound.playSuccessChime();
 
-          // Confetti celebration
           try {
             confetti({
-              particleCount: 80,
-              spread: 70,
+              particleCount: 60,
+              spread: 60,
               origin: { y: 0.6 },
-              colors: ['#00f0ff', '#ff2a85', '#9d4edd', '#10b981'],
+              colors: ['#38bdf8', '#34c759', '#2997ff', '#fb7185'],
             });
           } catch {
-            // ignore canvas confetti errors
+            // ignore confetti error
           }
 
           setTimeout(() => {
@@ -140,70 +135,69 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto space-y-6">
-      {/* Top Status Bar: Time & Stability */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl glass-panel">
+    <div className="w-full max-w-4xl mx-auto space-y-6">
+      {/* Top Status Console */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 rounded-2xl apple-glass">
+        {/* Timer */}
         <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xl bg-lab-cyan/10 border border-lab-cyan/30 text-lab-cyan">
-            <Timer className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-full bg-white/[0.06] border border-white/10 text-slate-300 flex items-center justify-center">
+            <Timer className="w-4 h-4 text-sky-400" strokeWidth={1.75} />
           </div>
           <div>
-            <div className="text-xs uppercase tracking-wider text-slate-400 font-mono">
-              Reaction Window
+            <div className="text-[11px] font-medium text-slate-400 tracking-wide uppercase">
+              Time Remaining
             </div>
-            <div className={`text-2xl font-mono font-bold ${timeLeft < 10 ? 'text-red-400 animate-pulse' : 'text-white'}`}>
+            <div className={`text-xl font-semibold tabular-data ${timeLeft < 10 ? 'text-rose-400 animate-pulse' : 'text-white'}`}>
               00:{timeLeft.toString().padStart(2, '0')}
             </div>
           </div>
         </div>
 
-        {/* Demo Mode Quick Perspective Switcher */}
+        {/* Demo Mode Role Switcher (Apple-style Segmented Control) */}
         {demoMode && (
-          <div className="flex items-center space-x-2 bg-black/40 p-1.5 rounded-xl border border-white/10">
-            <span className="text-[10px] text-slate-400 uppercase font-mono px-2">Demo View:</span>
+          <div className="flex items-center p-1 rounded-full bg-black/40 border border-white/10">
             <button
               onClick={() => setActiveTabRole('observer')}
-              className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 activeTabRole === 'observer'
-                  ? 'bg-lab-cyan text-black font-bold'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              User A (Observer)
+              Observer
             </button>
             <button
               onClick={() => setActiveTabRole('operator')}
-              className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                 activeTabRole === 'operator'
-                  ? 'bg-lab-pink text-white font-bold'
-                  : 'text-slate-300 hover:text-white'
+                  ? 'bg-white text-black shadow-sm'
+                  : 'text-slate-400 hover:text-white'
               }`}
             >
-              User B (Operator)
+              Operator
             </button>
           </div>
         )}
 
-        {/* Reaction Status Indicator */}
-        <div className="flex items-center space-x-2 font-mono text-xs">
-          <span className="text-slate-400">STATUS:</span>
+        {/* Status Badge */}
+        <div className="flex items-center space-x-2 text-xs">
           {state.isSuccess ? (
-            <span className="flex items-center gap-1.5 text-emerald-400 font-bold bg-emerald-400/10 px-3 py-1 rounded-full border border-emerald-400/30">
-              <CheckCircle2 className="w-3.5 h-3.5" /> REACTION SUCCESS
+            <span className="flex items-center gap-1.5 text-emerald-400 font-medium bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Reaction Successful
             </span>
           ) : state.isStabilized ? (
-            <span className="flex items-center gap-1.5 text-lab-cyan font-bold bg-lab-cyan/10 px-3 py-1 rounded-full border border-lab-cyan/30 animate-pulse">
-              <Sparkles className="w-3.5 h-3.5" /> STABILIZING ({state.stabilityPercentage}%)
+            <span className="flex items-center gap-1.5 text-sky-300 font-medium bg-sky-500/10 px-3 py-1 rounded-full border border-sky-500/30">
+              <Sparkles className="w-3.5 h-3.5 text-sky-400" /> Stabilizing ({state.stabilityPercentage}%)
             </span>
           ) : (
-            <span className="text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/20">
-              SEARCHING HARMONY
+            <span className="text-slate-300 bg-white/[0.05] px-3 py-1 rounded-full border border-white/10">
+              Awaiting Target Match
             </span>
           )}
         </div>
       </div>
 
-      {/* Center Chamber Vessel Visualizer */}
+      {/* Central Glassware Visualizer */}
       <div className="py-2">
         <ReactorVessel
           currentTemp={state.currentTemp}
@@ -214,8 +208,8 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
         />
       </div>
 
-      {/* Active Role Console (User A vs User B) */}
-      <div className="transition-all duration-300">
+      {/* Active Role Console (Observer or Operator) */}
+      <div className="transition-all duration-200">
         {activeTabRole === 'observer' ? (
           <ObserverView
             target={target}
@@ -236,12 +230,12 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
       {/* Success Notification Banner */}
       {state.isSuccess && (
-        <div className="p-6 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 shadow-glow-cyan text-center space-y-2 animate-bounce-short">
-          <h2 className="text-xl md:text-2xl font-bold text-white tracking-wide flex items-center justify-center gap-2">
-            <Sparkles className="w-6 h-6 text-emerald-400" />
-            REACTION SYNTHESIS COMPLETE!
+        <div className="p-6 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-center space-y-1.5 animate-fadeIn">
+          <h2 className="text-lg md:text-xl font-semibold text-white tracking-tight flex items-center justify-center gap-2">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            Reaction Synthesis Achieved
           </h2>
-          <p className="text-sm text-emerald-200">
+          <p className="text-xs text-slate-300">
             Chamber stabilized in {state.elapsedSeconds.toFixed(1)} seconds. Advancing to Synchronized Dilemma...
           </p>
         </div>

@@ -18,69 +18,58 @@ export const ReactorVessel: React.FC<ReactorVesselProps> = ({
   isSuccess,
   stabilityPercentage,
 }) => {
-  // Determine fluid color based on stability and temperature
-  const getFluidGradient = () => {
-    if (isSuccess) {
-      return 'from-emerald-400 via-cyan-400 to-teal-500';
-    }
-    if (isStabilized) {
-      return 'from-cyan-400 via-teal-400 to-blue-500';
-    }
-    if (currentTemp > 85 || currentPressure > 6.0) {
-      return 'from-rose-500 via-amber-500 to-red-600';
-    }
-    return 'from-purple-500 via-indigo-500 to-cyan-500';
+  // Fluid gradient communicating reaction state
+  const getFluidColor = () => {
+    if (isSuccess) return 'from-emerald-500/80 via-teal-500/70 to-emerald-400/90';
+    if (isStabilized) return 'from-sky-500/80 via-cyan-500/70 to-blue-500/80';
+    if (currentTemp > 85 || currentPressure > 6.0) return 'from-amber-500/80 via-orange-500/70 to-rose-500/80';
+    return 'from-blue-600/70 via-indigo-500/60 to-sky-500/70';
   };
 
-  const fillHeight = Math.min(88, Math.max(25, 20 + (currentPressure * 6.5)));
+  const fillHeight = Math.min(88, Math.max(22, 18 + currentPressure * 6.8));
 
   return (
-    <div className="relative w-48 h-64 md:w-56 md:h-72 mx-auto flex items-center justify-center">
-      {/* Outer Chamber Glass Flask Frame */}
-      <div className="absolute inset-0 rounded-[2.5rem] border-2 border-white/15 bg-white/[0.02] backdrop-blur-md shadow-glass-lg overflow-hidden flex flex-col justify-end p-2">
-        {/* Specular glass reflection bar */}
-        <div className="absolute top-2 left-4 w-2 h-20 bg-white/20 rounded-full blur-[1px] transform -rotate-6 pointer-events-none" />
-        <div className="absolute top-2 right-4 w-1 h-12 bg-white/10 rounded-full pointer-events-none" />
+    <div className="relative w-52 h-72 md:w-60 md:h-80 mx-auto flex items-center justify-center select-none">
+      {/* Outer Borosilicate Glass Cylinder */}
+      <div className="absolute inset-0 rounded-[2.5rem] border border-white/[0.12] bg-white/[0.02] backdrop-blur-xl shadow-apple-card overflow-hidden flex flex-col justify-end p-2.5">
+        {/* Specular Glare Lines */}
+        <div className="absolute top-4 left-5 w-1.5 h-24 bg-gradient-to-b from-white/25 via-white/10 to-transparent rounded-full pointer-events-none" />
+        <div className="absolute top-4 right-5 w-1 h-14 bg-gradient-to-b from-white/15 to-transparent rounded-full pointer-events-none" />
+
+        {/* Graduation Marks (Scientific Precision) */}
+        <div className="absolute left-3 inset-y-10 flex flex-col justify-between pointer-events-none opacity-40 text-[9px] font-mono text-slate-400">
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-[1px] bg-white" /><span>100</span></div>
+          <div className="flex items-center gap-1.5"><span className="w-1.5 h-[1px] bg-white/70" /><span>80</span></div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-[1px] bg-white" /><span>60</span></div>
+          <div className="flex items-center gap-1.5"><span className="w-1.5 h-[1px] bg-white/70" /><span>40</span></div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-[1px] bg-white" /><span>20</span></div>
+        </div>
 
         {/* Liquid Fluid Column */}
         <motion.div
-          className={`w-full rounded-b-[2rem] bg-gradient-to-t ${getFluidGradient()} opacity-80 relative overflow-hidden transition-all duration-300`}
+          className={`w-full rounded-b-[2rem] bg-gradient-to-t ${getFluidColor()} relative overflow-hidden transition-all duration-300 ease-out`}
           style={{ height: `${fillHeight}%` }}
-          animate={{
-            scaleY: [1, 1.02, 0.99, 1],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 2.5,
-            ease: 'easeInOut',
-          }}
         >
-          {/* Internal rising bubbles */}
-          <div className="absolute inset-0 pointer-events-none">
-            <span className="absolute bottom-2 left-6 w-3 h-3 bg-white/40 rounded-full animate-bubble" style={{ animationDuration: '2.2s' }} />
-            <span className="absolute bottom-1 left-20 w-2 h-2 bg-white/50 rounded-full animate-bubble" style={{ animationDuration: '1.8s', animationDelay: '0.4s' }} />
-            <span className="absolute bottom-3 right-8 w-2.5 h-2.5 bg-white/40 rounded-full animate-bubble" style={{ animationDuration: '2.6s', animationDelay: '0.8s' }} />
+          {/* Surface Meniscus Line */}
+          <div className="absolute top-0 inset-x-0 h-1.5 bg-white/40 blur-[1px] rounded-full" />
+
+          {/* Gentle Micro-Bubbles */}
+          <div className="absolute inset-0 pointer-events-none opacity-70">
+            <span className="absolute bottom-2 left-10 w-2 h-2 bg-white/50 rounded-full animate-bubble" style={{ animationDuration: '2.5s' }} />
+            <span className="absolute bottom-1 right-12 w-1.5 h-1.5 bg-white/60 rounded-full animate-bubble" style={{ animationDuration: '3s', animationDelay: '0.6s' }} />
           </div>
-
-          {/* Meniscus Wave */}
-          <div className="absolute top-0 inset-x-0 h-3 bg-white/30 blur-[2px] rounded-full" />
         </motion.div>
-
-        {/* Overheating warning steam pulse */}
-        {(currentTemp > 85 || currentPressure > 6.0) && (
-          <div className="absolute inset-0 bg-red-500/15 animate-pulse pointer-events-none" />
-        )}
       </div>
 
-      {/* Stability Orbital Ring */}
-      <div className="absolute -inset-3 pointer-events-none">
+      {/* Stability Progress Ring (Subtle Apple-style metric halo) */}
+      <div className="absolute -inset-2.5 pointer-events-none">
         <svg className="w-full h-full" viewBox="0 0 100 100">
           <circle
             cx="50"
             cy="50"
             r="48"
             fill="none"
-            stroke="rgba(255, 255, 255, 0.08)"
+            stroke="rgba(255, 255, 255, 0.05)"
             strokeWidth="1.5"
           />
           <circle
@@ -88,26 +77,26 @@ export const ReactorVessel: React.FC<ReactorVesselProps> = ({
             cy="50"
             r="48"
             fill="none"
-            stroke={isSuccess ? '#10b981' : isStabilized ? '#00f0ff' : '#9d4edd'}
-            strokeWidth="2.5"
+            stroke={isSuccess ? '#34c759' : isStabilized ? '#38bdf8' : '#818cf8'}
+            strokeWidth="2"
             strokeDasharray="301.6"
             strokeDashoffset={301.6 - (301.6 * stabilityPercentage) / 100}
             strokeLinecap="round"
-            className="transition-all duration-150 transform -rotate-90 origin-center"
+            className="transition-all duration-200 ease-out transform -rotate-90 origin-center"
           />
         </svg>
       </div>
 
-      {/* Center Stability Status Badge */}
-      <div className="absolute bottom-4 inset-x-0 flex justify-center pointer-events-none">
-        <div className={`px-3 py-1 rounded-full text-[11px] font-mono font-semibold tracking-wider uppercase backdrop-blur-md border ${
+      {/* State Pill */}
+      <div className="absolute bottom-5 inset-x-0 flex justify-center pointer-events-none">
+        <div className={`px-3.5 py-1 rounded-full text-[11px] font-medium tracking-wide uppercase backdrop-blur-xl border transition-all duration-200 ${
           isSuccess
             ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
             : isStabilized
-            ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 animate-pulse'
-            : 'bg-black/40 text-slate-400 border-white/10'
+            ? 'bg-sky-500/20 text-sky-200 border-sky-500/40'
+            : 'bg-black/50 text-slate-300 border-white/10'
         }`}>
-          {isSuccess ? 'REACTION STABLE' : isStabilized ? `LOCKING ${stabilityPercentage}%` : 'CALIBRATING'}
+          {isSuccess ? 'Synthesis Complete' : isStabilized ? `Locking ${stabilityPercentage}%` : 'Calibrating'}
         </div>
       </div>
     </div>

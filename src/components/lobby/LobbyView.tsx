@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { UserRole, Participant } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
-import { Atom, Shield, Eye, Wrench, Sparkles, Copy, Check, Users, ArrowRight } from 'lucide-react';
+import { Atom, Eye, Wrench, Copy, Check, ArrowRight } from 'lucide-react';
 
 interface LobbyViewProps {
   roomCode: string;
@@ -44,28 +43,30 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-8">
-      {/* Lobby Hero Title */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lab-cyan/10 border border-lab-cyan/30 text-lab-cyan text-xs font-mono uppercase tracking-widest">
-          <Atom className="w-3.5 h-3.5" /> Affecio Chemistry Lab
+    <div className="w-full max-w-3xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/[0.05] border border-white/10 text-slate-300 text-xs font-medium">
+          <Atom className="w-3.5 h-3.5 text-sky-400" />
+          <span>Experiment Chamber</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
-          Liquid Glass Chamber
+        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-white">
+          Shared Lobby
         </h1>
-        <p className="text-sm md:text-base text-slate-400 max-w-lg mx-auto">
-          Don&apos;t just match. Discover your chemistry. Synchronize with your partner to initiate the reactor.
+        <p className="text-sm md:text-base text-slate-400 max-w-md mx-auto">
+          Synchronize with your partner to begin the collaborative synthesis.
         </p>
 
-        {/* Room Share Pill */}
-        <div className="pt-2 flex items-center justify-center gap-3">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl glass-panel text-xs font-mono">
-            <span className="text-slate-400">CHAMBER CODE:</span>
-            <span className="text-lab-cyan font-bold tracking-widest text-sm">{roomCode}</span>
+        {/* Room Code Badge */}
+        <div className="pt-2 flex items-center justify-center">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 text-xs text-slate-300 tabular-data">
+            <span className="text-slate-500 font-medium">Chamber Code:</span>
+            <span className="font-semibold text-white tracking-wider">{roomCode}</span>
             <button
               onClick={handleCopyCode}
-              className="ml-2 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
-              title="Copy Room Code"
+              className="p-1 rounded-md hover:bg-white/10 text-slate-400 hover:text-white transition-colors"
+              title="Copy Chamber Code"
+              aria-label="Copy Chamber Code"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
@@ -73,43 +74,43 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </div>
       </div>
 
-      {/* Role Pods: Observer (User A) & Operator (User B) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Role Pods */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Pod 1: Observer (User A) */}
         <LiquidGlassPanel
-          glow={role === 'observer' ? 'cyan' : 'none'}
+          tint={role === 'observer' ? 'cyan' : 'none'}
           className={`p-6 flex flex-col justify-between transition-all ${
-            role === 'observer' ? 'ring-2 ring-lab-cyan/60' : 'opacity-85'
+            role === 'observer' ? 'ring-2 ring-sky-400/80' : 'opacity-85'
           }`}
         >
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-lab-cyan/10 border border-lab-cyan/30 text-lab-cyan">
-                <Eye className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
+                <Eye className="w-5 h-5" strokeWidth={1.75} />
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border ${
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
                 userA.isReady
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   : 'bg-white/5 text-slate-400 border-white/10'
               }`}>
-                {userA.isReady ? 'READY FOR SYNTHESIS' : 'WAITING'}
+                {userA.isReady ? 'Ready' : 'Not Ready'}
               </span>
             </div>
 
-            <div className="text-xs font-mono uppercase tracking-widest text-lab-cyan font-bold">
-              ROLE: OBSERVER
+            <div className="text-xs uppercase tracking-wider text-sky-400 font-medium">
+              Observer Role
             </div>
-            <h3 className="text-xl font-bold text-white mt-1">
+            <h3 className="text-xl font-semibold text-white mt-1">
               {userA.name || 'User A'}
             </h3>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Receives target temperature, pressure tolerances, and stability diagnostics. Holds the secret formula.
+              Monitors the recipe targets, pressure tolerances, and stability feedback. Holds the target values.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-            <span className="text-[11px] font-mono text-slate-400">
-              {role === 'observer' ? 'You are assigned here' : 'Partner role'}
+          <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="text-slate-400">
+              {role === 'observer' ? 'You are assigned here' : 'Partner Role'}
             </span>
             {role !== 'observer' && (
               <button
@@ -117,7 +118,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                   sound.playGlassClick();
                   onRoleSelect('observer');
                 }}
-                className="text-xs font-mono text-lab-cyan hover:underline"
+                className="text-sky-400 hover:text-sky-300 font-medium"
               >
                 Switch to Observer
               </button>
@@ -127,39 +128,39 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
         {/* Pod 2: Operator (User B) */}
         <LiquidGlassPanel
-          glow={role === 'operator' ? 'pink' : 'none'}
+          tint={role === 'operator' ? 'rose' : 'none'}
           className={`p-6 flex flex-col justify-between transition-all ${
-            role === 'operator' ? 'ring-2 ring-lab-pink/60' : 'opacity-85'
+            role === 'operator' ? 'ring-2 ring-rose-400/80' : 'opacity-85'
           }`}
         >
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 rounded-2xl bg-lab-pink/10 border border-lab-pink/30 text-lab-pink">
-                <Wrench className="w-6 h-6" />
+              <div className="w-10 h-10 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+                <Wrench className="w-5 h-5" strokeWidth={1.75} />
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase border ${
+              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
                 userB.isReady
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   : 'bg-white/5 text-slate-400 border-white/10'
               }`}>
-                {userB.isReady ? 'READY FOR SYNTHESIS' : 'WAITING'}
+                {userB.isReady ? 'Ready' : 'Not Ready'}
               </span>
             </div>
 
-            <div className="text-xs font-mono uppercase tracking-widest text-lab-pink font-bold">
-              ROLE: OPERATOR
+            <div className="text-xs uppercase tracking-wider text-rose-400 font-medium">
+              Operator Role
             </div>
-            <h3 className="text-xl font-bold text-white mt-1">
+            <h3 className="text-xl font-semibold text-white mt-1">
               {userB.name || 'User B'}
             </h3>
             <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-              Controls physical actuators, thermal sliders, and catalyst valves. Blind to the targets without verbal direction.
+              Controls physical sliders, heat levels, and catalyst valves. Relies on verbal communication.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-            <span className="text-[11px] font-mono text-slate-400">
-              {role === 'operator' ? 'You are assigned here' : 'Partner role'}
+          <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between text-xs">
+            <span className="text-slate-400">
+              {role === 'operator' ? 'You are assigned here' : 'Partner Role'}
             </span>
             {role !== 'operator' && (
               <button
@@ -167,7 +168,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                   sound.playGlassClick();
                   onRoleSelect('operator');
                 }}
-                className="text-xs font-mono text-lab-pink hover:underline"
+                className="text-rose-400 hover:text-rose-300 font-medium"
               >
                 Switch to Operator
               </button>
@@ -176,37 +177,35 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </LiquidGlassPanel>
       </div>
 
-      {/* Readiness & Chamber Launch Console */}
-      <LiquidGlassPanel className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-3 h-3 rounded-full bg-emerald-400 shadow-glow-cyan animate-pulse" />
+      {/* Readiness & Chamber Launch Bar */}
+      <LiquidGlassPanel className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center space-x-3 text-left">
+          <span className={`w-2.5 h-2.5 rounded-full ${bothReady ? 'bg-emerald-400' : 'bg-amber-400'}`} />
           <div>
-            <div className="text-sm font-semibold text-white">
+            <div className="text-sm font-medium text-white">
               {bothReady
-                ? 'Both Participants Synchronized!'
+                ? 'Both participants ready'
                 : me.isReady
-                ? `You are ready. Waiting for ${partner.name}...`
-                : 'Confirm readiness to initiate reaction synthesis.'}
+                ? `Ready. Waiting for ${partner.name}...`
+                : 'Confirm readiness when ready to start'}
             </div>
-            <div className="text-xs text-slate-400 font-mono">
-              Challenge duration: 45 seconds · Vocal communication required
+            <div className="text-xs text-slate-400">
+              Duration: 45 seconds · Voice communication encouraged
             </div>
           </div>
         </div>
 
-        <div className="flex items-center space-x-3 w-full md:w-auto">
+        <div className="flex items-center space-x-2.5 w-full sm:w-auto">
           <button
             onClick={() => {
               sound.playGlassClick();
               onReadyToggle();
             }}
-            className={`w-full md:w-auto px-6 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-bold transition-all border ${
-              me.isReady
-                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                : 'glass-btn text-white hover:border-white/30'
+            className={`apple-btn-secondary flex-1 sm:flex-none ${
+              me.isReady ? '!border-emerald-500/40 !bg-emerald-500/10 text-emerald-300' : ''
             }`}
           >
-            {me.isReady ? '✓ You Are Ready' : 'Mark Ready'}
+            {me.isReady ? '✓ You Are Ready' : 'Ready'}
           </button>
 
           <button
@@ -215,9 +214,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               onStartExperience();
             }}
             disabled={!bothReady && !demoMode}
-            className="w-full md:w-auto px-8 py-3 rounded-xl font-mono text-xs uppercase tracking-wider font-bold bg-gradient-to-r from-lab-cyan to-lab-pink text-black shadow-glow-cyan hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="apple-btn-primary flex-1 sm:flex-none"
           >
-            <span>Initiate Synthesis</span>
+            <span>Start Experiment</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

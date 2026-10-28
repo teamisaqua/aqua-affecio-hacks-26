@@ -5,7 +5,7 @@ interface MetricBadgeProps {
   label: string;
   value: string | number;
   unit?: string;
-  color?: 'cyan' | 'pink' | 'purple' | 'amber' | 'emerald';
+  color?: 'cyan' | 'rose' | 'emerald' | 'amber';
   className?: string;
 }
 
@@ -17,27 +17,26 @@ export const MetricBadge: React.FC<MetricBadgeProps> = ({
   className,
 }) => {
   const colorMap = {
-    cyan: 'text-lab-cyan bg-lab-cyan/10 border-lab-cyan/30',
-    pink: 'text-lab-pink bg-lab-pink/10 border-lab-pink/30',
-    purple: 'text-lab-purple bg-lab-purple/10 border-lab-purple/30',
-    amber: 'text-amber-400 bg-amber-400/10 border-amber-400/30',
-    emerald: 'text-emerald-400 bg-emerald-400/10 border-emerald-400/30',
+    cyan: 'text-sky-400 bg-sky-500/[0.08] border-sky-500/20',
+    rose: 'text-rose-400 bg-rose-500/[0.08] border-rose-500/20',
+    emerald: 'text-emerald-400 bg-emerald-500/[0.08] border-emerald-500/20',
+    amber: 'text-amber-400 bg-amber-500/[0.08] border-amber-500/20',
   };
 
   return (
     <div
       className={cn(
-        'inline-flex flex-col items-center justify-center px-4 py-2 rounded-xl border backdrop-blur-md',
+        'inline-flex flex-col items-center justify-center px-4 py-2.5 rounded-xl border backdrop-blur-md',
         colorMap[color],
         className
       )}
     >
-      <span className="text-[10px] uppercase tracking-widest font-mono text-slate-400">
+      <span className="text-[11px] font-medium tracking-wide uppercase text-slate-400">
         {label}
       </span>
-      <div className="flex items-baseline space-x-1 font-mono font-bold text-lg leading-tight">
+      <div className="flex items-baseline space-x-1 tabular-data font-semibold text-lg leading-tight mt-0.5">
         <span>{value}</span>
-        {unit && <span className="text-xs font-normal opacity-75">{unit}</span>}
+        {unit && <span className="text-xs font-normal text-slate-400">{unit}</span>}
       </div>
     </div>
   );
