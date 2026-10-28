@@ -31,7 +31,20 @@ import { DemoModeBar } from '@/components/demo/DemoModeBar';
 import { InteractionField } from '@/components/chamber/InteractionField';
 import { ReactionCanvas, ReactionFieldState } from '@/components/molecular/ReactionCanvas';
 import { sound } from '@/lib/sound/soundEffects';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, FlaskConical, Gamepad2, BarChart3, Sparkles } from 'lucide-react';
+import { ActivityRecord } from '@/lib/activities/types';
+import { ACTIVITIES, getActivityById } from '@/lib/activities/registry';
+import { ActivityHub } from '@/components/hub/ActivityHub';
+import { SessionSummary } from '@/components/hub/SessionSummary';
+import { ChoiceVotingGame } from '@/components/activities/ChoiceVotingGame';
+import { QuizBattleGame } from '@/components/activities/QuizBattleGame';
+import { DrawTogetherGame } from '@/components/activities/DrawTogetherGame';
+import { CollaborativeDateBuilder } from '@/components/activities/CollaborativeDateBuilder';
+import { DeepTalkGame } from '@/components/activities/DeepTalkGame';
+import { MemoryMatchGame } from '@/components/activities/MemoryMatchGame';
+import { getQuestionsForActivity } from '@/lib/data/questionBank';
+
+export type LabViewMode = 'chamber' | 'hub' | 'activity' | 'summary';
 
 const initialTarget: ReactorTarget = {
   temp: 72,
@@ -74,6 +87,14 @@ export default function LabSessionPage() {
   const paramName = searchParams.get('name') || (initialRole === 'explore' ? 'Alex' : 'Taylor');
   const isDemoParam = searchParams.get('demo') === 'true' || sessionId.startsWith('DEMO');
   const autoParam = searchParams.get('auto') === 'true';
+  const queryView = searchParams.get('view') as LabViewMode | null;
+  const queryActivity = searchParams.get('activity');
+
+  const [viewMode, setViewMode] = useState<LabViewMode>(
+    queryActivity ? 'activity' : queryView === 'hub' ? 'hub' : queryView === 'summary' ? 'summary' : 'chamber'
+  );
+  const [activeActivityId, setActiveActivityId] = useState<string | null>(queryActivity || null);
+  const [sessionRecords, setSessionRecords] = useState<ActivityRecord[]>([]);
 
   const [currentRole, setCurrentRole] = useState<UserRole>(initialRole);
   const [stage, setStage] = useState<ExperienceStage>('lobby');
@@ -143,7 +164,23 @@ export default function LabSessionPage() {
       // If any real network/broadcast message arrives from a second participant, disable simulated mode
       setIsSimulatedPartner(false);
 
-      if (event === 'STAGE_CHANGE') {
+      if (event === 'VIEW_MODE') {
+        const targetMode = data.viewMode as LabViewMode;
+        setViewMode(targetMode);
+        if (targetMode !== 'activity') {
+          setActiveActivityId(null);
+        }
+      } else if (event === 'LAUNCH_ACTIVITY') {
+        const actId = data.activityId as string;
+        setActiveActivityId(actId);
+        setViewMode('activity');
+      } else if (event === 'ACTIVITY_COMPLETE') {
+        const rec = data.record as ActivityRecord;
+        setSessionRecords((prev) => {
+          const existing = prev.filter((r) => r.activityId !== rec.activityId);
+          return [...existing, rec];
+        });
+      } else if (event === 'STAGE_CHANGE') {
         setStage(data.stage as ExperienceStage);
       } else if (event === 'REACTOR_STATE') {
         setReactorState(data.reactorState as ReactorState);
@@ -182,6 +219,126 @@ export default function LabSessionPage() {
       syncChannel.destroy();
     };
   }, [syncChannel]);
+
+  // View & Activity Handlers
+  const handleSwitchView = (newMode: LabViewMode) => {
+    sound.playGlassClick();
+    setViewMode(newMode);
+    if (newMode !== 'activity') {
+      setActiveActivityId(null);
+    }
+    syncChannel.broadcast('VIEW_MODE', { viewMode: newMode });
+  };
+
+  const handleLaunchActivity = (actId: string) => {
+    sound.playSuccessChime();
+    setActiveActivityId(actId);
+    setViewMode('activity');
+    syncChannel.broadcast('LAUNCH_ACTIVITY', { activityId: actId });
+  };
+
+  const handleFinishActivityGame = (record: ActivityRecord) => {
+    sound.playSuccessChime();
+    setSessionRecords((prev) => {
+      const existing = prev.filter((r) => r.activityId !== record.activityId);
+      return [...existing, record];
+    });
+    syncChannel.broadcast('ACTIVITY_COMPLETE', { record });
+    setViewMode('summary');
+  };
+
+  const handleExitActivityToHub = () => {
+    sound.playGlassClick();
+    setActiveActivityId(null);
+    setViewMode('hub');
+    syncChannel.broadcast('VIEW_MODE', { viewMode: 'hub' });
+  };
+
+  const renderActiveActivity = () => {
+    const actId = activeActivityId || 'would-you-rather';
+    const isUserA = currentRole === 'explore';
+
+    if (actId === 'quiz-battle') {
+      return (
+        <QuizBattleGame
+          userAName={userA.name}
+          userBName={userB.name}
+          isUserA={isUserA}
+          isSimulatedPartner={isSimulatedPartner}
+          onFinishGame={handleFinishActivityGame}
+          onExitToHub={handleExitActivityToHub}
+        />
+      );
+    }
+
+    if (actId === 'draw-together') {
+      return (
+        <DrawTogetherGame
+          userAName={userA.name}
+          userBName={userB.name}
+          isUserA={isUserA}
+          isSimulatedPartner={isSimulatedPartner}
+          onFinishGame={handleFinishActivityGame}
+          onExitToHub={handleExitActivityToHub}
+        />
+      );
+    }
+
+    if (actId === 'collaborative-date-builder' || actId === 'dream-trip-planner') {
+      return (
+        <CollaborativeDateBuilder
+          userAName={userA.name}
+          userBName={userB.name}
+          isUserA={isUserA}
+          isSimulatedPartner={isSimulatedPartner}
+          onFinishGame={handleFinishActivityGame}
+          onExitToHub={handleExitActivityToHub}
+        />
+      );
+    }
+
+    if (actId === 'deep-talk-5-levels') {
+      return (
+        <DeepTalkGame
+          userAName={userA.name}
+          userBName={userB.name}
+          isUserA={isUserA}
+          onFinishGame={handleFinishActivityGame}
+          onExitToHub={handleExitActivityToHub}
+        />
+      );
+    }
+
+    if (actId === 'memory-match') {
+      return (
+        <MemoryMatchGame
+          userAName={userA.name}
+          userBName={userB.name}
+          isUserA={isUserA}
+          isSimulatedPartner={isSimulatedPartner}
+          onFinishGame={handleFinishActivityGame}
+          onExitToHub={handleExitActivityToHub}
+        />
+      );
+    }
+
+    const activityDef = getActivityById(actId);
+    const prompts = getQuestionsForActivity(actId, sessionId, 5);
+
+    return (
+      <ChoiceVotingGame
+        activityId={actId}
+        activityTitle={activityDef?.title || 'Choice Challenge'}
+        prompts={prompts}
+        userAName={userA.name}
+        userBName={userB.name}
+        isUserA={isUserA}
+        isSimulatedPartner={isSimulatedPartner}
+        onFinishGame={handleFinishActivityGame}
+        onExitToHub={handleExitActivityToHub}
+      />
+    );
+  };
 
   // Handlers
   const handleRoleSelect = (newRole: UserRole) => {
@@ -499,6 +656,32 @@ export default function LabSessionPage() {
   // Derived Genuine Chamber Signal State (Phase 2 & Phase 3)
   // Strictly responsive to real experiment telemetry without simulating fake synchronization
   const chamberSignal = useMemo(() => {
+    if (viewMode === 'hub') {
+      return {
+        state: 'waiting' as const,
+        metric: 'ACTIVITY CATALOG',
+        message: 'Select from 25+ collaborative games and challenges',
+        activeRole: null,
+      };
+    }
+    if (viewMode === 'activity') {
+      const currentAct = getActivityById(activeActivityId || '');
+      return {
+        state: 'collaborating' as const,
+        metric: currentAct?.title?.toUpperCase() || 'SYNCHRONIZED ACTIVITY',
+        message: currentAct?.description || 'Collaborative gameplay session in progress',
+        activeRole: null,
+      };
+    }
+    if (viewMode === 'summary') {
+      return {
+        state: 'completing' as const,
+        metric: 'SESSION SUMMARY',
+        message: `${sessionRecords.length} activities completed · Decision and consensus metrics synthesized`,
+        activeRole: null,
+      };
+    }
+
     if (stage === 'lobby') {
       if (userA.isReady && userB.isReady) {
         return {
@@ -633,6 +816,9 @@ export default function LabSessionPage() {
       activeRole: null,
     };
   }, [
+    viewMode,
+    activeActivityId,
+    sessionRecords.length,
     stage,
     userA.isReady,
     userB.isReady,
@@ -658,6 +844,10 @@ export default function LabSessionPage() {
   const currentStepIdx = stepList.findIndex((s) => s.id === stage);
 
   const molecularFieldState: ReactionFieldState = useMemo(() => {
+    if (viewMode === 'hub') return 'lobby';
+    if (viewMode === 'activity') return 'calibrating';
+    if (viewMode === 'summary') return 'signature';
+
     if (stage === 'lobby') return 'lobby';
     if (stage === 'bond') return 'calibrating';
     if (stage === 'reactor') {
@@ -669,7 +859,7 @@ export default function LabSessionPage() {
     if (stage === 'dilemma') return 'calibrating';
     if (stage === 'engine' || stage === 'compound' || stage === 'card') return 'signature';
     return 'idle';
-  }, [stage, reactorState.isSuccess, reactorState.isStabilized, reactorState.overshootCount]);
+  }, [viewMode, stage, reactorState.isSuccess, reactorState.isStabilized, reactorState.overshootCount]);
 
   return (
     <div className="relative min-h-screen flex flex-col justify-between p-3 sm:p-6 md:p-8 bg-black text-white overflow-x-hidden">
@@ -703,28 +893,91 @@ export default function LabSessionPage() {
         </div>
 
         {/* Step Progress Indicator */}
-        <nav
-          aria-label="Experiment Progress"
-          className="hidden md:flex items-center space-x-1 p-1 rounded-full bg-[#111114] border border-white/8"
-        >
-          {stepList.map((st, i) => (
-            <div key={st.id} className="flex items-center">
-              <span
-                className={`text-xs px-3 py-1 rounded-full transition-all ${
-                  st.id === stage
-                    ? 'bg-white text-black font-semibold shadow-sm'
-                    : i < currentStepIdx
-                    ? 'text-white font-medium'
-                    : 'text-[#86868B]'
-                }`}
-              >
-                {st.label}
-              </span>
-            </div>
-          ))}
-        </nav>
+        {viewMode === 'chamber' ? (
+          <nav
+            aria-label="Experiment Progress"
+            className="hidden md:flex items-center space-x-1 p-1 rounded-full bg-[#111114] border border-white/8"
+          >
+            {stepList.map((st, i) => (
+              <div key={st.id} className="flex items-center">
+                <span
+                  className={`text-xs px-3 py-1 rounded-full transition-all ${
+                    st.id === stage
+                      ? 'bg-white text-black font-semibold shadow-sm'
+                      : i < currentStepIdx
+                      ? 'text-white font-medium'
+                      : 'text-[#86868B]'
+                  }`}
+                >
+                  {st.label}
+                </span>
+              </div>
+            ))}
+          </nav>
+        ) : (
+          <div className="hidden md:flex items-center space-x-2 text-xs text-[#86868B] px-3 py-1 rounded-full bg-[#111114] border border-white/8">
+            <span className="text-white/40">Active:</span>
+            <span className="text-white font-medium">
+              {viewMode === 'hub'
+                ? 'Activity Catalog (25+ Games)'
+                : viewMode === 'activity'
+                ? getActivityById(activeActivityId || '')?.title || 'Interactive Game'
+                : 'Session Summary & Metrics'}
+            </span>
+          </div>
+        )}
 
         <div className="flex items-center space-x-2">
+          {/* Segmented Mode Switcher */}
+          <div className="flex items-center p-0.5 rounded-full bg-[#16161A] border border-white/8">
+            <button
+              onClick={() => handleSwitchView('chamber')}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                viewMode === 'chamber'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-[#86868B] hover:text-white'
+              }`}
+              title="Return to 3-stage Chemistry Chamber"
+            >
+              <FlaskConical className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Chamber</span>
+            </button>
+
+            <button
+              onClick={() => handleSwitchView('hub')}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                viewMode === 'hub' || viewMode === 'activity'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-[#86868B] hover:text-white'
+              }`}
+              title="Browse 25+ Dating & Compatibility Games"
+            >
+              <Gamepad2 className="w-3.5 h-3.5 text-[#2997FF]" />
+              <span className="hidden sm:inline">Activities</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
+                25+
+              </span>
+            </button>
+
+            <button
+              onClick={() => handleSwitchView('summary')}
+              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+                viewMode === 'summary'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-[#86868B] hover:text-white'
+              }`}
+              title="View Cumulative Session Summary"
+            >
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Recap</span>
+              {sessionRecords.length > 0 && (
+                <span className="w-4 h-4 rounded-full bg-[#34C759] text-black text-[9px] font-bold flex items-center justify-center">
+                  {sessionRecords.length}
+                </span>
+              )}
+            </button>
+          </div>
+
           <SoundToggle />
         </div>
       </header>
@@ -783,137 +1036,165 @@ export default function LabSessionPage() {
 
       {/* Main Experience Router */}
       <main className="relative z-10 flex-1 flex items-center justify-center py-2 sm:py-4 w-full">
-        {stage === 'lobby' && (
-          <LobbyView
-            roomCode={sessionId}
-            role={currentRole}
-            userA={userA}
-            userB={userB}
+        {viewMode === 'hub' ? (
+          <ActivityHub
+            userAName={userA.name}
+            userBName={userB.name}
             isSimulatedPartner={isSimulatedPartner}
-            onToggleSimulatedPartner={() => setIsSimulatedPartner((prev) => !prev)}
-            onRoleSelect={handleRoleSelect}
-            onReadyToggle={handleReadyToggle}
-            onStartExperience={handleStartExperience}
-            demoMode={isDemoParam || isSimulatedPartner}
+            completedActivityIds={sessionRecords.map((r) => r.activityId)}
+            onLaunchActivity={handleLaunchActivity}
+            onOpenSessionSummary={() => setViewMode('summary')}
+            onReturnToChamber={() => setViewMode('chamber')}
           />
-        )}
-
-        {stage === 'bond' && (
-          <ElementBondStage
-            role={currentRole}
+        ) : viewMode === 'summary' ? (
+          <SessionSummary
             userAName={userA.name}
             userBName={userB.name}
-            userAChoice={bondState.userAChoice}
-            userBChoice={bondState.userBChoice}
-            onSelectElement={(elId) => handleBondChoice(elId)}
-            onComplete={(result) => {
-              setBondState((prev) => ({ ...prev, result }));
-              setStage('reactor');
-              syncChannel.broadcast('STAGE_CHANGE', { stage: 'reactor' });
-            }}
-            demoMode={isDemoParam}
+            records={sessionRecords}
+            onContinuePlaying={() => setViewMode('hub')}
+            onReturnToChamber={() => setViewMode('chamber')}
           />
-        )}
+        ) : viewMode === 'activity' ? (
+          renderActiveActivity()
+        ) : (
+          <>
+            {stage === 'lobby' && (
+              <LobbyView
+                roomCode={sessionId}
+                role={currentRole}
+                userA={userA}
+                userB={userB}
+                isSimulatedPartner={isSimulatedPartner}
+                onToggleSimulatedPartner={() => setIsSimulatedPartner((prev) => !prev)}
+                onRoleSelect={handleRoleSelect}
+                onReadyToggle={handleReadyToggle}
+                onStartExperience={handleStartExperience}
+                demoMode={isDemoParam || isSimulatedPartner}
+              />
+            )}
 
-        {stage === 'reactor' && (
-          <ReactorContainer
-            role={currentRole}
-            userAName={userA.name}
-            userBName={userB.name}
-            target={reactorTarget}
-            state={reactorState}
-            onStateUpdate={handleReactorUpdate}
-            onComplete={handleReactorComplete}
-            demoMode={isDemoParam}
-          />
-        )}
+            {stage === 'bond' && (
+              <ElementBondStage
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                userAChoice={bondState.userAChoice}
+                userBChoice={bondState.userBChoice}
+                onSelectElement={(elId) => handleBondChoice(elId)}
+                onComplete={(result) => {
+                  setBondState((prev) => ({ ...prev, result }));
+                  setStage('reactor');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'reactor' });
+                }}
+                demoMode={isDemoParam}
+              />
+            )}
 
-        {stage === 'dilemma' && (
-          <SynchronizedDilemma
-            role={currentRole}
-            userAName={userA.name}
-            userBName={userB.name}
-            state={dilemmaState}
-            onChoiceSelect={handleDilemmaChoice}
-            onAdvanceScenario={handleAdvanceDilemma}
-            onComplete={handleDilemmaComplete}
-            demoMode={isDemoParam}
-          />
-        )}
+            {stage === 'reactor' && (
+              <ReactorContainer
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                target={reactorTarget}
+                state={reactorState}
+                onStateUpdate={handleReactorUpdate}
+                onComplete={handleReactorComplete}
+                demoMode={isDemoParam}
+              />
+            )}
 
-        {stage === 'engine' && chemistryScore && (
-          <AffinityResult
-            score={chemistryScore}
-            compound={compound || undefined}
-            userAName={userA.name}
-            userBName={userB.name}
-            onRestart={() => {
-              setStage('bond');
-              setBondState({ userAChoice: null, userBChoice: null, result: null });
-              setDilemmaState({
-                scenarioIndex: 0,
-                totalScenarios: CURATED_DILEMMAS.length,
-                scenario: CURATED_DILEMMAS[0],
-                userAChoice: null,
-                userBChoice: null,
-                isLockedIn: false,
-                isRevealed: false,
-                isSynchronized: false,
-                harmonyClassification: 'Pending',
-                history: [],
-              });
-              setReactorState(initialReactorState);
-              syncChannel.broadcast('STAGE_CHANGE', { stage: 'bond' });
-            }}
-            onOpenConversation={() => {
-              setStage('conversation');
-              syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
-            }}
-          />
-        )}
+            {stage === 'dilemma' && (
+              <SynchronizedDilemma
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                state={dilemmaState}
+                onChoiceSelect={handleDilemmaChoice}
+                onAdvanceScenario={handleAdvanceDilemma}
+                onComplete={handleDilemmaComplete}
+                demoMode={isDemoParam}
+              />
+            )}
 
-        {stage === 'card' && chemistryScore && compound && (
-          <CollectibleCard
-            score={chemistryScore}
-            compound={compound}
-            userAName={userA.name}
-            userBName={userB.name}
-            onOpenConversation={() => {
-              setStage('conversation');
-              syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
-            }}
-            onRestart={() => {
-              setStage('bond');
-              setBondState({ userAChoice: null, userBChoice: null, result: null });
-              setDilemmaState({
-                scenarioIndex: 0,
-                totalScenarios: CURATED_DILEMMAS.length,
-                scenario: CURATED_DILEMMAS[0],
-                userAChoice: null,
-                userBChoice: null,
-                isLockedIn: false,
-                isRevealed: false,
-                isSynchronized: false,
-                harmonyClassification: 'Pending',
-                history: [],
-              });
-              setReactorState(initialReactorState);
-            }}
-          />
-        )}
+            {stage === 'engine' && chemistryScore && (
+              <AffinityResult
+                score={chemistryScore}
+                compound={compound || undefined}
+                userAName={userA.name}
+                userBName={userB.name}
+                onExploreActivities={() => {
+                  setViewMode('hub');
+                  syncChannel.broadcast('VIEW_MODE', { viewMode: 'hub' });
+                }}
+                onRestart={() => {
+                  setStage('bond');
+                  setBondState({ userAChoice: null, userBChoice: null, result: null });
+                  setDilemmaState({
+                    scenarioIndex: 0,
+                    totalScenarios: CURATED_DILEMMAS.length,
+                    scenario: CURATED_DILEMMAS[0],
+                    userAChoice: null,
+                    userBChoice: null,
+                    isLockedIn: false,
+                    isRevealed: false,
+                    isSynchronized: false,
+                    harmonyClassification: 'Pending',
+                    history: [],
+                  });
+                  setReactorState(initialReactorState);
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'bond' });
+                }}
+                onOpenConversation={() => {
+                  setStage('conversation');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
+                }}
+              />
+            )}
 
-        {stage === 'conversation' && (
-          <CatalyticChat
-            moments={catalyticMoments}
-            role={currentRole}
-            userAName={userA.name}
-            userBName={userB.name}
-          />
+            {stage === 'card' && chemistryScore && compound && (
+              <CollectibleCard
+                score={chemistryScore}
+                compound={compound}
+                userAName={userA.name}
+                userBName={userB.name}
+                onOpenConversation={() => {
+                  setStage('conversation');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
+                }}
+                onRestart={() => {
+                  setStage('bond');
+                  setBondState({ userAChoice: null, userBChoice: null, result: null });
+                  setDilemmaState({
+                    scenarioIndex: 0,
+                    totalScenarios: CURATED_DILEMMAS.length,
+                    scenario: CURATED_DILEMMAS[0],
+                    userAChoice: null,
+                    userBChoice: null,
+                    isLockedIn: false,
+                    isRevealed: false,
+                    isSynchronized: false,
+                    harmonyClassification: 'Pending',
+                    history: [],
+                  });
+                  setReactorState(initialReactorState);
+                }}
+              />
+            )}
+
+            {stage === 'conversation' && (
+              <CatalyticChat
+                moments={catalyticMoments}
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+              />
+            )}
+          </>
         )}
       </main>
 
       {/* Presenter / Judge Controller Bar */}
-      {(isDemoParam || isAutoDemo) && (
+      {(isDemoParam || isAutoDemo) && viewMode === 'chamber' && (
         <DemoModeBar
           currentStage={stage}
           currentRole={currentRole}
