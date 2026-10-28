@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Flame, Gauge, Zap, Wrench } from 'lucide-react';
-import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
+import { Flame, Gauge, Zap, Sliders } from 'lucide-react';
 import { ReactorState } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
 
@@ -41,38 +40,40 @@ export const OperatorView: React.FC<OperatorViewProps> = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Role Sub-header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/10">
+    <div className="space-y-4 text-left">
+      {/* Console Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/8">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-full bg-[#2C2C2E] border border-white/10 text-apple-blue flex items-center justify-center">
-            <Wrench className="w-4 h-4" strokeWidth={1.75} />
+          <div className="w-8 h-8 rounded-full bg-[#1C1C1E] border border-white/10 text-apple-blue flex items-center justify-center">
+            <Sliders className="w-4 h-4" />
           </div>
           <div>
             <h3 className="font-semibold text-white text-sm">
-              Operator Console
+              Control Board
             </h3>
             <p className="text-xs text-[#A1A1A6]">
-              You control the instruments. Listen to <span className="text-apple-blue font-medium">{partnerName}</span> for target values.
+              Adjust based on <span className="text-white font-medium">{partnerName}</span>&apos;s directions
             </p>
           </div>
         </div>
 
-        <div className="self-start sm:self-auto px-3 py-1 rounded-full bg-[#2C2C2E] border border-white/10 text-[#A1A1A6] text-xs tabular-data">
-          Controls Engaged
-        </div>
+        <span className="px-2.5 py-1 rounded-full bg-[#1C1C1E] border border-white/8 text-[#A1A1A6] text-xs">
+          Interactive
+        </span>
       </div>
 
       {/* Control Actuators Stack */}
       <div className="flex flex-col gap-3">
         {/* Actuator 1: Temperature */}
-        <LiquidGlassPanel className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
-            <span className="flex items-center gap-1.5"><Flame className="w-3.5 h-3.5 text-apple-amber" /> Thermal Actuator</span>
-            <span className="text-white font-semibold tabular-data text-sm">{state.currentTemp} °C</span>
+        <div className="p-4 rounded-2xl bg-[#141416] border border-white/8 space-y-3">
+          <div className="flex items-center justify-between text-xs text-[#A1A1A6]">
+            <span className="flex items-center gap-1.5 text-white font-medium">
+              <Flame className="w-3.5 h-3.5 text-apple-amber" /> Heat
+            </span>
+            <span className="text-white font-semibold tabular-nums text-sm">{state.currentTemp}°C</span>
           </div>
 
-          <div className="my-3">
+          <div>
             <input
               type="range"
               min="0"
@@ -83,26 +84,24 @@ export const OperatorView: React.FC<OperatorViewProps> = ({
               aria-label="Adjust Temperature"
               className="w-full h-2 rounded-full appearance-none cursor-pointer focus:outline-none disabled:opacity-50"
             />
-            <div className="flex justify-between text-[10px] text-[#A1A1A6] tabular-data mt-1.5 font-mono">
+            <div className="flex justify-between text-[11px] text-[#A1A1A6] tabular-nums mt-1.5">
               <span>0°C</span>
               <span>60°C</span>
               <span>120°C</span>
             </div>
           </div>
-
-          <div className="text-[11px] text-[#A1A1A6] text-center">
-            Slide to adjust chamber heat based on {partnerName}&apos;s cues
-          </div>
-        </LiquidGlassPanel>
+        </div>
 
         {/* Actuator 2: Pressure */}
-        <LiquidGlassPanel className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
-            <span className="flex items-center gap-1.5"><Gauge className="w-3.5 h-3.5 text-apple-blue" /> Pressure Regulator</span>
-            <span className="text-white font-semibold tabular-data text-sm">{state.currentPressure.toFixed(1)} bar</span>
+        <div className="p-4 rounded-2xl bg-[#141416] border border-white/8 space-y-3">
+          <div className="flex items-center justify-between text-xs text-[#A1A1A6]">
+            <span className="flex items-center gap-1.5 text-white font-medium">
+              <Gauge className="w-3.5 h-3.5 text-apple-blue" /> Pressure
+            </span>
+            <span className="text-white font-semibold tabular-nums text-sm">{state.currentPressure.toFixed(1)} bar</span>
           </div>
 
-          <div className="my-3">
+          <div>
             <input
               type="range"
               min="0"
@@ -114,47 +113,39 @@ export const OperatorView: React.FC<OperatorViewProps> = ({
               aria-label="Adjust Pressure"
               className="w-full h-2 rounded-full appearance-none cursor-pointer focus:outline-none disabled:opacity-50"
             />
-            <div className="flex justify-between text-[10px] text-[#A1A1A6] tabular-data mt-1.5 font-mono">
+            <div className="flex justify-between text-[11px] text-[#A1A1A6] tabular-nums mt-1.5">
               <span>0.0 bar</span>
               <span>5.0 bar</span>
               <span>10.0 bar</span>
             </div>
           </div>
-
-          <div className="text-[11px] text-[#A1A1A6] text-center">
-            Fine-tune pressure smoothly to avoid stability overshoots
-          </div>
-        </LiquidGlassPanel>
+        </div>
 
         {/* Actuator 3: Catalyst Valve Switch */}
-        <LiquidGlassPanel className="p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-xs text-[#A1A1A6] font-medium">
-            <span className="flex items-center gap-1.5"><Zap className="w-3.5 h-3.5 text-apple-green" /> Catalyst Flow</span>
+        <div className="p-4 rounded-2xl bg-[#141416] border border-white/8 space-y-3">
+          <div className="flex items-center justify-between text-xs text-[#A1A1A6]">
+            <span className="flex items-center gap-1.5 text-white font-medium">
+              <Zap className="w-3.5 h-3.5 text-apple-green" /> Catalyst Valve
+            </span>
             <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-medium ${
-              state.catalystValve ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-[#2C2C2E] text-[#A1A1A6] border border-white/10'
+              state.catalystValve ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-[#1C1C1E] text-[#A1A1A6] border border-white/8'
             }`}>
-              {state.catalystValve ? 'Active Flow' : 'Standby'}
+              {state.catalystValve ? 'Active' : 'Standby'}
             </span>
           </div>
 
-          <div className="my-2.5 flex justify-center">
-            <button
-              onClick={handleValve}
-              disabled={disabled}
-              className={`min-h-[40px] w-full px-4 py-2 rounded-full text-xs font-medium transition-all ${
-                state.catalystValve
-                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
-                  : 'apple-btn-secondary'
-              } disabled:opacity-50`}
-            >
-              {state.catalystValve ? '✓ Catalyst Valve Engaged' : 'Engage Catalyst Valve'}
-            </button>
-          </div>
-
-          <div className="text-[11px] text-[#A1A1A6] text-center">
-            Secondary stabilizing stream for equilibrium hold
-          </div>
-        </LiquidGlassPanel>
+          <button
+            onClick={handleValve}
+            disabled={disabled}
+            className={`min-h-[44px] w-full px-4 py-2.5 rounded-2xl text-xs font-medium transition-all ${
+              state.catalystValve
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                : 'apple-btn-secondary'
+            } disabled:opacity-50`}
+          >
+            {state.catalystValve ? '✓ Catalyst Valve Engaged' : 'Engage Catalyst Valve'}
+          </button>
+        </div>
       </div>
     </div>
   );

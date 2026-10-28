@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { UserRole, Participant } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
-import { Atom, Eye, Wrench, Copy, Check, ArrowRight } from 'lucide-react';
+import { Compass, Sliders, Copy, Check, ArrowRight, Sparkles } from 'lucide-react';
 
 interface LobbyViewProps {
   roomCode: string;
@@ -29,8 +28,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
 
-  const me = role === 'observer' ? userA : userB;
-  const partner = role === 'observer' ? userB : userA;
+  const isExplore = role === 'explore' || role === 'observer';
   const bothReady = userA.isReady && userB.isReady;
 
   const handleCopyCode = () => {
@@ -43,30 +41,30 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6 select-none text-center">
       {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[#A1A1A6] text-xs font-medium">
-          <Atom className="w-3.5 h-3.5 text-apple-blue" />
-          <span>Experiment Chamber</span>
+      <div className="space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#171717] border border-white/8 text-[#A1A1A6] text-xs font-medium">
+          <Sparkles className="w-3.5 h-3.5 text-apple-blue" />
+          <span>Experiment Lobby</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-white">
-          Shared Lobby
+        <h1 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
+          Ready to begin?
         </h1>
-        <p className="text-sm md:text-base text-[#A1A1A6] max-w-md mx-auto">
-          Synchronize with your partner to begin the collaborative synthesis.
+        <p className="text-sm text-[#A1A1A6] max-w-md mx-auto">
+          Both players must confirm readiness before entering Experiment 01.
         </p>
 
         {/* Room Code Badge */}
         <div className="pt-2 flex items-center justify-center">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1C1C1E] border border-white/10 text-xs text-white tabular-data">
-            <span className="text-[#A1A1A6] font-medium">Chamber Code:</span>
-            <span className="font-semibold text-white tracking-wider">{roomCode}</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#141416] border border-white/8 text-xs text-white">
+            <span className="text-[#A1A1A6]">Room code:</span>
+            <span className="font-semibold text-white tracking-wider font-mono">{roomCode}</span>
             <button
               onClick={handleCopyCode}
               className="p-1 rounded-md hover:bg-white/10 text-[#A1A1A6] hover:text-white transition-colors"
-              title="Copy Chamber Code"
-              aria-label="Copy Chamber Code"
+              title="Copy Code"
+              aria-label="Copy Code"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-apple-green" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
@@ -74,151 +72,141 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </div>
       </div>
 
-      {/* Role Pods */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Pod 1: Observer (User A) */}
-        <LiquidGlassPanel
-          className={`p-6 flex flex-col justify-between transition-all bg-[#1C1C1E] ${
-            role === 'observer' ? 'ring-2 ring-apple-blue' : 'opacity-85'
-          }`}
-        >
+      {/* Two Participant Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
+        {/* User A Card: Explore */}
+        <div className={`p-6 rounded-3xl border transition-all flex flex-col justify-between min-h-[220px] ${
+          isExplore
+            ? 'bg-[#171717] border-apple-blue ring-1 ring-apple-blue/40 shadow-xl'
+            : 'bg-[#111111] border-white/8 opacity-90'
+        }`}>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#2C2C2E] border border-white/10 text-apple-blue flex items-center justify-center">
-                <Eye className="w-5 h-5" strokeWidth={1.75} />
+              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] border border-white/10 text-apple-blue flex items-center justify-center">
+                <Compass className="w-5 h-5" />
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                 userA.isReady
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                  : 'bg-[#2C2C2E] text-[#A1A1A6] border-white/10'
+                  : 'bg-[#1C1C1E] text-[#A1A1A6] border-white/8'
               }`}>
-                {userA.isReady ? 'Ready' : 'Not Ready'}
+                {userA.isReady ? 'Ready' : 'Waiting'}
               </span>
             </div>
 
-            <div className="text-xs uppercase tracking-wider text-apple-blue font-medium">
-              Observer Role
+            <div className="text-xs uppercase tracking-wider text-apple-blue font-semibold">
+              Explore Role
             </div>
-            <h3 className="text-xl font-semibold text-white mt-1">
+            <h3 className="text-xl font-bold text-white mt-1">
               {userA.name || 'User A'}
             </h3>
             <p className="text-xs text-[#A1A1A6] mt-2 leading-relaxed">
-              Monitors the recipe targets, pressure tolerances, and stability feedback. Holds the target values.
+              You monitor target recipes, thermal tolerances, and verbally direct your partner.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
+          <div className="mt-6 pt-3 border-t border-white/8 flex items-center justify-between text-xs">
             <span className="text-[#A1A1A6]">
-              {role === 'observer' ? 'You are assigned here' : 'Partner Role'}
+              {isExplore ? 'You are assigned here' : 'Partner Role'}
             </span>
-            {role !== 'observer' && (
+            {!isExplore && (
               <button
                 onClick={() => {
                   sound.playGlassClick();
-                  onRoleSelect('observer');
+                  onRoleSelect('explore');
                 }}
                 className="text-apple-blue hover:underline font-medium"
               >
-                Switch to Observer
+                Switch to Explore
               </button>
             )}
           </div>
-        </LiquidGlassPanel>
+        </div>
 
-        {/* Pod 2: Operator (User B) */}
-        <LiquidGlassPanel
-          className={`p-6 flex flex-col justify-between transition-all bg-[#1C1C1E] ${
-            role === 'operator' ? 'ring-2 ring-apple-blue' : 'opacity-85'
-          }`}
-        >
+        {/* User B Card: Control */}
+        <div className={`p-6 rounded-3xl border transition-all flex flex-col justify-between min-h-[220px] ${
+          !isExplore
+            ? 'bg-[#171717] border-apple-blue ring-1 ring-apple-blue/40 shadow-xl'
+            : 'bg-[#111111] border-white/8 opacity-90'
+        }`}>
           <div>
             <div className="flex items-center justify-between mb-4">
-              <div className="w-10 h-10 rounded-full bg-[#2C2C2E] border border-white/10 text-apple-blue flex items-center justify-center">
-                <Wrench className="w-5 h-5" strokeWidth={1.75} />
+              <div className="w-10 h-10 rounded-full bg-[#1C1C1E] border border-white/10 text-apple-blue flex items-center justify-center">
+                <Sliders className="w-5 h-5" />
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-xs font-medium border ${
+              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                 userB.isReady
                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                  : 'bg-[#2C2C2E] text-[#A1A1A6] border-white/10'
+                  : 'bg-[#1C1C1E] text-[#A1A1A6] border-white/8'
               }`}>
-                {userB.isReady ? 'Ready' : 'Not Ready'}
+                {userB.isReady ? 'Ready' : 'Waiting'}
               </span>
             </div>
 
-            <div className="text-xs uppercase tracking-wider text-apple-blue font-medium">
-              Operator Role
+            <div className="text-xs uppercase tracking-wider text-apple-blue font-semibold">
+              Control Role
             </div>
-            <h3 className="text-xl font-semibold text-white mt-1">
+            <h3 className="text-xl font-bold text-white mt-1">
               {userB.name || 'User B'}
             </h3>
             <p className="text-xs text-[#A1A1A6] mt-2 leading-relaxed">
-              Controls physical sliders, heat levels, and catalyst valves. Relies on verbal communication.
+              You adjust live thermal actuators, pressure regulators, and secondary catalyst flow.
             </p>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between text-xs">
+          <div className="mt-6 pt-3 border-t border-white/8 flex items-center justify-between text-xs">
             <span className="text-[#A1A1A6]">
-              {role === 'operator' ? 'You are assigned here' : 'Partner Role'}
+              {!isExplore ? 'You are assigned here' : 'Partner Role'}
             </span>
-            {role !== 'operator' && (
+            {isExplore && (
               <button
                 onClick={() => {
                   sound.playGlassClick();
-                  onRoleSelect('operator');
+                  onRoleSelect('control');
                 }}
                 className="text-apple-blue hover:underline font-medium"
               >
-                Switch to Operator
+                Switch to Control
               </button>
             )}
           </div>
-        </LiquidGlassPanel>
+        </div>
       </div>
 
-      {/* Readiness Console */}
-      <LiquidGlassPanel className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#1C1C1E]">
-        <div className="flex items-center space-x-3 text-left">
-          <span className={`w-2.5 h-2.5 rounded-full ${bothReady ? 'bg-apple-green' : 'bg-apple-amber'}`} />
-          <div>
-            <div className="text-sm font-medium text-white">
-              {bothReady
-                ? 'Both participants ready'
-                : me.isReady
-                ? `Ready. Waiting for ${partner.name}...`
-                : 'Confirm readiness when ready to start'}
-            </div>
-            <div className="text-xs text-[#A1A1A6]">
-              Duration: 45 seconds · Voice communication encouraged
-            </div>
-          </div>
-        </div>
+      {/* Ready and Launch Actions */}
+      <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <button
+          onClick={() => {
+            sound.playGlassClick();
+            onReadyToggle();
+          }}
+          className={`apple-btn-secondary w-full sm:w-auto px-7 text-xs font-semibold ${
+            (isExplore ? userA.isReady : userB.isReady)
+              ? 'border-emerald-500/50 text-emerald-300'
+              : ''
+          }`}
+        >
+          <span>{(isExplore ? userA.isReady : userB.isReady) ? '✓ You Are Ready' : 'Mark Yourself Ready'}</span>
+        </button>
 
-        <div className="flex items-center space-x-2.5 w-full sm:w-auto">
-          <button
-            onClick={() => {
-              sound.playGlassClick();
-              onReadyToggle();
-            }}
-            className={`apple-btn-secondary flex-1 sm:flex-none ${
-              me.isReady ? '!border-emerald-500/40 !bg-emerald-500/20 text-emerald-300' : ''
-            }`}
-          >
-            {me.isReady ? '✓ You Are Ready' : 'Ready'}
-          </button>
+        <button
+          onClick={() => {
+            sound.playSuccessChime();
+            onStartExperience();
+          }}
+          disabled={!bothReady && !demoMode}
+          className="apple-btn-primary w-full sm:w-auto px-8 text-xs font-semibold"
+        >
+          <span>Begin Experiment</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
 
-          <button
-            onClick={() => {
-              sound.playGlassClick();
-              onStartExperience();
-            }}
-            disabled={!bothReady && !demoMode}
-            className="apple-btn-primary flex-1 sm:flex-none"
-          >
-            <span>Start Experiment</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </LiquidGlassPanel>
+      {!bothReady && !demoMode && (
+        <p className="text-xs text-[#A1A1A6]">
+          Waiting for both participants to confirm ready.
+        </p>
+      )}
     </div>
   );
 };

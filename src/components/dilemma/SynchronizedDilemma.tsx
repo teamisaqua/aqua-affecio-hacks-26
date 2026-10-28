@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LiquidGlassPanel } from '../ui/LiquidGlassPanel';
 import { DilemmaState, DilemmaOption, UserRole } from '@/lib/types/chemistry';
 import { sound } from '@/lib/sound/soundEffects';
-import { Compass, Flame, Heart, Zap, Sparkles, Activity } from 'lucide-react';
+import { Compass, Flame, Heart, Zap, Sparkles, Check } from 'lucide-react';
 
 interface SynchronizedDilemmaProps {
   role: UserRole;
@@ -28,9 +27,10 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
 }) => {
   const [countdown, setCountdown] = useState<number | null>(null);
 
-  const myChoice = role === 'observer' ? state.userAChoice : state.userBChoice;
-  const partnerChoice = role === 'observer' ? state.userBChoice : state.userAChoice;
-  const partnerName = role === 'observer' ? userBName : userAName;
+  const isExplore = role === 'explore' || role === 'observer';
+  const myChoice = isExplore ? state.userAChoice : state.userBChoice;
+  const partnerChoice = isExplore ? state.userBChoice : state.userAChoice;
+  const partnerName = isExplore ? userBName : userAName;
 
   const bothSelected = Boolean(state.userAChoice && state.userBChoice);
 
@@ -46,12 +46,11 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
 
       const timer2 = setTimeout(() => {
         setCountdown(1);
-        sound.playCountdownBeep(false);
+        sound.playCountdownBeep(true);
       }, 2000);
 
       const timer1 = setTimeout(() => {
         setCountdown(0);
-        sound.playCountdownBeep(true);
         sound.playSuccessChime();
         setTimeout(() => {
           onComplete();
@@ -74,38 +73,58 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   const getOptionIcon = (archetype: DilemmaOption['archetype']) => {
     switch (archetype) {
       case 'spontaneous':
-        return <Flame className="w-4 h-4 text-apple-amber" strokeWidth={1.75} />;
+        return <Flame className="w-4 h-4 text-apple-amber" />;
       case 'calculated':
-        return <Compass className="w-4 h-4 text-apple-blue" strokeWidth={1.75} />;
+        return <Compass className="w-4 h-4 text-apple-blue" />;
       case 'adventurous':
-        return <Zap className="w-4 h-4 text-apple-red" strokeWidth={1.75} />;
+        return <Zap className="w-4 h-4 text-apple-red" />;
       case 'intimate':
-        return <Heart className="w-4 h-4 text-purple-400" strokeWidth={1.75} />;
+        return <Heart className="w-4 h-4 text-purple-400" />;
     }
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
-      {/* Experiment Protocol Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between pb-3 border-b border-white/10 text-xs font-mono gap-2">
-        <div className="flex items-center space-x-2">
-          <span className="px-2.5 py-1 rounded bg-[#2C2C2E] text-white font-bold">EXPERIMENT 02</span>
-          <span className="text-white text-sm font-semibold tracking-wide">SYNCHRONIZED DILEMMA</span>
+    <div className="w-full max-w-3xl mx-auto space-y-6 select-none">
+      {/* Experiment Header */}
+      <div className="flex items-center justify-between pb-3 border-b border-white/8">
+        <div className="flex items-center space-x-2.5">
+          <span className="px-2.5 py-1 rounded-full bg-[#171717] border border-white/8 text-white text-xs font-semibold">
+            Experiment 03
+          </span>
+          <span className="text-white text-sm font-semibold tracking-tight">
+            Instinct Alignment
+          </span>
         </div>
-        <div className="flex items-center space-x-2 text-[#A1A1A6]">
-          <Activity className="w-3.5 h-3.5 text-apple-blue" />
-          <span>COGNITIVE HARMONY PROTOCOL</span>
+
+        <div className="text-xs text-[#A1A1A6]">
+          {bothSelected ? 'Both locked in' : 'Choose privately'}
         </div>
       </div>
 
-      {/* Large Typography Scenario Prompt */}
-      <div className="text-center space-y-2 py-4">
-        <h2 className="text-2xl sm:text-4xl font-semibold text-white tracking-tight leading-snug max-w-2xl mx-auto">
+      {/* Scenario Prompt */}
+      <div className="text-center space-y-2 py-2">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight leading-snug max-w-xl mx-auto">
           {state.scenario.prompt}
         </h2>
         <p className="text-xs sm:text-sm text-[#A1A1A6] max-w-md mx-auto">
           {state.scenario.context}
         </p>
+      </div>
+
+      {/* Participants Status Bar */}
+      <div className="flex items-center justify-between px-6 py-3 rounded-2xl bg-[#111111] border border-white/8 text-xs">
+        <div className="flex items-center space-x-2">
+          <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-apple-blue' : 'bg-white/20'}`} />
+          <span className="text-white font-medium">You</span>
+          <span className="text-[#A1A1A6]">{myChoice ? '· Chosen' : '· Thinking...'}</span>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <span className="text-[#A1A1A6]">
+            {partnerName}: {partnerChoice ? 'Chosen' : 'Thinking...'}
+          </span>
+          <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-apple-green' : 'bg-white/20'}`} />
+        </div>
       </div>
 
       {/* Synchronous 3-2-1 Reveal Countdown */}
@@ -115,108 +134,99 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="p-8 text-center rounded-[24px] bg-[#1C1C1E] border border-apple-blue/50 shadow-apple-card max-w-sm mx-auto"
+            className="p-8 text-center rounded-3xl bg-[#141416] border border-apple-blue/40 shadow-2xl max-w-xs mx-auto"
           >
-            <div className="text-[11px] font-mono uppercase tracking-widest text-[#A1A1A6] mb-1">
-              REVEALING HARMONY IN
+            <div className="text-xs uppercase tracking-wider text-[#A1A1A6] mb-1">
+              Revealing in
             </div>
-            <div className="text-7xl font-light tabular-data text-white font-mono">
+            <div className="text-7xl font-light tabular-nums text-white">
               {countdown}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Decision Quadrant Options */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Decision 4-Quadrant Options */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         {state.scenario.options.map((option) => {
           const isMyPick = myChoice === option.id;
           const isPartnerPick = partnerChoice === option.id;
           const isRevealed = countdown === 0 || state.isRevealed;
 
+          let cardStyle = 'bg-[#141416] border-white/8 text-[#A1A1A6] hover:border-white/15';
+
+          if (isMyPick && !isRevealed) {
+            cardStyle = 'bg-[#1C1C1E] border-apple-blue ring-1 ring-apple-blue/50 text-white';
+          } else if (isRevealed) {
+            if (isMyPick && isPartnerPick) {
+              cardStyle = 'bg-[#1C1C1E] border-emerald-500 ring-2 ring-emerald-500/40 text-white';
+            } else if (isMyPick) {
+              cardStyle = 'bg-[#1C1C1E] border-apple-blue text-white';
+            } else if (isPartnerPick) {
+              cardStyle = 'bg-[#1C1C1E] border-purple-400 text-white';
+            } else {
+              cardStyle = 'bg-[#111111] opacity-40 border-white/5 text-[#A1A1A6]';
+            }
+          }
+
           return (
             <div
               key={option.id}
               onClick={() => !isRevealed && handleSelect(option.id)}
-              className={`p-6 rounded-[20px] transition-all duration-150 border cursor-pointer ${
-                isMyPick
-                  ? 'bg-[#2C2C2E] border-apple-blue ring-1 ring-apple-blue/50'
-                  : 'bg-[#1C1C1E] border-white/10 hover:border-white/20'
-              } ${isRevealed && isPartnerPick && !isMyPick ? 'ring-1 ring-apple-green border-apple-green/60' : ''}`}
+              className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between min-h-[120px] ${cardStyle}`}
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="w-9 h-9 rounded-full bg-[#2C2C2E] border border-white/10 flex items-center justify-center">
-                  {getOptionIcon(option.archetype)}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-2">
+                    {getOptionIcon(option.archetype)}
+                    <span className="text-sm font-semibold text-white">{option.label}</span>
+                  </div>
+
+                  {/* Pick Badges */}
+                  <div className="flex items-center space-x-1.5">
+                    {isMyPick && (
+                      <span className="px-2 py-0.5 rounded-full bg-apple-blue/20 text-apple-blue text-[10px] font-semibold">
+                        You
+                      </span>
+                    )}
+                    {isRevealed && isPartnerPick && (
+                      <span className="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-semibold">
+                        {partnerName}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 font-mono text-[10px]">
-                  {isMyPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 font-semibold border border-blue-500/30">
-                      YOUR LOCK
-                    </span>
-                  )}
-                  {isRevealed && isPartnerPick && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
-                      {partnerName.toUpperCase()}&apos;S LOCK
-                    </span>
-                  )}
-                </div>
+                <p className="text-xs text-[#A1A1A6] leading-relaxed">
+                  {option.subtext}
+                </p>
               </div>
 
-              <h3 className="text-lg font-semibold text-white tracking-tight mb-1">
-                {option.label}
-              </h3>
-              <p className="text-xs text-[#A1A1A6] leading-relaxed">
-                {option.subtext}
-              </p>
+              {isRevealed && isMyPick && isPartnerPick && (
+                <div className="mt-3 pt-2 border-t border-emerald-500/30 flex items-center text-xs text-apple-green font-medium gap-1.5">
+                  <Check className="w-3.5 h-3.5" /> Synchronized Instinct
+                </div>
+              )}
             </div>
           );
         })}
       </div>
 
-      {/* Lock Status Console */}
-      <div className="p-4 rounded-[18px] bg-[#1C1C1E] border border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-        <div className="flex items-center space-x-6 text-white">
-          <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-apple-green' : 'bg-white/20'}`} />
-            <span>YOU: {myChoice ? 'LOCKED' : 'CALCULATING...'}</span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-apple-green' : 'bg-white/20'}`} />
-            <span>{partnerName.toUpperCase()}: {partnerChoice ? 'LOCKED' : 'CALCULATING...'}</span>
-          </div>
-        </div>
-
-        {demoMode && !partnerChoice && (
-          <button
-            onClick={() => onChoiceSelect(state.scenario.options[0].id, role === 'observer' ? 'operator' : 'observer')}
-            className="apple-btn-secondary !min-h-[32px] !py-1 !px-3 !text-xs font-mono"
-          >
-            [Demo] Auto-Lock Partner
-          </button>
-        )}
-      </div>
-
-      {/* Reveal Outcome: Behavioral Relationship */}
-      {(countdown === 0 || state.isRevealed) && (
+      {/* Reveal Verdict Banner */}
+      {countdown === 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-6 rounded-[20px] border text-center space-y-1.5 ${
-            state.userAChoice === state.userBChoice
-              ? 'bg-[#1C1C1E] border-apple-green/50'
-              : 'bg-[#1C1C1E] border-apple-blue/50'
-          }`}
+          className="p-5 rounded-2xl bg-[#141416] border border-white/10 text-center space-y-1"
         >
-          <div className="flex items-center justify-center gap-2 font-semibold text-white text-base font-mono">
+          <div className="text-base font-semibold text-white tracking-tight flex items-center justify-center gap-2">
             <Sparkles className="w-4 h-4 text-apple-blue" />
-            <span>{state.userAChoice === state.userBChoice ? 'HARMONIC CONVERGENCE' : 'DYNAMIC COMPLEMENTARY TENSION'}</span>
+            {myChoice === partnerChoice ? 'Synchronous Instinct' : 'Complementary Balance'}
           </div>
-          <p className="text-xs text-[#A1A1A6] max-w-md mx-auto">
-            {state.userAChoice === state.userBChoice
-              ? 'Identical instinctual frequency. High baseline decision alignment.'
-              : 'Complementary polarity: differing instinctual pathways produce balanced tension.'}
+          <p className="text-xs text-[#A1A1A6]">
+            {myChoice === partnerChoice
+              ? 'You both chose the exact same pathway without speaking.'
+              : 'Different impulses create dynamic counterweights in your connection.'}
           </p>
         </motion.div>
       )}

@@ -1,11 +1,12 @@
 import { ChemistryScore } from '../types/chemistry';
 
 interface EngineInput {
-  reactorTimeSeconds: number;     // e.g. 24.5s
-  overshoots: number;             // how many times temp or pressure flew past target
+  reactorTimeSeconds: number;      // e.g. 24.5s
+  overshoots: number;              // how many times temp or pressure flew past target
   stabilizedSeconds: number;       // total time held in target window
   dilemmaChoiceA: string | null;
   dilemmaChoiceB: string | null;
+  bondCompatibility?: number;      // 70 - 98
   responseLatencyDeltaMs?: number; // delta in ms between User A and User B locks
 }
 
@@ -19,71 +20,85 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
     overshoots,
     dilemmaChoiceA,
     dilemmaChoiceB,
-    responseLatencyDeltaMs = 1200,
+    bondCompatibility = 86,
+    responseLatencyDeltaMs = 950,
   } = input;
 
-  // 1. TEAMWORK SCORE (35% weight)
-  // Base 100 - penalties for time past 15s and excessive overshoots
-  const timeFactor = Math.max(0, reactorTimeSeconds - 12) * 1.1;
-  const overshootFactor = overshoots * 4.5;
-  const rawTeamwork = 100 - timeFactor - overshootFactor;
-  const teamwork = clamp(rawTeamwork, 68, 98);
+  // 1. CHEMICAL REASONING (25% weight)
+  // Evaluates element bond harmonic resonance + chamber calibration accuracy
+  const overshootDeduction = overshoots * 3.5;
+  const rawReasoning = bondCompatibility * 0.5 + (100 - overshootDeduction) * 0.5;
+  const chemicalReasoning = clamp(rawReasoning, 68, 97);
+  const reasoningReason = overshoots === 0
+    ? `Precision calibration held within ±3° target with zero containment loss`
+    : `Stabilized despite ${overshoots} thermal spikes through adaptive correction`;
 
-  const teamworkReason = overshoots === 0
-    ? `Flawless calibration in ${reactorTimeSeconds.toFixed(1)}s with zero containment breach`
-    : `Recovered stability in ${reactorTimeSeconds.toFixed(1)}s despite ${overshoots} thermal spikes`;
-
-  // 2. SYNCHRONIZATION SCORE (30% weight)
-  // Agreement on dilemma gives 95; complementary gives 84; hold stability adds bonus
+  // 2. DECISION ALIGNMENT (30% weight)
+  // Evaluates dilemma consensus + cognitive instinct harmony
   const isDirectMatch = dilemmaChoiceA && dilemmaChoiceB && dilemmaChoiceA === dilemmaChoiceB;
-  const rawSync = isDirectMatch ? 94 : 83;
-  const syncPenalty = Math.min(10, Math.floor((responseLatencyDeltaMs) / 600));
-  const synchronization = clamp(rawSync - syncPenalty, 65, 97);
+  const syncPenalty = Math.min(10, Math.floor(responseLatencyDeltaMs / 500));
+  const rawAlignment = isDirectMatch ? 94 : 82;
+  const decisionAlignment = clamp(rawAlignment - syncPenalty, 64, 96);
+  const alignmentReason = isDirectMatch
+    ? 'Identical instinct on the Dilemma decision node without prior alignment'
+    : 'Complementary viewpoints creating dynamic balance rather than friction';
 
-  const syncReason = isDirectMatch
-    ? "Synchronous instincts on the Dilemma decision node"
-    : "Complementary polarity — differing viewpoints with balanced counterweights";
+  // 3. REACTION TIMING (25% weight)
+  // Evaluates velocity to achieve stable equilibrium under the 45s clock
+  // Fast (e.g. 15-25s) gets high score 88-96; slower gets 72-84
+  const timeFactor = Math.max(0, reactorTimeSeconds - 14) * 1.05;
+  const rawTiming = 98 - timeFactor;
+  const reactionTiming = clamp(rawTiming, 66, 96);
+  const timingReason = reactorTimeSeconds < 25
+    ? `Rapid equilibrium achieved in ${reactorTimeSeconds.toFixed(1)} seconds`
+    : `Calculated steady convergence holding 3-second equilibrium`;
 
-  // 3. ADAPTABILITY SCORE (20% weight)
-  // Measures swift correction and responsiveness under 45-second clock
-  const rawAdaptability = 100 - (overshoots * 3.5) - (reactorTimeSeconds > 30 ? 12 : 2);
-  const adaptability = clamp(rawAdaptability, 62, 96);
+  // 4. RISK COMPATIBILITY (20% weight)
+  // Evaluates boldness under pressure, catalyst valve usage, and stability hold
+  const latencyBalance = Math.min(12, Math.floor(responseLatencyDeltaMs / 450));
+  const rawRisk = 90 - latencyBalance + (overshoots > 0 ? 4 : 8);
+  const riskCompatibility = clamp(rawRisk, 65, 95);
+  const riskReason = latencyBalance < 5
+    ? 'High mutual trust with reciprocal conversational pacing'
+    : 'Distinct risk tolerances that balanced each other when adjusting actuators';
 
-  const adaptabilityReason = reactorTimeSeconds < 25
-    ? "Rapid convergence: near-instant adaptation to asymmetric cues"
-    : "Resilient composure under thermal load and clock constraints";
+  // PROPRIETARY AFFINITY INDEX (0 to 100)
+  // Weighted: 25% Reasoning + 30% Alignment + 25% Timing + 20% Risk
+  const weightedAffinity =
+    chemicalReasoning * 0.25 +
+    decisionAlignment * 0.30 +
+    reactionTiming * 0.25 +
+    riskCompatibility * 0.20;
 
-  // 4. BALANCE SCORE (15% weight)
-  // Symmetry in participation and decision latency parity
-  const latencyPenalty = Math.min(18, Math.floor(responseLatencyDeltaMs / 400));
-  const rawBalance = 96 - latencyPenalty;
-  const balance = clamp(rawBalance, 66, 95);
+  const affinityIndex = clamp(weightedAffinity, 70, 96);
 
-  const balanceReason = latencyPenalty < 6
-    ? "High cadence symmetry: smooth conversational turn-taking"
-    : "Dynamic tension with reciprocal steering between partners";
-
-  // OVERALL WEIGHTED CHEMISTRY SCORE
-  // Formula: 35% Teamwork + 30% Sync + 20% Adaptability + 15% Balance
-  const weightedOverall =
-    teamwork * 0.35 +
-    synchronization * 0.30 +
-    adaptability * 0.20 +
-    balance * 0.15;
-
-  const overall = clamp(weightedOverall, 68, 98);
+  const headline = affinityIndex >= 82
+    ? 'Your chemistry is strong.'
+    : 'Interesting reaction.';
 
   return {
-    overall,
-    synchronization,
-    teamwork,
-    adaptability,
-    balance,
+    overall: affinityIndex,
+    affinityIndex,
+    chemicalReasoning,
+    decisionAlignment,
+    reactionTiming,
+    riskCompatibility,
+    headline,
     formulaExplanations: {
-      teamworkReason,
-      syncReason,
-      adaptabilityReason,
-      balanceReason,
+      reasoningReason,
+      alignmentReason,
+      timingReason,
+      riskReason,
+      // Backwards compatibility aliases
+      syncReason: alignmentReason,
+      teamworkReason: reasoningReason,
+      adaptabilityReason: timingReason,
+      balanceReason: riskReason,
     },
+    // Backwards compatibility aliases
+    synchronization: decisionAlignment,
+    teamwork: chemicalReasoning,
+    adaptability: reactionTiming,
+    balance: riskCompatibility,
   };
 }

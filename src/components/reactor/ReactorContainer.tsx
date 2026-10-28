@@ -7,7 +7,7 @@ import { ReactorVessel } from './ReactorVessel';
 import { ObserverView } from './ObserverView';
 import { OperatorView } from './OperatorView';
 import { sound } from '@/lib/sound/soundEffects';
-import { Timer, CheckCircle2, Sparkles, Activity, Shield } from 'lucide-react';
+import { Timer, CheckCircle2, Sparkles, Sliders, Compass } from 'lucide-react';
 
 interface ReactorContainerProps {
   role: UserRole;
@@ -30,10 +30,11 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   onComplete,
   demoMode = false,
 }) => {
-  const [viewFilter, setViewFilter] = useState<'all' | 'observer' | 'vessel' | 'operator'>('all');
+  const [viewFilter, setViewFilter] = useState<'all' | 'explore' | 'vessel' | 'control'>('all');
   const [timeLeft, setTimeLeft] = useState(45);
   const isCompletedRef = useRef(false);
 
+  const isExplore = role === 'explore' || role === 'observer';
 
   // 45-second countdown timer and stability evaluator loop
   useEffect(() => {
@@ -132,56 +133,100 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      {/* Hierarchy Step 1 & 2: Experiment Number & Title */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-3 pb-3 border-b border-white/10 text-xs font-mono">
-        <div className="flex items-center space-x-2">
-          <span className="px-2.5 py-1 rounded bg-[#2C2C2E] text-white font-bold">EXPERIMENT 01</span>
-          <span className="text-white text-sm font-semibold tracking-wide">ASYMMETRIC REACTOR CALIBRATION</span>
-          <span className="text-[#A1A1A6]">· 45s COOPERATIVE TIME PRESSURE</span>
+    <div className="w-full max-w-6xl mx-auto space-y-6 select-none">
+      {/* Experiment Header */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pb-3 border-b border-white/8">
+        <div className="flex items-center space-x-2.5">
+          <span className="px-2.5 py-1 rounded-full bg-[#171717] border border-white/8 text-white text-xs font-semibold">
+            Experiment 02
+          </span>
+          <span className="text-white text-sm font-semibold tracking-tight">
+            Reaction Equilibrium
+          </span>
         </div>
 
         <div className="flex items-center space-x-3">
           {/* Reaction Stability Status */}
-          <div className="flex items-center space-x-2">
-            <span className="text-[#A1A1A6]">EQUILIBRIUM:</span>
-            <span className={`px-2.5 py-0.5 rounded-full font-bold tabular-data ${
+          <div className="flex items-center space-x-1.5 text-xs">
+            <span className="text-[#A1A1A6]">Equilibrium:</span>
+            <span className={`px-2.5 py-0.5 rounded-full font-semibold tabular-nums text-xs ${
               state.isSuccess
                 ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                 : state.isStabilized
                 ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
-                : 'bg-[#2C2C2E] text-[#A1A1A6]'
+                : 'bg-[#171717] text-[#A1A1A6] border border-white/8'
             }`}>
-              {state.isSuccess ? '100% STABLE' : `${state.stabilityPercentage}%`}
+              {state.isSuccess ? '100% Stable' : `${state.stabilityPercentage}%`}
             </span>
           </div>
 
           {/* Time Remaining */}
-          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 tabular-data text-white font-bold">
+          <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#171717] border border-white/8 tabular-nums text-white text-xs font-semibold">
             <Timer className="w-3.5 h-3.5 text-apple-blue" />
             <span>00:{timeLeft.toString().padStart(2, '0')}</span>
           </div>
         </div>
       </div>
 
+      {/* Two Participant Status Row */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="p-3.5 rounded-2xl bg-[#111111] border border-white/8 flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-7 h-7 rounded-full bg-[#1C1C1E] text-apple-blue flex items-center justify-center text-xs font-semibold">
+              <Compass className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                <span>{userAName}</span>
+                {isExplore && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-apple-blue/20 text-apple-blue text-[9px] font-bold">
+                    You
+                  </span>
+                )}
+              </div>
+              <div className="text-[10px] text-[#A1A1A6]">Explore (Target cues)</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-3.5 rounded-2xl bg-[#111111] border border-white/8 flex items-center justify-between">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-7 h-7 rounded-full bg-[#1C1C1E] text-apple-blue flex items-center justify-center text-xs font-semibold">
+              <Sliders className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <div className="text-xs font-semibold text-white flex items-center gap-1.5">
+                <span>{userBName}</span>
+                {!isExplore && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-apple-blue/20 text-apple-blue text-[9px] font-bold">
+                    You
+                  </span>
+                )}
+              </div>
+              <div className="text-[10px] text-[#A1A1A6]">Control (Actuators)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Mobile/Tablet View Segmented Switch */}
       <div className="flex lg:hidden items-center justify-center">
-        <div className="inline-flex items-center p-1 rounded-full bg-[#1C1C1E] border border-white/10 text-xs">
+        <div className="inline-flex items-center p-1 rounded-full bg-[#171717] border border-white/8 text-xs">
           <button
             onClick={() => setViewFilter('all')}
             className={`px-3 py-1 rounded-full transition-all ${
               viewFilter === 'all' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
             }`}
           >
-            All Panels
+            All
           </button>
           <button
-            onClick={() => setViewFilter('observer')}
+            onClick={() => setViewFilter('explore')}
             className={`px-3 py-1 rounded-full transition-all ${
-              viewFilter === 'observer' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+              viewFilter === 'explore' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
             }`}
           >
-            Alpha {role === 'observer' ? '(You)' : ''}
+            Explore {isExplore ? '(You)' : ''}
           </button>
           <button
             onClick={() => setViewFilter('vessel')}
@@ -189,38 +234,25 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
               viewFilter === 'vessel' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
             }`}
           >
-            Core
+            Reaction Core
           </button>
           <button
-            onClick={() => setViewFilter('operator')}
+            onClick={() => setViewFilter('control')}
             className={`px-3 py-1 rounded-full transition-all ${
-              viewFilter === 'operator' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
+              viewFilter === 'control' ? 'bg-white text-black font-semibold' : 'text-[#A1A1A6]'
             }`}
           >
-            Beta {role === 'operator' ? '(You)' : ''}
+            Control {!isExplore ? '(You)' : ''}
           </button>
         </div>
       </div>
 
-      {/* Tri-Panel Scientific Instrument Layout */}
+      {/* Main Experiment Arena: Central Core Flanked by Consoles */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* LEFT CONSOLE: Participant A (Observer / Diagnostic) */}
-        <div className={`lg:col-span-4 apple-card p-5 space-y-4 bg-[#1C1C1E] border border-white/10 ${
-          viewFilter !== 'all' && viewFilter !== 'observer' ? 'hidden lg:block' : 'block'
+        {/* LEFT: Explore Console */}
+        <div className={`lg:col-span-4 p-5 rounded-3xl bg-[#111111] border border-white/8 space-y-4 ${
+          viewFilter !== 'all' && viewFilter !== 'explore' ? 'hidden lg:block' : 'block'
         }`}>
-          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs font-mono">
-            <div className="flex items-center space-x-2 text-apple-blue">
-              <span className="w-2 h-2 rounded-full bg-apple-blue" />
-              <span className="font-bold">STATION ALPHA [OBSERVER]</span>
-              {role === 'observer' && (
-                <span className="px-1.5 py-0.5 rounded bg-apple-blue/20 text-apple-blue border border-apple-blue/30 text-[9px] font-bold">
-                  YOU
-                </span>
-              )}
-            </div>
-            <span className="text-[#A1A1A6]">{userAName}</span>
-          </div>
-
           <ObserverView
             target={target}
             state={state}
@@ -228,16 +260,15 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
           />
         </div>
 
-        {/* CENTER STAGE: The Living Reaction Core Vessel */}
-        <div className={`lg:col-span-4 apple-card p-6 flex flex-col items-center justify-between bg-[#1C1C1E] border border-white/10 min-h-[460px] ${
+        {/* CENTER: The Reaction Vessel Core */}
+        <div className={`lg:col-span-4 p-6 rounded-3xl bg-[#111111] border border-white/8 flex flex-col items-center justify-between min-h-[440px] ${
           viewFilter !== 'all' && viewFilter !== 'vessel' ? 'hidden lg:flex' : 'flex'
         }`}>
-          <div className="w-full flex items-center justify-between pb-2 border-b border-white/10 text-[11px] font-mono text-[#A1A1A6]">
-            <span>REACTION VESSEL</span>
-            <span className="text-apple-green font-semibold">BOROSILICATE CORE</span>
+          <div className="w-full flex items-center justify-between pb-2 border-b border-white/8 text-xs text-[#A1A1A6]">
+            <span>Reaction Core</span>
+            <span className="text-apple-green font-medium">Borosilicate Chamber</span>
           </div>
 
-          {/* Graduated Glass Cylinder with Meniscus and Micro-Bubbles */}
           <div className="my-auto py-2">
             <ReactorVessel
               currentTemp={state.currentTemp}
@@ -248,39 +279,25 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
             />
           </div>
 
-          {/* Status Message */}
-          <div className="w-full pt-3 border-t border-white/10 text-center text-xs font-mono text-[#A1A1A6]">
+          <div className="w-full pt-3 border-t border-white/8 text-center text-xs text-[#A1A1A6]">
             {state.isSuccess ? (
-              <span className="text-apple-green font-bold flex items-center justify-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4" /> REACTION EQUILIBRIUM ACHIEVED
+              <span className="text-apple-green font-semibold flex items-center justify-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4" /> Reaction Equilibrium Achieved
               </span>
             ) : state.isStabilized ? (
-              <span className="text-apple-blue font-semibold animate-pulse flex items-center justify-center gap-1.5">
-                <Sparkles className="w-4 h-4" /> HOLDING EQUILIBRIUM ({state.stabilityPercentage}%)
+              <span className="text-apple-blue font-medium animate-pulse flex items-center justify-center gap-1.5">
+                <Sparkles className="w-4 h-4" /> Holding Equilibrium ({state.stabilityPercentage}%)
               </span>
             ) : (
-              <span>STABILIZE WITHIN ±{target.tolerance}° FOR 3.0 SECONDS</span>
+              <span>Hold within target range for 3.0 seconds</span>
             )}
           </div>
         </div>
 
-        {/* RIGHT CONSOLE: Participant B (Operator / Actuator Controls) */}
-        <div className={`lg:col-span-4 apple-card p-5 space-y-4 bg-[#1C1C1E] border border-white/10 ${
-          viewFilter !== 'all' && viewFilter !== 'operator' ? 'hidden lg:block' : 'block'
+        {/* RIGHT: Control Console */}
+        <div className={`lg:col-span-4 p-5 rounded-3xl bg-[#111111] border border-white/8 space-y-4 ${
+          viewFilter !== 'all' && viewFilter !== 'control' ? 'hidden lg:block' : 'block'
         }`}>
-          <div className="flex items-center justify-between pb-2 border-b border-white/10 text-xs font-mono">
-            <div className="flex items-center space-x-2 text-apple-blue">
-              <span className="w-2 h-2 rounded-full bg-apple-blue" />
-              <span className="font-bold">STATION BETA [OPERATOR]</span>
-              {role === 'operator' && (
-                <span className="px-1.5 py-0.5 rounded bg-apple-blue/20 text-apple-blue border border-apple-blue/30 text-[9px] font-bold">
-                  YOU
-                </span>
-              )}
-            </div>
-            <span className="text-[#A1A1A6]">{userBName}</span>
-          </div>
-
           <OperatorView
             state={state}
             partnerName={userAName}
@@ -294,13 +311,13 @@ export const ReactorContainer: React.FC<ReactorContainerProps> = ({
 
       {/* Success Notification Banner */}
       {state.isSuccess && (
-        <div className="p-5 rounded-[18px] bg-[#1C1C1E] border border-apple-green/50 text-center space-y-1">
+        <div className="p-5 rounded-2xl bg-[#141416] border border-apple-green/40 text-center space-y-1">
           <h3 className="text-base font-semibold text-white tracking-tight flex items-center justify-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-apple-green" />
-            Reaction Calibration Complete
+            Reaction Equilibrium Reached
           </h3>
-          <p className="text-xs text-[#A1A1A6] font-mono">
-            Chamber stabilized in {state.elapsedSeconds.toFixed(1)}s with {state.overshootCount} overshoots. Advancing to Dilemma Experiment...
+          <p className="text-xs text-[#A1A1A6]">
+            Chamber stabilized in {state.elapsedSeconds.toFixed(1)} seconds. Advancing to Dilemma...
           </p>
         </div>
       )}

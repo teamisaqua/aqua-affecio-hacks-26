@@ -1,7 +1,8 @@
-export type UserRole = 'observer' | 'operator';
+export type UserRole = 'explore' | 'control' | 'observer' | 'operator';
 
 export type ExperienceStage =
   | 'lobby'
+  | 'bond'
   | 'reactor'
   | 'dilemma'
   | 'engine'
@@ -16,11 +17,38 @@ export interface Participant {
   isReady: boolean;
 }
 
+export interface ElementItem {
+  id: string;
+  symbol: string;
+  name: string;
+  category: 'reactive' | 'stable' | 'magnetic' | 'catalytic';
+  tag: string;
+  color: string;
+  valence: number;
+}
+
+export interface BondResult {
+  elementA: ElementItem;
+  elementB: ElementItem;
+  bondName: string;
+  bondType: 'Covalent' | 'Ionic' | 'Resonance' | 'Hydrogen Polar';
+  formula: string;
+  compatibility: number;
+  description: string;
+}
+
+export interface BondState {
+  userAChoice: string | null;
+  userBChoice: string | null;
+  isRevealed: boolean;
+  result: BondResult | null;
+}
+
 export interface ReactorTarget {
   temp: number;        // e.g. 72 °C
   pressure: number;    // e.g. 4.2 bar
-  colorName: string;   // e.g. "Hyper-Cyan"
-  colorHex: string;    // e.g. "#00f0ff"
+  colorName: string;   // e.g. "Equilibrium Cyan"
+  colorHex: string;    // e.g. "#38bdf8"
   tolerance: number;   // e.g. 3
 }
 
@@ -61,17 +89,29 @@ export interface DilemmaState {
 }
 
 export interface ChemistryScore {
-  overall: number;       // 65 - 98
-  synchronization: number;
-  teamwork: number;
-  adaptability: number;
-  balance: number;
+  overall: number;              // Affinity Index, e.g. 82
+  affinityIndex: number;        // e.g. 82
+  chemicalReasoning: number;    // e.g. 82
+  decisionAlignment: number;    // e.g. 74
+  reactionTiming: number;       // e.g. 91
+  riskCompatibility: number;    // e.g. 68
+  headline: string;             // e.g. "Your chemistry is strong."
   formulaExplanations: {
+    reasoningReason: string;
+    alignmentReason: string;
+    timingReason: string;
+    riskReason: string;
+    // Backwards compatibility aliases
     syncReason: string;
     teamworkReason: string;
     adaptabilityReason: string;
     balanceReason: string;
   };
+  // Backwards compatibility aliases
+  synchronization: number;
+  teamwork: number;
+  adaptability: number;
+  balance: number;
 }
 
 export interface FictionalCompound {
@@ -98,6 +138,7 @@ export interface SessionData {
   stage: ExperienceStage;
   userA: Participant;
   userB: Participant;
+  bondState?: BondState;
   reactorTarget: ReactorTarget;
   reactorState: ReactorState;
   dilemmaState: DilemmaState;
