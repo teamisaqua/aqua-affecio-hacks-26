@@ -23,6 +23,7 @@ import { ElementBondStage } from '@/components/bond/ElementBondStage';
 import { ReactorContainer } from '@/components/reactor/ReactorContainer';
 import { SynchronizedDilemma } from '@/components/dilemma/SynchronizedDilemma';
 import { ChemistryScoreboard } from '@/components/engine/ChemistryScoreboard';
+import { AffinityResult } from '@/components/results/AffinityResult';
 import { CollectibleCard } from '@/components/card/CollectibleCard';
 import { CatalyticChat } from '@/components/conversation/CatalyticChat';
 import { DemoModeBar } from '@/components/demo/DemoModeBar';
@@ -480,11 +481,21 @@ export default function LabSessionPage() {
         )}
 
         {stage === 'engine' && chemistryScore && (
-          <ChemistryScoreboard
+          <AffinityResult
             score={chemistryScore}
-            onContinue={() => {
-              setStage('card');
-              syncChannel.broadcast('STAGE_CHANGE', { stage: 'card' });
+            compound={compound || undefined}
+            userAName={userA.name}
+            userBName={userB.name}
+            onRestart={() => {
+              setStage('bond');
+              setBondState({ userAChoice: null, userBChoice: null, result: null });
+              setDilemmaState((prev) => ({ ...prev, userAChoice: null, userBChoice: null, isRevealed: false }));
+              setReactorState(initialReactorState);
+              syncChannel.broadcast('STAGE_CHANGE', { stage: 'bond' });
+            }}
+            onOpenConversation={() => {
+              setStage('conversation');
+              syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
             }}
           />
         )}

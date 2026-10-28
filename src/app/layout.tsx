@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AFFECIO — Chemistry Lab",
-  description: "Don't just match. Discover your chemistry. An interactive connection experience.",
+  title: "AFFECIO — Social Chemistry Experiment",
+  description: "Two people. One experiment. Discover what your interaction reveals.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
