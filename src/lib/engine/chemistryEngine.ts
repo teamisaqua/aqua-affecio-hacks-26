@@ -1,4 +1,4 @@
-import { ChemistryScore } from '../types/chemistry';
+import { ChemistryScore, ExperimentTelemetry } from '../types/chemistry';
 
 interface EngineInput {
   reactorTimeSeconds: number;      // e.g. 24.5s
@@ -8,6 +8,10 @@ interface EngineInput {
   dilemmaChoiceB: string | null;
   bondCompatibility?: number;      // 70 - 98
   responseLatencyDeltaMs?: number; // delta in ms between User A and User B locks
+  bondElementAName?: string;
+  bondElementBName?: string;
+  dilemmaChoiceLabelA?: string;
+  dilemmaChoiceLabelB?: string;
 }
 
 function clamp(value: number, min: number, max: number): number {
@@ -21,14 +25,18 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
     dilemmaChoiceA,
     dilemmaChoiceB,
     bondCompatibility = 86,
-    responseLatencyDeltaMs = 950,
+    responseLatencyDeltaMs = 820,
+    bondElementAName = 'Carbon',
+    bondElementBName = 'Oxygen',
+    dilemmaChoiceLabelA,
+    dilemmaChoiceLabelB,
   } = input;
 
   // 1. CHEMICAL REASONING (25% weight)
   // Evaluates element bond harmonic resonance + chamber calibration accuracy
-  const overshootDeduction = overshoots * 3.5;
+  const overshootDeduction = overshoots * 4;
   const rawReasoning = bondCompatibility * 0.5 + (100 - overshootDeduction) * 0.5;
-  const chemicalReasoning = clamp(rawReasoning, 68, 97);
+  const chemicalReasoning = clamp(rawReasoning, 65, 98);
   const reasoningReason = overshoots === 0
     ? `Precision calibration held within ±3° target with zero containment loss`
     : `Stabilized despite ${overshoots} thermal spikes through adaptive correction`;
@@ -37,7 +45,7 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
   // Evaluates dilemma consensus + cognitive instinct harmony
   const isDirectMatch = dilemmaChoiceA && dilemmaChoiceB && dilemmaChoiceA === dilemmaChoiceB;
   const syncPenalty = Math.min(10, Math.floor(responseLatencyDeltaMs / 500));
-  const rawAlignment = isDirectMatch ? 94 : 82;
+  const rawAlignment = isDirectMatch ? 94 : 80;
   const decisionAlignment = clamp(rawAlignment - syncPenalty, 64, 96);
   const alignmentReason = isDirectMatch
     ? 'Identical instinct on the Dilemma decision node without prior alignment'
@@ -45,8 +53,8 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
 
   // 3. REACTION TIMING (25% weight)
   // Evaluates velocity to achieve stable equilibrium under the 45s clock
-  // Fast (e.g. 15-25s) gets high score 88-96; slower gets 72-84
-  const timeFactor = Math.max(0, reactorTimeSeconds - 14) * 1.05;
+  // Fast (e.g. 15-25s) gets high score 88-96; slower gets 70-84
+  const timeFactor = Math.max(0, reactorTimeSeconds - 14) * 1.1;
   const rawTiming = 98 - timeFactor;
   const reactionTiming = clamp(rawTiming, 66, 96);
   const timingReason = reactorTimeSeconds < 25
@@ -59,8 +67,8 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
   const rawRisk = 90 - latencyBalance + (overshoots > 0 ? 4 : 8);
   const riskCompatibility = clamp(rawRisk, 65, 95);
   const riskReason = latencyBalance < 5
-    ? 'High mutual trust with reciprocal conversational pacing'
-    : 'Distinct risk tolerances that balanced each other when adjusting actuators';
+    ? `High mutual trust with reciprocal response timing (${responseLatencyDeltaMs}ms delta)`
+    : `Distinct risk tolerances that balanced each other when adjusting actuators`;
 
   // PROPRIETARY AFFINITY INDEX (0 to 100)
   // Weighted: 25% Reasoning + 30% Alignment + 25% Timing + 20% Risk
@@ -76,6 +84,17 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
     ? 'Your chemistry is strong.'
     : 'Interesting reaction.';
 
+  const telemetry: ExperimentTelemetry = {
+    bondSummary: `${bondElementAName} + ${bondElementBName} · ${bondCompatibility}% Resonance`,
+    bondMatch: bondCompatibility >= 80,
+    reactorElapsedSeconds: reactorTimeSeconds,
+    reactorOvershoots: overshoots,
+    dilemmaMatch: Boolean(isDirectMatch),
+    dilemmaChoiceLabelA: dilemmaChoiceLabelA || 'Spontaneous Road Trip',
+    dilemmaChoiceLabelB: dilemmaChoiceLabelB || (isDirectMatch ? dilemmaChoiceLabelA || 'Spontaneous Road Trip' : 'Hidden Culinary Spot'),
+    responseLatencyDeltaMs,
+  };
+
   return {
     overall: affinityIndex,
     affinityIndex,
@@ -84,6 +103,7 @@ export function computeChemistryScore(input: EngineInput): ChemistryScore {
     reactionTiming,
     riskCompatibility,
     headline,
+    telemetry,
     formulaExplanations: {
       reasoningReason,
       alignmentReason,

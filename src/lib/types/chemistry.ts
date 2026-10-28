@@ -88,6 +88,17 @@ export interface DilemmaState {
   harmonyClassification: string;
 }
 
+export interface ExperimentTelemetry {
+  bondSummary: string;
+  bondMatch: boolean;
+  reactorElapsedSeconds: number;
+  reactorOvershoots: number;
+  dilemmaMatch: boolean;
+  dilemmaChoiceLabelA?: string;
+  dilemmaChoiceLabelB?: string;
+  responseLatencyDeltaMs?: number;
+}
+
 export interface ChemistryScore {
   overall: number;              // Affinity Index, e.g. 82
   affinityIndex: number;        // e.g. 82
@@ -96,6 +107,7 @@ export interface ChemistryScore {
   reactionTiming: number;       // e.g. 91
   riskCompatibility: number;    // e.g. 68
   headline: string;             // e.g. "Your chemistry is strong."
+  telemetry?: ExperimentTelemetry;
   formulaExplanations: {
     reasoningReason: string;
     alignmentReason: string;

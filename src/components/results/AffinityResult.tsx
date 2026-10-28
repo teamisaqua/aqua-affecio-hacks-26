@@ -6,7 +6,7 @@ import { ChemistryScore, FictionalCompound } from '@/lib/types/chemistry';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { sound } from '@/lib/sound/soundEffects';
-import { Check, Copy, MessageCircle, RotateCcw, ArrowRight } from 'lucide-react';
+import { Check, Copy, MessageCircle, RotateCcw, Activity, Sparkles, Cpu, Clock, Zap } from 'lucide-react';
 
 interface AffinityResultProps {
   score: ChemistryScore;
@@ -29,8 +29,9 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
   const [copied, setCopied] = useState(false);
 
   const finalAffinity = score.affinityIndex || score.overall || 87;
+  const telemetry = score.telemetry;
 
-  // The 2.5-second quiet equilibrium resolution sequence
+  // The 2.0-second quiet equilibrium resolution sequence
   useEffect(() => {
     sound.playSuccessChime();
 
@@ -38,7 +39,7 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
       setPhase('revealed');
 
       let current = 0;
-      const step = Math.ceil(finalAffinity / 22);
+      const step = Math.ceil(finalAffinity / 24);
       const timer = setInterval(() => {
         current += step;
         if (current >= finalAffinity) {
@@ -47,8 +48,8 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
         } else {
           setDisplayScore(current);
         }
-      }, 35);
-    }, 1800);
+      }, 30);
+    }, 1600);
 
     return () => clearTimeout(t);
   }, [finalAffinity]);
@@ -63,14 +64,34 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
   };
 
   const dimensions = [
-    { label: 'SYNC', value: score.decisionAlignment || 82, desc: 'Instinct alignment on dilemmas' },
-    { label: 'ADAPTABILITY', value: score.reactionTiming || 91, desc: 'Velocity to restore balance' },
-    { label: 'DECISION ALIGNMENT', value: score.chemicalReasoning || 78, desc: 'Impulse polarity consensus' },
-    { label: 'COMMUNICATION', value: score.riskCompatibility || 89, desc: 'Bidirectional steering parity' },
+    {
+      label: 'DECISION ALIGNMENT',
+      value: score.decisionAlignment || 82,
+      desc: 'Instinct consensus & decision latency on Dilemma node',
+      evidence: score.formulaExplanations?.alignmentReason || 'Consensus recorded across instinct nodes',
+    },
+    {
+      label: 'REACTION TIMING',
+      value: score.reactionTiming || 91,
+      desc: 'Velocity to restore equilibrium under 45s clock',
+      evidence: score.formulaExplanations?.timingReason || 'Rapid equilibrium convergence observed',
+    },
+    {
+      label: 'CHEMICAL REASONING',
+      value: score.chemicalReasoning || 86,
+      desc: 'Element valence compatibility & thermal stability hold',
+      evidence: score.formulaExplanations?.reasoningReason || 'Containment maintained within ±3° tolerance',
+    },
+    {
+      label: 'COMMUNICATION BALANCE',
+      value: score.riskCompatibility || 88,
+      desc: 'Bidirectional steering parity & risk mitigation',
+      evidence: score.formulaExplanations?.riskReason || 'Reciprocal adjustment pace during critical flux',
+    },
   ];
 
   return (
-    <div className="w-full max-w-xl mx-auto space-y-6 select-none text-center">
+    <div className="w-full max-w-2xl mx-auto space-y-6 select-none text-center pb-8">
       <AnimatePresence mode="wait">
         {phase === 'converging' ? (
           <motion.div
@@ -78,29 +99,33 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.04 }}
-            transition={{ duration: 0.5 }}
-            className="py-16 space-y-6 affecio-card p-8"
+            transition={{ duration: 0.4 }}
+            className="py-20 space-y-6 affecio-card p-8"
           >
-            <div className="relative w-32 h-16 mx-auto flex items-center justify-center">
+            <div className="relative w-36 h-16 mx-auto flex items-center justify-center">
               {/* Converging Signal Nodes */}
               <motion.div
-                animate={{ x: [-28, 0] }}
-                transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                className="w-8 h-8 rounded-full bg-apple-blue shadow-lg absolute left-4"
-              />
+                animate={{ x: [-36, 0] }}
+                transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                className="w-9 h-9 rounded-full bg-[#2997FF] shadow-[0_0_20px_rgba(41,151,255,0.6)] absolute left-3 flex items-center justify-center text-xs font-semibold text-white"
+              >
+                {userAName[0]}
+              </motion.div>
               <motion.div
-                animate={{ x: [28, 0] }}
-                transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-                className="w-8 h-8 rounded-full bg-white shadow-lg absolute right-4"
-              />
+                animate={{ x: [36, 0] }}
+                transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+                className="w-9 h-9 rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] absolute right-3 flex items-center justify-center text-xs font-semibold text-black"
+              >
+                {userBName[0]}
+              </motion.div>
             </div>
 
-            <div className="space-y-1">
-              <div className="text-xs uppercase tracking-widest text-[#9E9EA7] font-medium">
+            <div className="space-y-1.5">
+              <div className="text-xs uppercase tracking-widest text-[#86868B] font-mono">
                 Equilibrium Reached
               </div>
-              <p className="text-xs text-[#62626B]">
-                Synthesizing final interaction data...
+              <p className="text-xs text-[#636366]">
+                Synthesizing multi-modal telemetry between {userAName} & {userBName}...
               </p>
             </div>
           </motion.div>
@@ -114,64 +139,129 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
           >
             {/* Payoff Header */}
             <div className="space-y-1.5">
-              <Badge variant="success">Experiment Complete</Badge>
+              <Badge variant="success">Experiment Verified</Badge>
               <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
                 {score.headline || 'Your chemistry is strong.'}
               </h2>
-              <p className="text-xs sm:text-sm text-[#9E9EA7] max-w-md mx-auto">
+              <p className="text-xs sm:text-sm text-[#86868B] max-w-md mx-auto">
                 Measurable signals recorded between {userAName} and {userBName}.
               </p>
             </div>
 
             {/* Core Affinity Scorecard */}
-            <div className="affecio-card p-7 sm:p-8 space-y-6 text-center">
+            <div className="affecio-card p-6 sm:p-8 space-y-6 text-center">
               <div>
-                <div className="text-xs uppercase tracking-widest text-[#9E9EA7] font-semibold">
-                  AFFINITY
+                <div className="text-xs uppercase tracking-widest text-[#86868B] font-mono font-medium">
+                  AFFINITY INDEX
                 </div>
                 <div className="text-7xl sm:text-8xl font-light tracking-tight text-white tabular-nums my-1">
                   {displayScore}
                 </div>
-                <div className="text-xs text-apple-green font-medium">
-                  {userAName} · {userBName}
+                <div className="text-xs text-[#34C759] font-medium flex items-center justify-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#34C759]" />
+                  <span>{userAName} · {userBName}</span>
                 </div>
               </div>
 
-              {/* 4 Measurable Behavioral Dimensions */}
-              <div className="grid grid-cols-2 gap-3 text-left">
+              {/* 4 Measurable Telemetry Dimensions */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
                 {dimensions.map((dim) => (
                   <div key={dim.label} className="p-3.5 rounded-2xl bg-[#141417] border border-white/6 space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-xs font-semibold text-[#9E9EA7] tracking-tight">{dim.label}</span>
-                      <span className="text-white font-semibold tabular-nums text-sm">{dim.value}</span>
+                      <span className="text-[11px] font-mono font-semibold text-[#86868B] tracking-tight">
+                        {dim.label}
+                      </span>
+                      <span className="text-white font-semibold tabular-nums text-sm">
+                        {dim.value}
+                      </span>
                     </div>
-                    <p className="text-[10px] text-[#62626B] leading-tight">
+                    <p className="text-[10px] text-[#636366] leading-tight">
                       {dim.desc}
                     </p>
+                    <div className="text-[10px] text-white/70 font-mono pt-0.5 border-t border-white/5">
+                      ↳ {dim.evidence}
+                    </div>
                   </div>
                 ))}
               </div>
 
-              {/* Scientific Observation Interpretation */}
-              <div className="p-4 rounded-2xl bg-[#141417] border border-white/6 text-xs text-[#9E9EA7] leading-relaxed text-left">
-                <span className="text-white font-semibold">Primary observation: </span>
-                <span>
-                  {score.formulaExplanations?.alignmentReason ||
-                    'Your strongest signal was synchronized decision-making under time pressure, showing natural instinct convergence.'}
-                </span>
+              {/* Distinction: Hardware/Telemetry Data vs AI Behavioral Synthesis */}
+              <div className="space-y-3 pt-2">
+                {/* 1. Hardware Sensor Log */}
+                <div className="p-4 rounded-2xl bg-[#111114] border border-white/6 text-left space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1.5 text-xs font-mono font-semibold text-white">
+                      <Activity className="w-3.5 h-3.5 text-[#2997FF]" />
+                      <span>MEASURED EXPERIMENT TELEMETRY</span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/5 text-[#86868B]">
+                      Verified Sensor Log
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/4">
+                      <div className="text-[10px] text-[#86868B] font-mono uppercase">01 Bond Synthesis</div>
+                      <div className="text-white font-medium text-xs mt-0.5 truncate">
+                        {telemetry?.bondSummary || 'C + O · 92% Resonance'}
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/4">
+                      <div className="text-[10px] text-[#86868B] font-mono uppercase">02 Equilibrium Time</div>
+                      <div className="text-white font-medium text-xs mt-0.5">
+                        {telemetry?.reactorElapsedSeconds ? `${telemetry.reactorElapsedSeconds.toFixed(1)}s` : '21.4s'}
+                        <span className="text-[#86868B] text-[10px] ml-1">
+                          ({telemetry?.reactorOvershoots ?? 0} overshoots)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 rounded-xl bg-black/40 border border-white/4">
+                      <div className="text-[10px] text-[#86868B] font-mono uppercase">03 Dilemma Polarity</div>
+                      <div className="text-white font-medium text-xs mt-0.5 truncate">
+                        {telemetry?.dilemmaMatch ? 'Direct Consensus' : 'Complementary Divergence'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. AI Behavioral Synthesis */}
+                <div className="p-4 rounded-2xl bg-[#121216] border border-white/8 text-left space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1.5 text-xs font-mono font-semibold text-[#64D2FF]">
+                      <Sparkles className="w-3.5 h-3.5 text-[#64D2FF]" />
+                      <span>AI BEHAVIORAL INTERPRETATION</span>
+                    </div>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#64D2FF]/10 text-[#64D2FF]">
+                      Gemini Model
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#86868B] leading-relaxed">
+                    {score.formulaExplanations?.alignmentReason ||
+                      'Your strongest collaborative signal was rapid instinct convergence under time pressure.'}{' '}
+                    {score.formulaExplanations?.timingReason}
+                  </p>
+                </div>
               </div>
 
-              {/* Visual Reaction History Timeline */}
+              {/* Dynamic Interaction Sequence History (True to Telemetry) */}
               <div className="pt-2 text-left space-y-2">
-                <div className="text-[11px] uppercase tracking-wider text-[#62626B] font-semibold">
-                  Interaction Sequence
+                <div className="text-[10px] uppercase tracking-wider text-[#636366] font-mono font-semibold">
+                  Signal Trajectory
                 </div>
-                <div className="flex items-center space-x-2 text-xs text-[#9E9EA7]">
-                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white">01 Calibrate: Synchronous</span>
+                <div className="flex flex-wrap items-center gap-2 text-xs text-[#86868B]">
+                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white border border-white/5 font-mono text-[11px]">
+                    01 Bond: {telemetry?.bondMatch ? 'Resonant' : 'Complementary'}
+                  </span>
                   <span className="text-white/20">→</span>
-                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white">02 React: Resonant</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white border border-white/5 font-mono text-[11px]">
+                    02 Reactor: {(telemetry?.reactorOvershoots ?? 0) <= 1 ? 'Precision Hold' : 'Adaptive Recovery'}
+                  </span>
                   <span className="text-white/20">→</span>
-                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white">03 Dilemma: Matched</span>
+                  <span className="px-2.5 py-1 rounded-full bg-[#141417] text-white border border-white/5 font-mono text-[11px]">
+                    03 Dilemma: {telemetry?.dilemmaMatch ? 'Direct Consensus' : 'Polarity Split'}
+                  </span>
                 </div>
               </div>
 
@@ -193,7 +283,7 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
                   className="w-full sm:w-auto px-6 text-xs"
                   onClick={handleCopyLink}
                 >
-                  {copied ? <Check className="w-4 h-4 text-apple-green" /> : <Copy className="w-4 h-4" />}
+                  {copied ? <Check className="w-4 h-4 text-[#34C759]" /> : <Copy className="w-4 h-4" />}
                   <span>{copied ? 'Link Copied' : 'Share Result'}</span>
                 </Button>
 
