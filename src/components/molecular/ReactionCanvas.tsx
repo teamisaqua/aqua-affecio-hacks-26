@@ -17,6 +17,8 @@ interface ReactionCanvasProps {
   stability?: number; // 0 to 100
   participantAName?: string;
   participantBName?: string;
+  showLabels?: boolean;
+  showTelemetry?: boolean;
   className?: string;
 }
 
@@ -25,6 +27,8 @@ export const ReactionCanvas: React.FC<ReactionCanvasProps> = ({
   stability = 0,
   participantAName = 'Alpha',
   participantBName = 'Beta',
+  showLabels = false,
+  showTelemetry = false,
   className = '',
 }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -59,12 +63,12 @@ export const ReactionCanvas: React.FC<ReactionCanvasProps> = ({
 
   const distance = getDistance();
 
-  // Dynamic color palette per state
+  // Dynamic color palette per state using defined design tokens
   const getCoreColor = (node: 'alpha' | 'beta') => {
-    if (state === 'success' || state === 'signature') return '#34C759';
-    if (state === 'stabilized') return '#2997FF';
-    if (state === 'overheat') return '#FF9F0A';
-    return node === 'alpha' ? '#2997FF' : '#38BDF8';
+    if (state === 'success' || state === 'signature') return '#4ADE80';
+    if (state === 'stabilized') return '#38BDF8';
+    if (state === 'overheat') return '#FB7185';
+    return node === 'alpha' ? '#38BDF8' : '#A78BFA';
   };
 
   return (
@@ -161,10 +165,12 @@ export const ReactionCanvas: React.FC<ReactionCanvasProps> = ({
           <circle cx="0" cy="0" r="9" fill="#1C1C1E" stroke={getCoreColor('alpha')} strokeWidth="2" filter="url(#softGlow)" />
           <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
 
-          {/* Node Alpha Label */}
-          <text y="42" textAnchor="middle" fill="#A1A1A6" fontSize="9" letterSpacing="0.08em" fontFamily="monospace">
-            {participantAName.toUpperCase()} [α]
-          </text>
+          {/* Optional Node Alpha Label - suppressed by default to prevent UI collisions */}
+          {showLabels && (
+            <text y="42" textAnchor="middle" fill="#A1A1AA" fontSize="9" letterSpacing="0.08em" fontFamily="monospace">
+              {participantAName.toUpperCase()}
+            </text>
+          )}
         </g>
 
         {/* NODE BETA (Participant B / Right) */}
@@ -191,43 +197,47 @@ export const ReactionCanvas: React.FC<ReactionCanvasProps> = ({
           />
 
           {/* Center Nucleus */}
-          <circle cx="0" cy="0" r="9" fill="#1C1C1E" stroke={getCoreColor('beta')} strokeWidth="2" filter="url(#softGlow)" />
-          <circle cx="0" cy="0" r="3.5" fill="#FFFFFF" />
+          <circle cx="0" cy="0" r="9" fill="#18181D" stroke={getCoreColor('beta')} strokeWidth="2" filter="url(#softGlow)" />
+          <circle cx="0" cy="0" r="3.5" fill="#F5F5F7" />
 
-          {/* Node Beta Label */}
-          <text y="42" textAnchor="middle" fill="#A1A1A6" fontSize="9" letterSpacing="0.08em" fontFamily="monospace">
-            {participantBName.toUpperCase()} [β]
-          </text>
+          {/* Optional Node Beta Label - suppressed by default to prevent UI collisions */}
+          {showLabels && (
+            <text y="42" textAnchor="middle" fill="#A1A1AA" fontSize="9" letterSpacing="0.08em" fontFamily="monospace">
+              {participantBName.toUpperCase()}
+            </text>
+          )}
         </g>
       </svg>
 
-      {/* State Telemetry Pill (Anchored at the bottom of the field) */}
-      <div className="absolute bottom-2 inset-x-0 flex justify-center pointer-events-none">
-        <div className="px-3 py-1 rounded-full bg-[#1C1C1E] border border-white/10 text-[11px] font-mono tracking-wider uppercase text-[#A1A1A6] flex items-center gap-2 shadow-sm">
-          <span className={`w-1.5 h-1.5 rounded-full ${
-            state === 'success' || state === 'signature'
-              ? 'bg-apple-green'
-              : state === 'stabilized'
-              ? 'bg-apple-blue'
-              : state === 'overheat'
-              ? 'bg-apple-amber'
-              : 'bg-white/40'
-          }`} />
-          <span>
-            {state === 'idle'
-              ? 'FIELD: STANDBY · 2 UNCOUPLED SYSTEMS'
-              : state === 'lobby'
-              ? 'FIELD: RESONANCE LINK ESTABLISHED'
-              : state === 'calibrating'
-              ? `CALIBRATION IN PROGRESS · STABILITY ${stability}%`
-              : state === 'stabilized'
-              ? 'FIELD: EQUILIBRIUM ACHIEVED'
-              : state === 'overheat'
-              ? 'WARNING: THERMAL SPIKE DETECTED'
-              : 'REACTION SIGNATURE FORMED'}
-          </span>
+      {/* Optional State Telemetry Pill */}
+      {showTelemetry && (
+        <div className="absolute bottom-2 inset-x-0 flex justify-center pointer-events-none">
+          <div className="px-3 py-1 rounded-full bg-[#18181D] border border-white/10 text-[11px] font-mono tracking-wider uppercase text-[#A1A1AA] flex items-center gap-2 shadow-sm">
+            <span className={`w-1.5 h-1.5 rounded-full ${
+              state === 'success' || state === 'signature'
+                ? 'bg-[#4ADE80]'
+                : state === 'stabilized'
+                ? 'bg-[#38BDF8]'
+                : state === 'overheat'
+                ? 'bg-[#FB7185]'
+                : 'bg-white/40'
+            }`} />
+            <span>
+              {state === 'idle'
+                ? 'FIELD: STANDBY · 2 UNCOUPLED SYSTEMS'
+                : state === 'lobby'
+                ? 'FIELD: RESONANCE LINK ESTABLISHED'
+                : state === 'calibrating'
+                ? `CALIBRATION IN PROGRESS · STABILITY ${stability}%`
+                : state === 'stabilized'
+                ? 'FIELD: EQUILIBRIUM ACHIEVED'
+                : state === 'overheat'
+                ? 'WARNING: THERMAL SPIKE DETECTED'
+                : 'REACTION SIGNATURE FORMED'}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

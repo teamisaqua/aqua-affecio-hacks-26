@@ -135,16 +135,16 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   const getOptionIcon = (archetype: string) => {
     switch (archetype) {
       case 'spontaneous':
-        return <Flame className="w-4 h-4 text-[#FF9F0A]" />;
+        return <Flame className="w-4 h-4 text-[#FB7185]" />;
       case 'calculated':
-        return <Compass className="w-4 h-4 text-[#2997FF]" />;
+        return <Compass className="w-4 h-4 text-[#38BDF8]" />;
       case 'adventurous':
-        return <Zap className="w-4 h-4 text-[#FF453A]" />;
+        return <Zap className="w-4 h-4 text-[#FB7185]" />;
       case 'intimate':
       case 'collaborative':
-        return <Heart className="w-4 h-4 text-[#BF5AF2]" />;
+        return <Heart className="w-4 h-4 text-[#A78BFA]" />;
       default:
-        return <Sparkles className="w-4 h-4 text-[#34C759]" />;
+        return <Sparkles className="w-4 h-4 text-[#4ADE80]" />;
     }
   };
 
@@ -162,20 +162,20 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   return (
     <div className="w-full max-w-3xl mx-auto space-y-4 select-none">
       {/* Experiment Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/8">
+      <div className="flex items-center justify-between pb-3 border-b border-white/10">
         <div className="flex items-center space-x-2.5">
-          <span className="px-2.5 py-0.5 rounded-full bg-[#16161A] border border-white/8 text-white text-xs font-semibold font-mono">
+          <span className="px-2.5 py-0.5 rounded-full bg-[#18181D] border border-white/10 text-[#F5F5F7] text-xs font-semibold font-mono">
             03 Dilemma
           </span>
-          <span className="text-white text-xs sm:text-sm font-semibold tracking-tight">
+          <span className="text-[#F5F5F7] text-xs sm:text-sm font-semibold tracking-tight">
             Decision {(state.scenarioIndex ?? 0) + 1} of {totalCount}
           </span>
-          <span className="text-[10px] font-mono text-[#86868B] px-1.5 py-0.2 rounded bg-white/5">
+          <span className="text-[10px] font-mono text-[#A1A1AA] px-1.5 py-0.5 rounded bg-white/5 border border-white/5">
             42 Dilemmas Bank
           </span>
         </div>
 
-        <div className="text-xs text-[#86868B] font-mono">
+        <div className="text-xs text-[#A1A1AA] font-mono">
           {bothSelected ? 'Both Locked In' : 'Private Selection'}
         </div>
       </div>
@@ -190,10 +190,10 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
               setScenarioIndexOffset(0);
               setRevealed(false);
             }}
-            className={`px-2.5 py-1 rounded-full text-[11px] font-medium capitalize transition-all whitespace-nowrap ${
+            className={`px-3 py-1 rounded-full text-[11px] font-medium capitalize transition-all whitespace-nowrap cursor-pointer ${
               selectedCategory === cat
-                ? 'bg-white text-black font-semibold'
-                : 'bg-[#121216] text-[#86868B] hover:text-white border border-white/6'
+                ? 'bg-[#F5F5F7] text-[#09090B] font-semibold shadow-sm'
+                : 'bg-[#111114] text-[#A1A1AA] hover:text-[#F5F5F7] border border-white/10 hover:border-white/20'
             }`}
           >
             {cat}
@@ -202,31 +202,31 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
       </div>
 
       {/* Scenario Prompt */}
-      <div className="text-center space-y-1.5 py-1">
-        <div className="text-[10px] font-mono uppercase tracking-widest text-[#2997FF]">
+      <div className="text-center space-y-1.5 py-2">
+        <div className="text-[10px] font-mono uppercase tracking-widest text-[#38BDF8]">
           {activeDilemma.categoryLabel || activeDilemma.category}
         </div>
-        <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight leading-snug max-w-xl mx-auto">
+        <h2 className="text-xl sm:text-2xl font-semibold text-[#F5F5F7] tracking-tight leading-snug max-w-xl mx-auto">
           {activeDilemma.prompt}
         </h2>
-        <p className="text-xs text-[#86868B] max-w-md mx-auto">
+        <p className="text-xs text-[#A1A1AA] max-w-md mx-auto">
           {activeDilemma.context}
         </p>
       </div>
 
       {/* Participants Status Bar */}
-      <div className="flex items-center justify-between px-5 py-2.5 rounded-2xl bg-[#111114] border border-white/8 text-xs">
+      <div className="flex items-center justify-between px-5 py-2.5 rounded-2xl bg-[#111114] border border-white/10 text-xs">
         <div className="flex items-center space-x-2">
-          <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-[#2997FF]' : 'bg-white/20'}`} />
-          <span className="text-white font-medium">You</span>
-          <span className="text-[#86868B]">{myChoice ? '· Chosen' : '· Deciding...'}</span>
+          <span className={`w-2 h-2 rounded-full ${myChoice ? 'bg-[#38BDF8]' : 'bg-white/20'}`} />
+          <span className="text-[#F5F5F7] font-medium">You</span>
+          <span className="text-[#A1A1AA]">{myChoice ? '· Chosen' : '· Deciding...'}</span>
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-[#86868B]">
+          <span className="text-[#A1A1AA]">
             {partnerName}: {partnerChoice ? 'Chosen' : 'Deciding...'}
           </span>
-          <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-[#34C759]' : 'bg-white/20'}`} />
+          <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-[#4ADE80]' : 'bg-white/20'}`} />
         </div>
       </div>
 
@@ -237,12 +237,12 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="p-6 text-center rounded-3xl bg-[#141416] border border-[#2997FF]/40 shadow-2xl max-w-xs mx-auto"
+            className="p-6 text-center rounded-3xl bg-[#111114] border border-[#38BDF8]/40 shadow-2xl max-w-xs mx-auto"
           >
-            <div className="text-xs uppercase tracking-wider text-[#86868B] mb-1 font-mono">
+            <div className="text-xs uppercase tracking-wider text-[#A1A1AA] mb-1 font-mono">
               Revealing Answers In
             </div>
-            <div className="text-6xl font-light tabular-nums text-white">
+            <div className="text-6xl font-light tabular-nums text-[#F5F5F7]">
               {countdown}
             </div>
           </motion.div>
@@ -256,19 +256,19 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
           const isPartnerPick = partnerChoice === option.id;
           const isRevealed = countdown === 0 || revealed;
 
-          let cardStyle = 'bg-[#121215] border-white/8 text-[#86868B] hover:border-white/15';
+          let cardStyle = 'bg-[#111114] border-white/10 text-[#A1A1AA] hover:border-white/20';
 
           if (isMyPick && !isRevealed) {
-            cardStyle = 'bg-[#18181D] border-[#2997FF] ring-1 ring-[#2997FF]/50 text-white';
+            cardStyle = 'bg-[#18181D] border-[#38BDF8] ring-1 ring-[#38BDF8]/50 text-[#F5F5F7]';
           } else if (isRevealed) {
             if (isMyPick && isPartnerPick) {
-              cardStyle = 'bg-[#141E16] border-[#34C759] ring-2 ring-[#34C759]/40 text-white';
+              cardStyle = 'bg-[#111114] border-[#4ADE80] ring-1 ring-[#4ADE80]/40 text-[#F5F5F7]';
             } else if (isMyPick) {
-              cardStyle = 'bg-[#18181D] border-[#2997FF] text-white';
+              cardStyle = 'bg-[#18181D] border-[#38BDF8] text-[#F5F5F7]';
             } else if (isPartnerPick) {
-              cardStyle = 'bg-[#18181D] border-[#BF5AF2] text-white';
+              cardStyle = 'bg-[#18181D] border-[#A78BFA] text-[#F5F5F7]';
             } else {
-              cardStyle = 'bg-[#0E0E10] opacity-35 border-white/4 text-[#86868B]';
+              cardStyle = 'bg-[#09090B] opacity-40 border-white/5 text-[#71717A]';
             }
           }
 
@@ -282,31 +282,31 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-2">
                     {getOptionIcon(option.archetype)}
-                    <span className="text-xs sm:text-sm font-semibold text-white">{option.label}</span>
+                    <span className="text-xs sm:text-sm font-semibold text-[#F5F5F7]">{option.label}</span>
                   </div>
 
                   {/* Pick Badges */}
                   <div className="flex items-center space-x-1.5">
                     {isMyPick && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-semibold font-mono">
+                      <span className="px-2 py-0.5 rounded-full bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8] text-[10px] font-semibold font-mono">
                         You
                       </span>
                     )}
                     {isRevealed && isPartnerPick && (
-                      <span className="px-2 py-0.5 rounded-full bg-[#BF5AF2]/20 text-[#BF5AF2] text-[10px] font-semibold font-mono">
+                      <span className="px-2 py-0.5 rounded-full bg-[#A78BFA]/15 border border-[#A78BFA]/30 text-[#A78BFA] text-[10px] font-semibold font-mono">
                         {partnerName}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <p className="text-xs text-[#86868B] leading-relaxed">
+                <p className="text-xs text-[#A1A1AA] leading-relaxed">
                   {option.subtext}
                 </p>
               </div>
 
               {isRevealed && isMyPick && isPartnerPick && (
-                <div className="mt-2.5 pt-2 border-t border-[#34C759]/30 flex items-center text-xs text-[#34C759] font-medium gap-1.5">
+                <div className="mt-2.5 pt-2 border-t border-[#4ADE80]/30 flex items-center text-xs text-[#4ADE80] font-medium gap-1.5">
                   <Check className="w-3.5 h-3.5" /> Consensus Match
                 </div>
               )}
@@ -320,14 +320,14 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 sm:p-5 rounded-2xl bg-[#141416] border border-white/10 space-y-3 text-center"
+          className="p-4 sm:p-5 rounded-2xl bg-[#111114] border border-white/10 space-y-3 text-center"
         >
-          <div className="text-sm font-semibold text-white tracking-tight flex items-center justify-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-[#2997FF]" />
+          <div className="text-sm font-semibold text-[#F5F5F7] tracking-tight flex items-center justify-center gap-2">
+            <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
             {myChoice === partnerChoice ? 'Direct Consensus Match' : 'Complementary Perspectives'}
           </div>
 
-          <p className="text-xs text-[#86868B] max-w-md mx-auto">
+          <p className="text-xs text-[#A1A1AA] max-w-md mx-auto">
             {myChoice === partnerChoice
               ? 'Both participants made the identical instinctual choice independently.'
               : 'Different instincts create dynamic balance rather than friction.'}
@@ -335,12 +335,12 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
 
           {/* Conversation Spark */}
           {activeDilemma.discussionSpark && (
-            <div className="p-3 rounded-xl bg-white/5 border border-white/8 text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2997FF]">
+            <div className="p-3 rounded-xl bg-[#18181D] border border-white/10 text-left space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#38BDF8]">
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>Discussion Spark</span>
               </div>
-              <p className="text-xs text-white/90 italic">
+              <p className="text-xs text-[#F5F5F7] italic">
                 &ldquo;{activeDilemma.discussionSpark}&rdquo;
               </p>
             </div>

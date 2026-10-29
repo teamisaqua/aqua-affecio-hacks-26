@@ -157,38 +157,38 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
   }, [detailedOutcome, demoMode, currentRoundIdx]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6 select-none py-2">
+    <div className="w-full max-w-4xl mx-auto space-y-5 select-none py-2">
       {/* Experiment Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#16161A] border border-white/8 text-xs font-medium text-[#86868B]">
-          <Sparkles className="w-3.5 h-3.5 text-[#2997FF]" />
-          <span>Experiment 01 · {currentRound.title}</span>
+      <div className="space-y-2 pb-3 border-b border-white/10 text-center">
+        <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#38BDF8]/10 border border-[#38BDF8]/25 text-xs font-medium text-[#38BDF8]">
+          <Sparkles className="w-3.5 h-3.5 text-[#38BDF8]" />
+          <span>Experiment 01 · Round {currentRoundIdx + 1} of 3</span>
           <span className="text-white/20">·</span>
-          <span className="text-[#34C759] font-mono">Round {currentRoundIdx + 1} of 3</span>
+          <span className="font-mono text-[11px]">{currentRound.title}</span>
         </div>
-        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#F5F5F7]">
           Element Bond & Valence Synthesis
         </h2>
-        <p className="text-xs sm:text-sm text-[#86868B] max-w-lg mx-auto">
+        <p className="text-xs sm:text-sm text-[#A1A1AA] max-w-lg mx-auto leading-relaxed">
           {currentRound.subtext}
         </p>
       </div>
 
       {/* Participants Status Bar */}
-      <div className="flex items-center justify-between px-5 py-3 rounded-2xl bg-[#121216] border border-white/8 text-xs">
+      <div className="flex items-center justify-between px-5 py-3 rounded-2xl bg-[#111114] border border-white/10 text-xs">
         <div className="flex items-center space-x-2.5">
-          <span className="w-2 h-2 rounded-full bg-[#2997FF]" />
-          <span className="text-white font-medium">You</span>
-          <span className="text-[#86868B]">
-            {myChoice ? '· Locked in' : '· Selecting instinct...'}
+          <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+          <span className="text-[#F5F5F7] font-medium">You</span>
+          <span className="text-[#A1A1AA]">
+            {myChoice ? '· Locked in' : '· Selecting element...'}
           </span>
         </div>
 
         <div className="flex items-center space-x-2.5">
-          <span className="text-[#86868B]">
+          <span className="text-[#A1A1AA]">
             {partnerName}: {partnerChoice ? 'Locked in' : 'Selecting...'}
           </span>
-          <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-[#34C759]' : 'bg-white/20'}`} />
+          <span className={`w-2 h-2 rounded-full ${partnerChoice ? 'bg-[#4ADE80]' : 'bg-white/20'}`} />
         </div>
       </div>
 
@@ -209,10 +209,10 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
                   <button
                     key={el.id}
                     onClick={() => handlePick(el.id)}
-                    className={`p-3.5 rounded-2xl border text-left transition-all relative overflow-hidden group ${
+                    className={`p-3.5 rounded-2xl border text-left transition-all relative overflow-hidden group cursor-pointer ${
                       isSelected
-                        ? 'bg-[#1C1C22] border-[#2997FF] ring-1 ring-[#2997FF]/50 text-white shadow-lg shadow-[#2997FF]/10'
-                        : 'bg-[#121216] border-white/8 text-[#86868B] hover:text-white hover:border-white/20 hover:bg-[#16161C]'
+                        ? 'bg-[#18181D] border-[#38BDF8] ring-1 ring-[#38BDF8]/50 text-[#F5F5F7] shadow-md shadow-[#38BDF8]/10'
+                        : 'bg-[#111114] border-white/10 text-[#A1A1AA] hover:text-[#F5F5F7] hover:border-white/20 hover:bg-[#18181D]'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -223,23 +223,23 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
                         >
                           {el.symbol}
                         </span>
-                        <span className="text-[10px] font-mono text-[#86868B]">Z={el.atomicNumber}</span>
+                        <span className="text-[10px] font-mono text-[#A1A1AA]">Z={el.atomicNumber}</span>
                       </div>
                       {isSelected ? (
-                        <Check className="w-4 h-4 text-[#2997FF]" />
+                        <Check className="w-4 h-4 text-[#38BDF8]" />
                       ) : (
                         <span className="text-[10px] text-white/30 font-mono">
                           {el.valenceElectrons}e⁻
                         </span>
                       )}
                     </div>
-                    <div className="text-xs font-semibold text-white tracking-tight">{el.name}</div>
-                    <div className="text-[10px] text-[#86868B] mt-0.5 truncate">{el.tagline}</div>
+                    <div className="text-xs font-semibold text-[#F5F5F7] tracking-tight">{el.name}</div>
+                    <div className="text-[10px] text-[#71717A] mt-0.5 truncate">{el.tagline}</div>
                   </button>
                 );
               })}
             </div>
-            <div className="text-center text-[11px] text-[#86868B]">
+            <div className="text-center text-[11px] text-[#A1A1AA] font-mono">
               Goal: {currentRound.suggestedGoal}
             </div>
           </motion.div>
@@ -251,12 +251,12 @@ export const ElementBondStage: React.FC<ElementBondStageProps> = ({
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            className="py-16 text-center space-y-4 rounded-3xl bg-[#121216] border border-white/8"
+            className="py-16 text-center space-y-4 rounded-2xl bg-[#111114] border border-white/10 shadow-lg"
           >
-            <div className="text-xs text-[#86868B] uppercase tracking-widest font-mono font-medium">
+            <div className="text-xs text-[#A1A1AA] uppercase tracking-widest font-mono font-medium">
               Synthesizing Valence Bond
             </div>
-            <div className="text-8xl font-light text-white tracking-tight tabular-nums">
+            <div className="text-8xl font-light text-[#F5F5F7] tracking-tight tabular-nums">
               {countdown}
             </div>
             <p className="text-xs text-[#86868B]">

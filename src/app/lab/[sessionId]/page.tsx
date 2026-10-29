@@ -1041,20 +1041,20 @@ function LabSessionContent() {
   ], [bondState.result, reactorState.isSuccess, dilemmaState.history.length, sessionRecords]);
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between p-3 sm:p-5 md:p-6 lg:p-8 bg-black text-white overflow-x-hidden">
+    <div className="relative min-h-screen flex flex-col justify-between p-3 sm:p-5 md:p-6 lg:p-8 bg-[#09090B] text-[#F5F5F7] overflow-x-hidden">
       {/* Living Ambient Molecular Matrix */}
       <div className="pointer-events-none fixed inset-0 opacity-15 z-0">
         <ReactionCanvas state={molecularFieldState} />
       </div>
 
       {/* Redesigned Upper Navigation Tier 1: Brand, Mode Switcher, Session Status */}
-      <header className="relative z-20 max-w-5xl w-full mx-auto flex flex-col gap-2.5 pb-2.5 border-b border-white/6">
+      <header className="relative z-20 max-w-5xl w-full mx-auto flex flex-col gap-2.5 pb-2.5 border-b border-white/10">
         <div className="flex items-center justify-between gap-2 sm:gap-4">
           {/* Left: Brand + Session Status */}
           <div className="flex items-center space-x-2.5 min-w-0">
             <button
               onClick={() => router.push('/')}
-              className="w-8 h-8 rounded-full bg-[#16161A] hover:bg-[#222228] active:scale-95 border border-white/8 flex items-center justify-center text-[#86868B] hover:text-white transition-all shrink-0 cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#18181D] hover:bg-[#222228] active:scale-95 border border-white/10 flex items-center justify-center text-[#A1A1AA] hover:text-[#F5F5F7] transition-all shrink-0 cursor-pointer"
               title="Return to Portal"
               aria-label="Return to Portal"
             >
@@ -1062,18 +1062,18 @@ function LabSessionContent() {
             </button>
 
             <div className="flex items-center gap-2 min-w-0">
-              <span className="font-mono text-xs font-bold tracking-widest uppercase text-white flex items-center gap-1.5 shrink-0">
+              <span className="font-mono text-xs font-bold tracking-widest uppercase text-[#F5F5F7] flex items-center gap-1.5 shrink-0">
                 AFFECIO
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2997FF] shadow-sm shadow-[#2997FF]/50" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8] shadow-sm shadow-[#38BDF8]/50" />
               </span>
 
               <span className="text-white/20 hidden sm:inline">|</span>
 
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#121216] border border-white/8 text-[11px] font-mono text-[#86868B] truncate">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse shrink-0" />
-                <span className="text-white font-medium truncate">{sessionId}</span>
+              <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#111114] border border-white/10 text-[11px] font-mono text-[#A1A1AA] truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#4ADE80] animate-pulse shrink-0" />
+                <span className="text-[#F5F5F7] font-medium truncate">{sessionId}</span>
                 {isSimulatedPartner && (
-                  <span className="text-[9px] text-[#2997FF] font-sans px-1 rounded bg-[#2997FF]/10 hidden md:inline">
+                  <span className="text-[9px] text-[#38BDF8] font-sans px-1 rounded bg-[#38BDF8]/10 hidden md:inline">
                     Simulated
                   </span>
                 )}
@@ -1082,7 +1082,7 @@ function LabSessionContent() {
           </div>
 
           {/* Center: Structured Navigation Pill (Lobby, Chamber, Activities, Recap) */}
-          <nav aria-label="Main Navigation" className="hidden sm:flex items-center p-0.5 rounded-full bg-[#141418] border border-white/8">
+          <nav aria-label="Main Navigation" className="hidden sm:flex items-center p-0.5 rounded-full bg-[#111114] border border-white/10">
             <button
               onClick={() => {
                 sound.playGlassClick();
@@ -1091,8 +1091,8 @@ function LabSessionContent() {
               }}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
                 stage === 'lobby' && viewMode === 'chamber'
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'text-[#86868B] hover:text-white'
+                  ? 'bg-[#F5F5F7] text-[#09090B] font-semibold shadow-sm'
+                  : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
             >
               Lobby
@@ -1102,12 +1102,12 @@ function LabSessionContent() {
               onClick={() => handleSwitchView('chamber')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'chamber' && stage !== 'lobby'
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'text-[#86868B] hover:text-white'
+                  ? 'bg-[#F5F5F7] text-[#09090B] font-semibold shadow-sm'
+                  : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
               title="Return to Science Chamber"
             >
-              <FlaskConical className="w-3 h-3 text-[#2997FF]" />
+              <FlaskConical className="w-3 h-3 text-[#38BDF8]" />
               <span>Chamber</span>
             </button>
 
@@ -1115,14 +1115,14 @@ function LabSessionContent() {
               onClick={() => handleSwitchView('hub')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'hub' || viewMode === 'activity'
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'text-[#86868B] hover:text-white'
+                  ? 'bg-[#F5F5F7] text-[#09090B] font-semibold shadow-sm'
+                  : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
               title="Browse 25+ Dating & Compatibility Games"
             >
-              <Gamepad2 className="w-3 h-3 text-[#2997FF]" />
+              <Gamepad2 className="w-3 h-3 text-[#38BDF8]" />
               <span>Activities</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-[#38BDF8]/20 text-[#38BDF8] text-[10px] font-mono">
                 25+
               </span>
             </button>
@@ -1131,15 +1131,15 @@ function LabSessionContent() {
               onClick={() => handleSwitchView('summary')}
               className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'summary'
-                  ? 'bg-white text-black font-semibold shadow-sm'
-                  : 'text-[#86868B] hover:text-white'
+                  ? 'bg-[#F5F5F7] text-[#09090B] font-semibold shadow-sm'
+                  : 'text-[#A1A1AA] hover:text-[#F5F5F7]'
               }`}
               title="View Cumulative Compatibility Recap"
             >
-              <BarChart3 className="w-3 h-3 text-[#34C759]" />
+              <BarChart3 className="w-3 h-3 text-[#4ADE80]" />
               <span>Recap</span>
               {sessionRecords.length > 0 && (
-                <span className="w-3.5 h-3.5 rounded-full bg-[#34C759] text-black text-[9px] font-bold flex items-center justify-center">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#4ADE80] text-black text-[9px] font-bold flex items-center justify-center">
                   {sessionRecords.length}
                 </span>
               )}
@@ -1150,11 +1150,11 @@ function LabSessionContent() {
           <div className="flex items-center space-x-2 shrink-0">
             {/* Participant Role Pill */}
             <div
-              className="px-2.5 py-1 rounded-full bg-[#16161A] border border-white/8 text-[11px] font-mono text-[#86868B] flex items-center gap-1"
+              className="px-2.5 py-1 rounded-full bg-[#18181D] border border-white/10 text-[11px] font-mono text-[#A1A1AA] flex items-center gap-1"
               title="Your assigned participant role in this chamber"
             >
               <span className="text-white/40">Role:</span>
-              <span className="text-white font-medium capitalize">
+              <span className="text-[#F5F5F7] font-medium capitalize">
                 {currentRole === 'explore' ? 'Explore' : 'Control'}
               </span>
             </div>
@@ -1162,12 +1162,12 @@ function LabSessionContent() {
             {/* Experiment Map Trigger */}
             <button
               onClick={() => setIsSelectorOpen(true)}
-              className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 bg-[#16161A] hover:bg-[#222228] border border-white/8 text-white cursor-pointer active:scale-95"
+              className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 bg-[#18181D] hover:bg-[#222228] border border-white/10 text-[#F5F5F7] cursor-pointer active:scale-95"
               title="Browse and launch all 10 Science Experiments"
             >
-              <Compass className="w-3.5 h-3.5 text-[#2997FF]" />
+              <Compass className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span className="hidden sm:inline">10 Experiments</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
+              <span className="px-1.5 py-0.2 rounded-full bg-[#38BDF8]/20 text-[#38BDF8] text-[10px] font-mono">
                 Map
               </span>
             </button>
@@ -1177,7 +1177,7 @@ function LabSessionContent() {
         </div>
 
         {/* Mobile Segmented Navigation Bar (<640px) */}
-        <div className="flex sm:hidden items-center justify-between p-0.5 rounded-full bg-[#141418] border border-white/8 w-full text-xs">
+        <div className="flex sm:hidden items-center justify-between p-0.5 rounded-full bg-[#111114] border border-white/10 w-full text-xs">
           <button
             onClick={() => {
               sound.playGlassClick();
@@ -1186,8 +1186,8 @@ function LabSessionContent() {
             }}
             className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
               stage === 'lobby' && viewMode === 'chamber'
-                ? 'bg-white text-black font-semibold'
-                : 'text-[#86868B]'
+                ? 'bg-[#F5F5F7] text-[#09090B] font-semibold'
+                : 'text-[#A1A1AA]'
             }`}
           >
             Lobby
@@ -1196,8 +1196,8 @@ function LabSessionContent() {
             onClick={() => handleSwitchView('chamber')}
             className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
               viewMode === 'chamber' && stage !== 'lobby'
-                ? 'bg-white text-black font-semibold'
-                : 'text-[#86868B]'
+                ? 'bg-[#F5F5F7] text-[#09090B] font-semibold'
+                : 'text-[#A1A1AA]'
             }`}
           >
             Chamber
@@ -1206,8 +1206,8 @@ function LabSessionContent() {
             onClick={() => handleSwitchView('hub')}
             className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
               viewMode === 'hub' || viewMode === 'activity'
-                ? 'bg-white text-black font-semibold'
-                : 'text-[#86868B]'
+                ? 'bg-[#F5F5F7] text-[#09090B] font-semibold'
+                : 'text-[#A1A1AA]'
             }`}
           >
             Activities
@@ -1216,8 +1216,8 @@ function LabSessionContent() {
             onClick={() => handleSwitchView('summary')}
             className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
               viewMode === 'summary'
-                ? 'bg-white text-black font-semibold'
-                : 'text-[#86868B]'
+                ? 'bg-[#F5F5F7] text-[#09090B] font-semibold'
+                : 'text-[#A1A1AA]'
             }`}
           >
             Recap

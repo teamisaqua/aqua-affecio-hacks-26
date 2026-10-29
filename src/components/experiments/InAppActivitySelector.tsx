@@ -161,25 +161,25 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          className="w-full max-w-3xl max-h-[90vh] bg-[#121216] border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+          className="w-full max-w-3xl max-h-[90vh] bg-[#111114] border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
         >
           {/* Header */}
-          <div className="p-5 sm:p-6 border-b border-white/8 flex items-center justify-between">
+          <div className="p-5 sm:p-6 border-b border-white/10 flex items-center justify-between">
             <div>
-              <div className="text-[10px] font-mono uppercase tracking-widest text-[#2997FF] mb-1">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-[#38BDF8] mb-1">
                 Laboratory Operations Map
               </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-[#F5F5F7] tracking-tight">
                 10 Core Science Experiments
               </h2>
-              <p className="text-xs text-[#86868B] mt-0.5">
+              <p className="text-xs text-[#A1A1AA] mt-0.5">
                 Launch or replay any experiment without leaving the active chamber.
               </p>
             </div>
 
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-[#18181D] hover:bg-[#222228] border border-white/8 flex items-center justify-center text-[#86868B] hover:text-white transition-all cursor-pointer"
+              className="w-8 h-8 rounded-full bg-[#18181D] hover:bg-[#222228] border border-white/10 flex items-center justify-center text-[#A1A1AA] hover:text-[#F5F5F7] transition-all cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -202,20 +202,20 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
                   }}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
                     isActive
-                      ? 'bg-[#181822] border-[#2997FF] ring-1 ring-[#2997FF]/30'
+                      ? 'bg-[#18181D] border-[#38BDF8] ring-1 ring-[#38BDF8]/40'
                       : isCompleted
-                      ? 'bg-[#141A16] border-[#34C759]/40 hover:border-[#34C759]'
-                      : 'bg-[#141418] border-white/6 hover:border-white/15'
+                      ? 'bg-[#111114] border-[#4ADE80]/30 hover:border-[#4ADE80]/60'
+                      : 'bg-[#111114] border-white/10 hover:border-white/20'
                   }`}
                 >
                   <div className="flex items-center space-x-3.5">
                     <div
                       className={`w-10 h-10 rounded-xl flex items-center justify-center font-mono font-bold text-sm ${
                         isActive
-                          ? 'bg-[#2997FF]/20 text-[#2997FF]'
+                          ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30'
                           : isCompleted
-                          ? 'bg-[#34C759]/20 text-[#34C759]'
-                          : 'bg-white/5 text-white/50'
+                          ? 'bg-[#4ADE80]/15 text-[#4ADE80] border border-[#4ADE80]/30'
+                          : 'bg-white/5 text-white/50 border border-white/5'
                       }`}
                     >
                       {exp.number}
@@ -223,27 +223,27 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
 
                     <div>
                       <div className="flex items-center space-x-2">
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-semibold text-[#F5F5F7]">
                           {exp.title}
                         </span>
                         {isActive && (
-                          <span className="px-2 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[9px] font-mono font-semibold">
+                          <span className="px-2 py-0.5 rounded-full bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8] text-[9px] font-mono font-semibold">
                             Active
                           </span>
                         )}
                         {isCompleted && !isActive && (
-                          <span className="px-2 py-0.2 rounded-full bg-[#34C759]/20 text-[#34C759] text-[9px] font-mono font-semibold flex items-center gap-1">
+                          <span className="px-2 py-0.5 rounded-full bg-[#4ADE80]/15 border border-[#4ADE80]/30 text-[#4ADE80] text-[9px] font-mono font-semibold flex items-center gap-1">
                             <CheckCircle2 className="w-2.5 h-2.5" /> Completed
                           </span>
                         )}
                       </div>
 
-                      <div className="text-xs text-[#86868B] mt-0.5">
+                      <div className="text-xs text-[#A1A1AA] mt-0.5">
                         {exp.subtitle}
                       </div>
 
-                      <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-[#86868B]">
-                        <span className="px-1.5 py-0.2 rounded bg-white/5 text-white/60">
+                      <div className="flex items-center gap-2 mt-1 text-[10px] font-mono text-[#A1A1AA]">
+                        <span className="px-1.5 py-0.5 rounded bg-white/5 text-white/70 border border-white/5">
                           {exp.category}
                         </span>
                         <span>·</span>
@@ -258,12 +258,12 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
 
                   <div className="flex items-center space-x-2">
                     <button
-                      className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                         isActive
-                          ? 'bg-[#2997FF] text-white'
+                          ? 'bg-[#38BDF8] text-[#09090B]'
                           : isCompleted
-                          ? 'bg-[#34C759]/20 text-[#34C759] hover:bg-[#34C759] hover:text-black'
-                          : 'bg-white text-black hover:bg-white/90'
+                          ? 'bg-[#4ADE80]/15 border border-[#4ADE80]/30 text-[#4ADE80] hover:bg-[#4ADE80] hover:text-[#09090B]'
+                          : 'bg-[#F5F5F7] text-[#09090B] hover:bg-white'
                       }`}
                     >
                       {isCompleted ? (
@@ -285,8 +285,8 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
           </div>
 
           {/* Footer with Activity Hub Link */}
-          <div className="p-4 sm:p-5 border-t border-white/8 bg-[#0E0E10] flex items-center justify-between">
-            <div className="text-xs text-[#86868B]">
+          <div className="p-4 sm:p-5 border-t border-white/10 bg-[#09090B] flex items-center justify-between">
+            <div className="text-xs text-[#A1A1AA]">
               Looking for informal social dating games?
             </div>
 
@@ -295,9 +295,9 @@ export const InAppActivitySelector: React.FC<InAppActivitySelectorProps> = ({
                 onClose();
                 onOpenSocialHub();
               }}
-              className="px-4 py-2 rounded-full bg-[#18181D] hover:bg-[#222228] text-white text-xs font-medium border border-white/8 transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2 rounded-full bg-[#18181D] hover:bg-[#222228] text-[#F5F5F7] text-xs font-medium border border-white/10 transition-all flex items-center gap-1.5 cursor-pointer"
             >
-              <Gamepad2 className="w-3.5 h-3.5 text-[#2997FF]" />
+              <Gamepad2 className="w-3.5 h-3.5 text-[#38BDF8]" />
               <span>Browse 25+ Dating Games Hub</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
