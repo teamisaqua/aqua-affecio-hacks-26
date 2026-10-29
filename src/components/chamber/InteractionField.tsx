@@ -142,19 +142,19 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
       nodeBColor: activeRole === 'control' ? 'border-[#2997FF] shadow-[0_0_10px_rgba(41,151,255,0.35)]' : 'border-white/30',
     },
     diverging: {
-      color: '#FF9F0A', // Apple Amber
-      glow: 'drop-shadow(0 0 6px rgba(255, 159, 10, 0.35))',
-      badgeBg: 'bg-[#FF9F0A]/10',
-      badgeText: 'text-[#FF9F0A]',
-      badgeBorder: 'border-[#FF9F0A]/30',
+      color: '#FB7185', // Warm Rose - emotional contrast & differing choices
+      glow: 'drop-shadow(0 0 8px rgba(251, 113, 133, 0.35))',
+      badgeBg: 'bg-[#FB7185]/10',
+      badgeText: 'text-[#FB7185]',
+      badgeBorder: 'border-[#FB7185]/30',
       label: 'DISTINCT CHOICES',
       subtext: statusMessage || 'Contrasting viewpoints selected',
       detail: 'Phase Split',
-      nodeAColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.25)]',
-      nodeBColor: 'border-[#FF9F0A]/80 shadow-[0_0_8px_rgba(255,159,10,0.25)]',
+      nodeAColor: 'border-[#FB7185]/80 shadow-[0_0_8px_rgba(251,113,133,0.25)]',
+      nodeBColor: 'border-[#FB7185]/80 shadow-[0_0_8px_rgba(251,113,133,0.25)]',
     },
     synchronizing: {
-      color: '#34C759', // Apple Green
+      color: '#34C759', // Apple Green - resonant lock
       glow: 'drop-shadow(0 0 8px rgba(52, 199, 89, 0.4))',
       badgeBg: 'bg-[#34C759]/10',
       badgeText: 'text-[#34C759]',
@@ -166,16 +166,16 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
       nodeBColor: 'border-[#34C759] shadow-[0_0_10px_rgba(52,199,89,0.3)]',
     },
     collaborating: {
-      color: '#30D158', // Apple Mint/Cyan
-      glow: 'drop-shadow(0 0 7px rgba(48, 209, 88, 0.35))',
-      badgeBg: 'bg-[#30D158]/10',
-      badgeText: 'text-[#30D158]',
-      badgeBorder: 'border-[#30D158]/30',
+      color: '#A78BFA', // Soft Lavender - joint reciprocal manipulation
+      glow: 'drop-shadow(0 0 8px rgba(167, 139, 250, 0.4))',
+      badgeBg: 'bg-[#8B5CF6]/10',
+      badgeText: 'text-[#A78BFA]',
+      badgeBorder: 'border-[#8B5CF6]/30',
       label: 'RECIPROCAL STEERING',
       subtext: statusMessage || 'Balancing temperature & pressure controls',
       detail: 'Live Adjustment',
       nodeAColor: 'border-[#2997FF]',
-      nodeBColor: 'border-[#30D158]',
+      nodeBColor: 'border-[#A78BFA]',
     },
     completing: {
       color: '#64D2FF', // Apple Cyan
@@ -333,8 +333,8 @@ export const InteractionField: React.FC<InteractionFieldProps> = ({
                   fill="none"
                   stroke={
                     normalizedState === 'diverging'
-                      ? 'rgba(255, 159, 10, 0.45)'
-                      : 'rgba(48, 209, 88, 0.4)'
+                      ? 'rgba(251, 113, 133, 0.45)'
+                      : 'rgba(167, 139, 250, 0.45)'
                   }
                   strokeWidth="1.5"
                   strokeLinecap="round"

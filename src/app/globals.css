@@ -3,18 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --canvas: #000000;
-  --surface-1: #0D0D0F;
-  --surface-2: #141417;
-  --surface-3: #1C1C20;
-  --surface-elevated: #24242A;
+  --canvas: #050508;
+  --surface-1: #0D0D12;
+  --surface-2: #14141A;
+  --surface-3: #1A1A22;
+  --surface-elevated: #242430;
   --text-primary: #FFFFFF;
-  --text-secondary: #9E9EA7;
-  --text-muted: #62626B;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.14);
   --accent: #2997FF;
   --accent-soft: rgba(41, 151, 255, 0.15);
+  --accent-violet: #8B5CF6;
+  --accent-lavender: #A78BFA;
+  --accent-rose: #FB7185;
   --accent-emerald: #34C759;
   --accent-amber: #FF9F0A;
 }
@@ -70,31 +73,45 @@ a {
 
 /* Design System Surface Primitives */
 .affecio-card {
-  background-color: #0E0E10;
+  background-color: #0E0E12;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  border-radius: 24px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .affecio-card-subtle {
-  background-color: #141417;
+  background-color: #14141A;
   border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 16px;
+  border-radius: 20px;
 }
 
 .affecio-card-interactive {
-  background-color: #141417;
+  background-color: #14141A;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .affecio-card-interactive:hover {
-  background-color: #1A1A1E;
+  background-color: #1A1A24;
   border-color: rgba(255, 255, 255, 0.16);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
+}
+
+.ambient-glow-top {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  max-width: 1280px;
+  height: 520px;
+  background: radial-gradient(circle at 50% 0%, rgba(139, 92, 246, 0.10) 0%, rgba(41, 151, 255, 0.06) 35%, rgba(251, 113, 133, 0.03) 60%, transparent 80%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Design System Buttons (Apple HIG, 44px min touch target, tactile spring) */

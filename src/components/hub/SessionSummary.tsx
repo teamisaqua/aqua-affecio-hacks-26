@@ -44,63 +44,64 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
   const consensusRatio = totalDecisions > 0 ? Math.round((totalConsensus / totalDecisions) * 100) : 85;
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6 select-none p-4 sm:p-6 affecio-card">
+    <div className="w-full max-w-3xl mx-auto space-y-6 select-none p-5 sm:p-7 rounded-3xl bg-[#0D0D12] border border-white/[0.08] shadow-2xl">
       {/* Top Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/8 text-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-white/[0.08] text-xs">
         <button
           onClick={onContinuePlaying}
-          className="text-[#86868B] hover:text-white transition-colors flex items-center gap-1 font-mono"
+          className="text-zinc-400 hover:text-white transition-colors flex items-center gap-1 font-mono cursor-pointer"
         >
           <ChevronLeft className="w-3.5 h-3.5" />
           <span>Back to Activity Library</span>
         </button>
 
-        <span className="text-emerald-400 font-mono font-semibold">
-          Verified Session Telemetry
+        <span className="text-emerald-400 font-mono text-[11px] font-semibold flex items-center gap-1.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>Verified Session Telemetry</span>
         </span>
       </div>
 
       {/* Main Title & Hero Metrics */}
       <div className="text-center space-y-2 py-2">
-        <span className="px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
-          SESSION COMPLETE
+        <span className="px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold uppercase tracking-wider">
+          Experience Complete
         </span>
-        <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+        <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
           Social Experience Recap
         </h2>
-        <p className="text-xs text-[#86868B] max-w-md mx-auto">
+        <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
           Comprehensive observation of coordination and choices recorded between {userAName} & {userBName}.
         </p>
       </div>
 
       {/* 4 Cumulative Metrics Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-        <div className="p-4 rounded-2xl bg-black/40 border border-white/8 text-center space-y-1">
+        <div className="p-4 rounded-2xl bg-[#13131A] border border-white/[0.06] text-center space-y-1">
           <div className="text-2xl sm:text-3xl font-light text-white font-mono tabular-nums">
             {totalActivities}
           </div>
-          <div className="text-[10px] uppercase font-mono text-[#86868B]">Activities Played</div>
+          <div className="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Activities Played</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-black/40 border border-white/8 text-center space-y-1">
+        <div className="p-4 rounded-2xl bg-[#13131A] border border-white/[0.06] text-center space-y-1">
           <div className="text-2xl sm:text-3xl font-light text-white font-mono tabular-nums">
             {totalRounds}
           </div>
-          <div className="text-[10px] uppercase font-mono text-[#86868B]">Decisions Made</div>
+          <div className="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Decisions Made</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-black/40 border border-white/8 text-center space-y-1">
-          <div className="text-2xl sm:text-3xl font-light text-white font-mono tabular-nums">
+        <div className="p-4 rounded-2xl bg-[#13131A] border border-white/[0.06] text-center space-y-1">
+          <div className="text-2xl sm:text-3xl font-light text-emerald-400 font-mono tabular-nums">
             {consensusRatio}%
           </div>
-          <div className="text-[10px] uppercase font-mono text-[#86868B]">Instinct Consensus</div>
+          <div className="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Instinct Consensus</div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-black/40 border border-white/8 text-center space-y-1">
+        <div className="p-4 rounded-2xl bg-[#13131A] border border-white/[0.06] text-center space-y-1">
           <div className="text-2xl sm:text-3xl font-light text-white font-mono tabular-nums">
             {totalDurationMinutes || 12}m
           </div>
-          <div className="text-[10px] uppercase font-mono text-[#86868B]">Time Engaged</div>
+          <div className="text-[10px] uppercase font-mono text-zinc-400 tracking-wider">Time Engaged</div>
         </div>
       </div>
 
@@ -156,7 +157,7 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
             sound.playGlassClick();
             onContinuePlaying();
           }}
-          className="apple-btn-primary px-8 py-2.5 text-xs font-semibold flex items-center gap-2 w-full sm:w-auto justify-center"
+          className="btn-primary px-8 py-3 text-xs font-semibold flex items-center gap-2 w-full sm:w-auto justify-center !rounded-full shadow-lg shadow-white/10"
         >
           <span>Choose Another Activity</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -167,7 +168,7 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
             sound.playGlassClick();
             onReturnToChamber();
           }}
-          className="apple-btn-secondary px-6 py-2.5 text-xs font-mono w-full sm:w-auto justify-center"
+          className="btn-secondary px-6 py-3 text-xs font-mono w-full sm:w-auto justify-center !rounded-full !bg-white/5 !border-white/10 hover:!bg-white/10"
         >
           Return to Chemistry Chamber
         </button>

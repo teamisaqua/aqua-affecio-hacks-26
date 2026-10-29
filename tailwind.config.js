@@ -37,11 +37,24 @@ module.exports = {
       },
       colors: {
         canvas: "#000000",
+        ink: "#050508",
         surface: {
-          primary: "#1C1C1E",
-          secondary: "#2C2C2E",
-          tertiary: "#3A3A3C",
-          glass: "rgba(28, 28, 30, 0.75)",
+          DEFAULT: "#0E0E12",
+          primary: "#14141A",
+          secondary: "#1A1A22",
+          tertiary: "#24242E",
+          glass: "rgba(18, 18, 24, 0.75)",
+        },
+        electric: "#2997FF",
+        lavender: {
+          DEFAULT: "#A78BFA",
+          soft: "#C4B5FD",
+          deep: "#8B5CF6",
+        },
+        rose: {
+          DEFAULT: "#F43F5E",
+          soft: "#FB7185",
+          warm: "#FDA4AF",
         },
         apple: {
           blue: "#2997FF",

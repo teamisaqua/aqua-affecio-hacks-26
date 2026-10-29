@@ -72,6 +72,35 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
     }
   };
 
+  // Category styling dictionary
+  const categoryStyles: Record<string, { border: string; text: string; badge: string }> = {
+    icebreakers: {
+      border: 'hover:border-[#38BDF8]/40',
+      text: 'group-hover:text-[#38BDF8]',
+      badge: 'border-[#38BDF8]/25 bg-[#38BDF8]/10 text-[#38BDF8]',
+    },
+    personality: {
+      border: 'hover:border-[#A78BFA]/40',
+      text: 'group-hover:text-[#A78BFA]',
+      badge: 'border-[#A78BFA]/25 bg-[#A78BFA]/10 text-[#A78BFA]',
+    },
+    competitive: {
+      border: 'hover:border-[#FF9F0A]/40',
+      text: 'group-hover:text-[#FF9F0A]',
+      badge: 'border-[#FF9F0A]/25 bg-[#FF9F0A]/10 text-[#FF9F0A]',
+    },
+    creative: {
+      border: 'hover:border-[#FB7185]/40',
+      text: 'group-hover:text-[#FB7185]',
+      badge: 'border-[#FB7185]/25 bg-[#FB7185]/10 text-[#FB7185]',
+    },
+    cooperative: {
+      border: 'hover:border-[#34C759]/40',
+      text: 'group-hover:text-[#34C759]',
+      badge: 'border-[#34C759]/25 bg-[#34C759]/10 text-[#34C759]',
+    },
+  };
+
   // Filtered Activities
   const filteredActivities = useMemo(() => {
     return ACTIVITIES.filter((act) => {
@@ -97,7 +126,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
       {/* Refined Multiplayer Session Header */}
       <section
         aria-label="Multiplayer Session Status"
-        className="p-4 sm:p-5 rounded-2xl bg-[#121216] border border-white/8 shadow-md"
+        className="p-4 sm:p-5 rounded-3xl bg-[#0D0D12] border border-white/[0.08] shadow-md"
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
@@ -107,7 +136,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
                 Multiplayer Session Active
               </span>
               {isSimulatedPartner && (
-                <span className="text-[10px] font-mono text-[#2997FF] bg-[#2997FF]/10 px-2 py-0.5 rounded-full border border-[#2997FF]/20">
+                <span className="text-[10px] font-mono text-[#2997FF] bg-[#2997FF]/10 px-2.5 py-0.5 rounded-full border border-[#2997FF]/20">
                   Simulated Partner
                 </span>
               )}
@@ -117,7 +146,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
               <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                 {userAName} <span className="text-white/30 font-normal">·</span> {userBName}
               </h2>
-              <span className="text-xs text-[#86868B] font-mono">
+              <span className="text-xs text-zinc-400 font-mono">
                 ({completedActivityIds.length} of {ACTIVITIES.length} completed)
               </span>
             </div>
@@ -130,7 +159,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
                 sound.playGlassClick();
                 onReturnToChamber();
               }}
-              className="px-4 py-2 rounded-full bg-[#18181D] hover:bg-[#222228] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-all cursor-pointer active:scale-95"
+              className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-all cursor-pointer active:scale-95"
               title="Return to Laboratory Chamber"
             >
               <FlaskConical className="w-3.5 h-3.5 text-[#2997FF]" />
@@ -142,7 +171,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
                 sound.playGlassClick();
                 onOpenSessionSummary();
               }}
-              className="px-4 py-2 rounded-full bg-[#18181D] hover:bg-[#222228] border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-all cursor-pointer active:scale-95"
+              className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white flex items-center justify-center gap-1.5 flex-1 sm:flex-none transition-all cursor-pointer active:scale-95"
               title="View Cumulative Compatibility Summary"
             >
               <BarChart3 className="w-3.5 h-3.5 text-[#34C759]" />
@@ -161,11 +190,11 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
       {recommendedActivity && (
         <section
           aria-label="Recommended Next Activity"
-          className="p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-[#141822] via-[#121218] to-[#121216] border border-[#2997FF]/30 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+          className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-violet-950/30 via-[#13131A] to-[#0E0E14] border border-violet-500/25 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
         >
           <div className="space-y-1.5 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#2997FF]/15 text-[#2997FF] text-[10px] font-mono font-semibold uppercase tracking-wider">
-              <Sparkles className="w-3 h-3" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-violet-300 text-[10px] font-mono font-semibold uppercase tracking-wider">
+              <Sparkles className="w-3 h-3 text-lavender" />
               <span>Featured Recommendation</span>
             </div>
 
@@ -173,11 +202,11 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
               {recommendedActivity.title}
             </h3>
 
-            <p className="text-xs text-[#86868B] leading-relaxed">
+            <p className="text-xs text-zinc-400 leading-relaxed">
               {recommendedActivity.tagline}
             </p>
 
-            <div className="flex items-center gap-2 pt-0.5 text-[11px] font-mono text-[#86868B]">
+            <div className="flex items-center gap-2 pt-0.5 text-[11px] font-mono text-zinc-400">
               <span className="px-2 py-0.5 rounded bg-white/5 text-white/70">
                 {recommendedActivity.category}
               </span>
@@ -195,7 +224,7 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
               sound.playSuccessChime();
               onLaunchActivity(recommendedActivity.id);
             }}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-[#2997FF] hover:bg-[#2997FF]/90 active:scale-95 text-white text-xs font-semibold shadow-lg shadow-[#2997FF]/20 flex items-center justify-center gap-2 flex-shrink-0 transition-all cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-white text-black hover:bg-zinc-100 active:scale-95 text-xs font-semibold shadow-lg shadow-white/10 flex items-center justify-center gap-2 flex-shrink-0 transition-all cursor-pointer"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
             <span>Launch Together</span>
@@ -300,39 +329,44 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {filteredActivities.map((act) => {
             const isDone = completedActivityIds.includes(act.id);
+            const style = categoryStyles[act.category] || {
+              border: 'hover:border-white/20',
+              text: 'group-hover:text-white',
+              badge: 'border-white/10 bg-white/5 text-[#86868B]',
+            };
 
             return (
               <div
                 key={act.id}
-                className="p-5 rounded-2xl bg-[#101014] border border-white/8 hover:border-white/20 transition-all flex flex-col justify-between min-h-[170px] group shadow-sm hover:shadow-md"
+                className={`p-5 rounded-3xl bg-[#0D0D12] border border-white/[0.08] ${style.border} transition-all duration-200 flex flex-col justify-between min-h-[185px] group shadow-sm hover:shadow-xl hover:-translate-y-1`}
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider bg-white/5 text-[#86868B] border border-white/5">
+                  <div className="flex items-center justify-between mb-2.5">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider border font-medium ${style.badge}`}>
                       {act.category}
                     </span>
 
-                    <div className="flex items-center gap-1.5 text-[10px] text-[#86868B] font-mono">
+                    <div className="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono">
                       <Clock className="w-3 h-3" />
                       <span>{act.estimatedMinutes}m</span>
                       {act.badge && (
-                        <span className="px-1.5 py-0.5 rounded-full bg-[#2997FF]/15 text-[#2997FF] font-bold">
+                        <span className="px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-300 font-semibold border border-violet-500/25">
                           {act.badge}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <h4 className="text-base font-bold text-white tracking-tight group-hover:text-[#2997FF] transition-colors">
+                  <h4 className={`text-base font-bold text-white tracking-tight ${style.text} transition-colors`}>
                     {act.title}
                   </h4>
-                  <p className="text-xs text-[#86868B] mt-1 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed line-clamp-2">
                     {act.tagline}
                   </p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-white/6 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-[#86868B] font-mono capitalize">
+                <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between text-xs">
+                  <span className="text-[11px] text-zinc-400 font-mono capitalize">
                     {act.playstyle}
                   </span>
 
@@ -341,10 +375,10 @@ export const ActivityHub: React.FC<ActivityHubProps> = ({
                       sound.playGlassClick();
                       onLaunchActivity(act.id);
                     }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer active:scale-95 ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer active:scale-95 shadow-sm ${
                       isDone
                         ? 'bg-[#141C16] text-[#34C759] border border-[#34C759]/40 hover:bg-[#34C759] hover:text-black'
-                        : 'bg-white text-black hover:bg-white/90'
+                        : 'bg-white text-black hover:bg-zinc-100 hover:shadow-md'
                     }`}
                   >
                     {isDone && <CheckCircle2 className="w-3 h-3 text-[#34C759] group-hover:text-black" />}

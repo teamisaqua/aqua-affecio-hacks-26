@@ -48,25 +48,25 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     <div className="w-full max-w-2xl mx-auto space-y-6 select-none text-center">
       {/* Header */}
       <div className="space-y-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#16161A] border border-white/8 text-[#86868B] text-xs font-medium">
-          <Sparkles className="w-3.5 h-3.5 text-[#2997FF]" />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-300 text-xs font-medium">
+          <Sparkles className="w-3.5 h-3.5 text-lavender" />
           <span>Experiment Chamber Setup</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">
           Chamber Ready
         </h1>
-        <p className="text-xs sm:text-sm text-[#86868B] max-w-md mx-auto">
+        <p className="text-xs sm:text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
           Share the room code with your partner, or evaluate with a simulated partner.
         </p>
 
         {/* Room Code & Connection Badge */}
         <div className="pt-2 flex flex-wrap items-center justify-center gap-2">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#121215] border border-white/8 text-xs text-white">
-            <span className="text-[#86868B]">Room:</span>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#13131A] border border-white/[0.08] text-xs text-white">
+            <span className="text-zinc-400">Room:</span>
             <span className="font-semibold text-white tracking-wider font-mono">{roomCode}</span>
             <button
               onClick={handleCopyCode}
-              className="p-1 rounded-md hover:bg-white/10 text-[#86868B] hover:text-white transition-colors"
+              className="p-1 rounded-md hover:bg-white/10 text-zinc-400 hover:text-white transition-colors cursor-pointer"
               title="Copy Code"
               aria-label="Copy Code"
             >
@@ -80,10 +80,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                 sound.playGlassClick();
                 onToggleSimulatedPartner();
               }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono transition-all border ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-mono transition-all border cursor-pointer ${
                 isSimulatedPartner
                   ? 'bg-[#2997FF]/15 border-[#2997FF]/40 text-[#2997FF]'
-                  : 'bg-[#121215] border-white/8 text-[#86868B] hover:text-white'
+                  : 'bg-[#13131A] border-white/[0.08] text-zinc-400 hover:text-white'
               }`}
             >
               <Bot className="w-3.5 h-3.5" />
@@ -209,9 +209,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             sound.playGlassClick();
             onReadyToggle();
           }}
-          className={`apple-btn-secondary w-full sm:w-auto px-6 text-xs font-semibold ${
+          className={`btn-secondary w-full sm:w-auto px-7 py-3 text-xs font-semibold !rounded-full cursor-pointer transition-all ${
             (isExplore ? userA.isReady : userB.isReady)
-              ? 'border-[#34C759]/50 text-[#34C759]'
+              ? '!border-[#34C759]/50 !text-[#34C759] !bg-[#34C759]/10'
               : ''
           }`}
         >
@@ -224,15 +224,15 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             onStartExperience();
           }}
           disabled={!bothReady && !demoMode}
-          className="apple-btn-primary w-full sm:w-auto px-8 text-xs font-semibold disabled:opacity-40 disabled:cursor-not-allowed"
+          className="btn-primary w-full sm:w-auto px-8 py-3 text-xs font-semibold !rounded-full shadow-lg shadow-white/10 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
         >
           <span>Begin Experiment</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-4 h-4 ml-1" />
         </button>
       </div>
 
       {!bothReady && !demoMode && (
-        <p className="text-xs text-[#86868B]">
+        <p className="text-xs text-zinc-400">
           {isSimulatedPartner
             ? 'Confirm ready above to commence with simulated partner.'
             : 'Waiting for partner or activate simulated partner above.'}
