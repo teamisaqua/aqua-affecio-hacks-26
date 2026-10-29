@@ -31,7 +31,7 @@ import { DemoModeBar } from '@/components/demo/DemoModeBar';
 import { InteractionField } from '@/components/chamber/InteractionField';
 import { ReactionCanvas, ReactionFieldState } from '@/components/molecular/ReactionCanvas';
 import { sound } from '@/lib/sound/soundEffects';
-import { ChevronLeft, FlaskConical, Gamepad2, BarChart3, Sparkles, Atom } from 'lucide-react';
+import { ChevronLeft, FlaskConical, Gamepad2, BarChart3, Sparkles, Atom, Compass } from 'lucide-react';
 import { ActivityRecord } from '@/lib/activities/types';
 import { ACTIVITIES, getActivityById } from '@/lib/activities/registry';
 import { ActivityHub } from '@/components/hub/ActivityHub';
@@ -46,6 +46,7 @@ import { getQuestionsForActivity } from '@/lib/data/questionBank';
 
 // Core 10 Science Experiments
 import { InAppActivitySelector, LAB_EXPERIMENTS } from '@/components/experiments/InAppActivitySelector';
+import { ExperimentStepper } from '@/components/experiments/ExperimentStepper';
 import { ReactionPredictionGame } from '@/components/experiments/ReactionPredictionGame';
 import { MolecularMemoryGame } from '@/components/experiments/MolecularMemoryGame';
 import { CollaborativeSynthesisGame } from '@/components/experiments/CollaborativeSynthesisGame';
@@ -1001,112 +1002,126 @@ function LabSessionContent() {
     return 'idle';
   }, [viewMode, stage, reactorState.isSuccess, reactorState.isStabilized, reactorState.overshootCount]);
 
+  const activeExpId = useMemo(() => {
+    switch (stage) {
+      case 'bond':
+        return 'element-bond';
+      case 'reactor':
+        return 'reaction-equilibrium';
+      case 'dilemma':
+        return 'synchronized-dilemmas';
+      case 'prediction':
+        return 'reaction-prediction';
+      case 'memory':
+        return 'molecular-memory';
+      case 'synthesis':
+        return 'collaborative-synthesis';
+      case 'signal':
+        return 'signal-communication';
+      case 'quiz':
+        return 'chemistry-quiz-battle';
+      case 'discovery':
+        return 'shared-discovery';
+      case 'final':
+      case 'engine':
+      case 'compound':
+      case 'card':
+      case 'conversation':
+        return 'final-synthesis';
+      default:
+        return 'element-bond';
+    }
+  }, [stage]);
+
+  const completedExperimentIds = useMemo(() => [
+    ...(bondState.result ? ['element-bond'] : []),
+    ...(reactorState.isSuccess ? ['reaction-equilibrium'] : []),
+    ...(dilemmaState.history.length > 0 ? ['synchronized-dilemmas'] : []),
+    ...sessionRecords.map((r) => r.activityId),
+  ], [bondState.result, reactorState.isSuccess, dilemmaState.history.length, sessionRecords]);
+
   return (
-    <div className="relative min-h-screen flex flex-col justify-between p-3 sm:p-6 md:p-8 bg-black text-white overflow-x-hidden">
+    <div className="relative min-h-screen flex flex-col justify-between p-3 sm:p-5 md:p-6 lg:p-8 bg-black text-white overflow-x-hidden">
       {/* Living Ambient Molecular Matrix */}
       <div className="pointer-events-none fixed inset-0 opacity-15 z-0">
         <ReactionCanvas state={molecularFieldState} />
       </div>
 
-      {/* Top Header & Navigation Bar */}
-      <header className="relative z-10 max-w-5xl w-full mx-auto flex items-center justify-between pb-3 sm:pb-4 border-b border-white/6">
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={() => router.push('/')}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#16161A] hover:bg-[#222228] active:scale-95 border border-white/8 flex items-center justify-center text-[#86868B] hover:text-white transition-all"
-            title="Return to Portal"
-            aria-label="Return to Portal"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <div className="text-xs sm:text-sm font-semibold tracking-tight text-white flex items-center gap-1.5">
-              <span>Affecio Lab</span>
-              <span className="text-white/20">·</span>
-              <span className="text-xs text-[#86868B] font-mono">{sessionId}</span>
-            </div>
-            <div className="text-[11px] text-[#86868B]">
-              Role: <span className="text-white font-medium">{currentRole === 'explore' ? 'Explore' : 'Control'}</span>
-              {isSimulatedPartner && <span className="text-[#2997FF] ml-1.5 font-mono">(Simulated Partner)</span>}
-            </div>
-          </div>
-        </div>
-
-        {/* Step Progress Indicator */}
-        {viewMode === 'chamber' ? (
-          <nav
-            aria-label="Experiment Progress"
-            className="hidden md:flex items-center space-x-1 p-1 rounded-full bg-[#111114] border border-white/8"
-          >
-            {stepList.map((st, i) => (
-              <div key={st.id} className="flex items-center">
-                <span
-                  className={`text-xs px-3 py-1 rounded-full transition-all ${
-                    st.id === stage
-                      ? 'bg-white text-black font-semibold shadow-sm'
-                      : i < currentStepIdx
-                      ? 'text-white font-medium'
-                      : 'text-[#86868B]'
-                  }`}
-                >
-                  {st.label}
-                </span>
-              </div>
-            ))}
-          </nav>
-        ) : (
-          <div className="hidden md:flex items-center space-x-2 text-xs text-[#86868B] px-3 py-1 rounded-full bg-[#111114] border border-white/8">
-            <span className="text-white/40">Active:</span>
-            <span className="text-white font-medium">
-              {viewMode === 'hub'
-                ? 'Activity Catalog (25+ Games)'
-                : viewMode === 'activity'
-                ? getActivityById(activeActivityId || '')?.title || 'Interactive Game'
-                : 'Session Summary & Metrics'}
-            </span>
-          </div>
-        )}
-
-        <div className="flex items-center space-x-2">
-          {/* In-App 10 Experiments Map Trigger */}
-          <button
-            onClick={() => setIsSelectorOpen(true)}
-            className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 bg-[#16161A] hover:bg-[#222228] border border-white/8 text-white cursor-pointer"
-            title="Browse all 10 Science Experiments"
-          >
-            <Atom className="w-3.5 h-3.5 text-[#2997FF]" />
-            <span className="hidden sm:inline">10 Experiments</span>
-            <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
-              Map
-            </span>
-          </button>
-
-          {/* Segmented Mode Switcher */}
-          <div className="flex items-center p-0.5 rounded-full bg-[#16161A] border border-white/8">
+      {/* Redesigned Upper Navigation Tier 1: Brand, Mode Switcher, Session Status */}
+      <header className="relative z-20 max-w-5xl w-full mx-auto flex flex-col gap-2.5 pb-2.5 border-b border-white/6">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
+          {/* Left: Brand + Session Status */}
+          <div className="flex items-center space-x-2.5 min-w-0">
             <button
-              onClick={() => handleSwitchView('chamber')}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
-                viewMode === 'chamber'
+              onClick={() => router.push('/')}
+              className="w-8 h-8 rounded-full bg-[#16161A] hover:bg-[#222228] active:scale-95 border border-white/8 flex items-center justify-center text-[#86868B] hover:text-white transition-all shrink-0 cursor-pointer"
+              title="Return to Portal"
+              aria-label="Return to Portal"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="font-mono text-xs font-bold tracking-widest uppercase text-white flex items-center gap-1.5 shrink-0">
+                AFFECIO
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2997FF] shadow-sm shadow-[#2997FF]/50" />
+              </span>
+
+              <span className="text-white/20 hidden sm:inline">|</span>
+
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#121216] border border-white/8 text-[11px] font-mono text-[#86868B] truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse shrink-0" />
+                <span className="text-white font-medium truncate">{sessionId}</span>
+                {isSimulatedPartner && (
+                  <span className="text-[9px] text-[#2997FF] font-sans px-1 rounded bg-[#2997FF]/10 hidden md:inline">
+                    Simulated
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Center: Structured Navigation Pill (Lobby, Chamber, Activities, Recap) */}
+          <nav aria-label="Main Navigation" className="hidden sm:flex items-center p-0.5 rounded-full bg-[#141418] border border-white/8">
+            <button
+              onClick={() => {
+                sound.playGlassClick();
+                setStage('lobby');
+                setViewMode('chamber');
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                stage === 'lobby' && viewMode === 'chamber'
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'text-[#86868B] hover:text-white'
               }`}
-              title="Return to 3-stage Chemistry Chamber"
             >
-              <FlaskConical className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Chamber</span>
+              Lobby
+            </button>
+
+            <button
+              onClick={() => handleSwitchView('chamber')}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'chamber' && stage !== 'lobby'
+                  ? 'bg-white text-black font-semibold shadow-sm'
+                  : 'text-[#86868B] hover:text-white'
+              }`}
+              title="Return to Science Chamber"
+            >
+              <FlaskConical className="w-3 h-3 text-[#2997FF]" />
+              <span>Chamber</span>
             </button>
 
             <button
               onClick={() => handleSwitchView('hub')}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'hub' || viewMode === 'activity'
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'text-[#86868B] hover:text-white'
               }`}
               title="Browse 25+ Dating & Compatibility Games"
             >
-              <Gamepad2 className="w-3.5 h-3.5 text-[#2997FF]" />
-              <span className="hidden sm:inline">Activities</span>
+              <Gamepad2 className="w-3 h-3 text-[#2997FF]" />
+              <span>Activities</span>
               <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
                 25+
               </span>
@@ -1114,26 +1129,113 @@ function LabSessionContent() {
 
             <button
               onClick={() => handleSwitchView('summary')}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
                 viewMode === 'summary'
                   ? 'bg-white text-black font-semibold shadow-sm'
                   : 'text-[#86868B] hover:text-white'
               }`}
-              title="View Cumulative Session Summary"
+              title="View Cumulative Compatibility Recap"
             >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Recap</span>
+              <BarChart3 className="w-3 h-3 text-[#34C759]" />
+              <span>Recap</span>
               {sessionRecords.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[#34C759] text-black text-[9px] font-bold flex items-center justify-center">
+                <span className="w-3.5 h-3.5 rounded-full bg-[#34C759] text-black text-[9px] font-bold flex items-center justify-center">
                   {sessionRecords.length}
                 </span>
               )}
             </button>
-          </div>
+          </nav>
 
-          <SoundToggle />
+          {/* Right: Participant Role + Map Trigger + Sound */}
+          <div className="flex items-center space-x-2 shrink-0">
+            {/* Participant Role Pill */}
+            <div
+              className="px-2.5 py-1 rounded-full bg-[#16161A] border border-white/8 text-[11px] font-mono text-[#86868B] flex items-center gap-1"
+              title="Your assigned participant role in this chamber"
+            >
+              <span className="text-white/40">Role:</span>
+              <span className="text-white font-medium capitalize">
+                {currentRole === 'explore' ? 'Explore' : 'Control'}
+              </span>
+            </div>
+
+            {/* Experiment Map Trigger */}
+            <button
+              onClick={() => setIsSelectorOpen(true)}
+              className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 bg-[#16161A] hover:bg-[#222228] border border-white/8 text-white cursor-pointer active:scale-95"
+              title="Browse and launch all 10 Science Experiments"
+            >
+              <Compass className="w-3.5 h-3.5 text-[#2997FF]" />
+              <span className="hidden sm:inline">10 Experiments</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
+                Map
+              </span>
+            </button>
+
+            <SoundToggle />
+          </div>
+        </div>
+
+        {/* Mobile Segmented Navigation Bar (<640px) */}
+        <div className="flex sm:hidden items-center justify-between p-0.5 rounded-full bg-[#141418] border border-white/8 w-full text-xs">
+          <button
+            onClick={() => {
+              sound.playGlassClick();
+              setStage('lobby');
+              setViewMode('chamber');
+            }}
+            className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
+              stage === 'lobby' && viewMode === 'chamber'
+                ? 'bg-white text-black font-semibold'
+                : 'text-[#86868B]'
+            }`}
+          >
+            Lobby
+          </button>
+          <button
+            onClick={() => handleSwitchView('chamber')}
+            className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
+              viewMode === 'chamber' && stage !== 'lobby'
+                ? 'bg-white text-black font-semibold'
+                : 'text-[#86868B]'
+            }`}
+          >
+            Chamber
+          </button>
+          <button
+            onClick={() => handleSwitchView('hub')}
+            className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
+              viewMode === 'hub' || viewMode === 'activity'
+                ? 'bg-white text-black font-semibold'
+                : 'text-[#86868B]'
+            }`}
+          >
+            Activities
+          </button>
+          <button
+            onClick={() => handleSwitchView('summary')}
+            className={`flex-1 py-1 rounded-full text-center font-medium transition-all ${
+              viewMode === 'summary'
+                ? 'bg-white text-black font-semibold'
+                : 'text-[#86868B]'
+            }`}
+          >
+            Recap
+          </button>
         </div>
       </header>
+
+      {/* Tier 2: Dedicated Experiment Stepper Sub-Bar (In Chamber view mode when not in lobby) */}
+      {viewMode === 'chamber' && stage !== 'lobby' && (
+        <div className="relative z-10 max-w-5xl w-full mx-auto pt-2">
+          <ExperimentStepper
+            activeExperimentId={activeExpId}
+            completedExperimentIds={completedExperimentIds}
+            onSelectExperiment={handleSelectExperiment}
+            onOpenMap={() => setIsSelectorOpen(true)}
+          />
+        </div>
+      )}
 
       {/* Living Responsive Interaction Field Dock */}
       <div className="relative z-10 max-w-5xl w-full mx-auto pt-3 pb-2">
