@@ -16,6 +16,7 @@ interface AffinityResultProps {
   onRestart: () => void;
   onOpenConversation: () => void;
   onExploreActivities?: () => void;
+  onNextExperiment?: () => void;
 }
 
 export const AffinityResult: React.FC<AffinityResultProps> = ({
@@ -25,6 +26,7 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
   onRestart,
   onOpenConversation,
   onExploreActivities,
+  onNextExperiment,
 }) => {
   const [phase, setPhase] = useState<'converging' | 'revealed'>('converging');
   const [displayScore, setDisplayScore] = useState(0);
@@ -287,6 +289,18 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
 
               {/* Action Buttons */}
               <div className="pt-4 border-t border-white/8 flex flex-col sm:flex-row flex-wrap items-center justify-center gap-3">
+                {onNextExperiment && (
+                  <Button
+                    variant="primary"
+                    size="md"
+                    className="w-full sm:w-auto px-6 text-xs bg-[#2997FF] text-white hover:bg-[#2997FF]/90 font-semibold shadow-lg shadow-[#2997FF]/20"
+                    onClick={onNextExperiment}
+                  >
+                    <Sparkles className="w-4 h-4 text-white" />
+                    <span>Advance to Exp 04: Reaction Prediction →</span>
+                  </Button>
+                )}
+
                 {onExploreActivities && (
                   <Button
                     variant="primary"
@@ -295,7 +309,7 @@ export const AffinityResult: React.FC<AffinityResultProps> = ({
                     onClick={onExploreActivities}
                   >
                     <Sparkles className="w-4 h-4 text-[#2997FF]" />
-                    <span>Explore 25+ Dating Activities →</span>
+                    <span>Explore 25+ Dating Activities</span>
                   </Button>
                 )}
 

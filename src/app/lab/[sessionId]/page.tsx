@@ -31,7 +31,7 @@ import { DemoModeBar } from '@/components/demo/DemoModeBar';
 import { InteractionField } from '@/components/chamber/InteractionField';
 import { ReactionCanvas, ReactionFieldState } from '@/components/molecular/ReactionCanvas';
 import { sound } from '@/lib/sound/soundEffects';
-import { ChevronLeft, FlaskConical, Gamepad2, BarChart3, Sparkles } from 'lucide-react';
+import { ChevronLeft, FlaskConical, Gamepad2, BarChart3, Sparkles, Atom } from 'lucide-react';
 import { ActivityRecord } from '@/lib/activities/types';
 import { ACTIVITIES, getActivityById } from '@/lib/activities/registry';
 import { ActivityHub } from '@/components/hub/ActivityHub';
@@ -43,6 +43,16 @@ import { CollaborativeDateBuilder } from '@/components/activities/CollaborativeD
 import { DeepTalkGame } from '@/components/activities/DeepTalkGame';
 import { MemoryMatchGame } from '@/components/activities/MemoryMatchGame';
 import { getQuestionsForActivity } from '@/lib/data/questionBank';
+
+// Core 10 Science Experiments
+import { InAppActivitySelector, LAB_EXPERIMENTS } from '@/components/experiments/InAppActivitySelector';
+import { ReactionPredictionGame } from '@/components/experiments/ReactionPredictionGame';
+import { MolecularMemoryGame } from '@/components/experiments/MolecularMemoryGame';
+import { CollaborativeSynthesisGame } from '@/components/experiments/CollaborativeSynthesisGame';
+import { SignalCommunicationGame } from '@/components/experiments/SignalCommunicationGame';
+import { ChemistryQuizBattleGame } from '@/components/experiments/ChemistryQuizBattleGame';
+import { SharedDiscoveryGame } from '@/components/experiments/SharedDiscoveryGame';
+import { FinalSynthesisReport } from '@/components/experiments/FinalSynthesisReport';
 
 export type LabViewMode = 'chamber' | 'hub' | 'activity' | 'summary';
 
@@ -71,9 +81,13 @@ const stepList: { id: ExperienceStage; label: string }[] = [
   { id: 'bond', label: '01 Bond' },
   { id: 'reactor', label: '02 Reaction' },
   { id: 'dilemma', label: '03 Dilemma' },
-  { id: 'engine', label: 'Affinity' },
-  { id: 'card', label: 'Card' },
-  { id: 'conversation', label: 'Sparks' },
+  { id: 'prediction', label: '04 Predict' },
+  { id: 'memory', label: '05 Memory' },
+  { id: 'synthesis', label: '06 Synthesis' },
+  { id: 'signal', label: '07 Signal' },
+  { id: 'quiz', label: '08 Quiz' },
+  { id: 'discovery', label: '09 Discovery' },
+  { id: 'final', label: '10 Dossier' },
 ];
 
 function LabSessionContent() {
@@ -153,6 +167,8 @@ function LabSessionContent() {
   const [chemistryScore, setChemistryScore] = useState<ChemistryScore | null>(null);
   const [compound, setCompound] = useState<FictionalCompound | null>(null);
 
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+
   // MultiChannelSync for both local multi-tab and Supabase Realtime
   const syncChannel = useMemo(() => {
     return new MultiChannelSync(sessionId);
@@ -174,6 +190,19 @@ function LabSessionContent() {
         const actId = data.activityId as string;
         setActiveActivityId(actId);
         setViewMode('activity');
+      } else if (event === 'EXPERIMENT_SELECT') {
+        const expId = data.expId as string;
+        setViewMode('chamber');
+        if (expId === 'element-bond') setStage('bond');
+        else if (expId === 'reaction-equilibrium') setStage('reactor');
+        else if (expId === 'synchronized-dilemmas') setStage('dilemma');
+        else if (expId === 'reaction-prediction') setStage('prediction');
+        else if (expId === 'molecular-memory') setStage('memory');
+        else if (expId === 'collaborative-synthesis') setStage('synthesis');
+        else if (expId === 'signal-communication') setStage('signal');
+        else if (expId === 'chemistry-quiz-battle') setStage('quiz');
+        else if (expId === 'shared-discovery') setStage('discovery');
+        else if (expId === 'final-synthesis') setStage('final');
       } else if (event === 'ACTIVITY_COMPLETE') {
         const rec = data.record as ActivityRecord;
         setSessionRecords((prev) => {
@@ -235,6 +264,22 @@ function LabSessionContent() {
     setActiveActivityId(actId);
     setViewMode('activity');
     syncChannel.broadcast('LAUNCH_ACTIVITY', { activityId: actId });
+  };
+
+  const handleSelectExperiment = (expId: string) => {
+    sound.playSuccessChime();
+    setViewMode('chamber');
+    if (expId === 'element-bond') setStage('bond');
+    else if (expId === 'reaction-equilibrium') setStage('reactor');
+    else if (expId === 'synchronized-dilemmas') setStage('dilemma');
+    else if (expId === 'reaction-prediction') setStage('prediction');
+    else if (expId === 'molecular-memory') setStage('memory');
+    else if (expId === 'collaborative-synthesis') setStage('synthesis');
+    else if (expId === 'signal-communication') setStage('signal');
+    else if (expId === 'chemistry-quiz-battle') setStage('quiz');
+    else if (expId === 'shared-discovery') setStage('discovery');
+    else if (expId === 'final-synthesis') setStage('final');
+    syncChannel.broadcast('EXPERIMENT_SELECT', { expId });
   };
 
   const handleFinishActivityGame = (record: ActivityRecord) => {
@@ -829,6 +874,69 @@ function LabSessionContent() {
       };
     }
 
+    if (stage === 'prediction') {
+      return {
+        state: 'selecting' as const,
+        metric: 'REACTION PREDICTION',
+        message: 'Empirical Kinetics Challenge · Predict chemical outcome',
+        activeRole: null,
+      };
+    }
+
+    if (stage === 'memory') {
+      return {
+        state: 'collaborating' as const,
+        metric: 'MOLECULAR MEMORY',
+        message: 'Periodic Symmetry Matrix · Find elemental pairs',
+        activeRole: null,
+      };
+    }
+
+    if (stage === 'synthesis') {
+      return {
+        state: 'collaborating' as const,
+        metric: 'ASYMMETRIC SYNTHESIS',
+        message: 'Explore selects precursors · Control manages thermodynamics',
+        activeRole: currentRole === 'explore' || currentRole === 'observer' ? ('explore' as const) : ('control' as const),
+      };
+    }
+
+    if (stage === 'signal') {
+      return {
+        state: 'synchronizing' as const,
+        metric: 'SPATIAL TRANSMISSION',
+        message: 'Descriptor coordinates · Reconstructor assembles lattice',
+        activeRole: currentRole === 'explore' || currentRole === 'observer' ? ('explore' as const) : ('control' as const),
+      };
+    }
+
+    if (stage === 'quiz') {
+      return {
+        state: 'selecting' as const,
+        metric: 'KNOWLEDGE BATTLE',
+        message: '52 Pure Chemistry Questions · Speed & Accuracy Score',
+        activeRole: null,
+      };
+    }
+
+    if (stage === 'discovery') {
+      return {
+        state: 'collaborating' as const,
+        metric: 'SCIENTIFIC EXPEDITION',
+        message: '15 Historical Discoveries · Rigorous Empirical Investigation',
+        activeRole: null,
+      };
+    }
+
+    if (stage === 'final') {
+      return {
+        state: 'completing' as const,
+        metric: 'COMPREHENSIVE DOSSIER',
+        message: 'Cumulative Compatibility Audit · Molecular Compound',
+        activeRole: null,
+      };
+    }
+
     return {
       state: 'completing' as const,
       metric: 'SYNTHESIS VERIFIED',
@@ -877,7 +985,19 @@ function LabSessionContent() {
       return 'calibrating';
     }
     if (stage === 'dilemma') return 'calibrating';
-    if (stage === 'engine' || stage === 'compound' || stage === 'card') return 'signature';
+    if (
+      stage === 'prediction' ||
+      stage === 'memory' ||
+      stage === 'synthesis' ||
+      stage === 'signal' ||
+      stage === 'quiz' ||
+      stage === 'discovery'
+    ) {
+      return 'calibrating';
+    }
+    if (stage === 'final' || stage === 'engine' || stage === 'compound' || stage === 'card') {
+      return 'signature';
+    }
     return 'idle';
   }, [viewMode, stage, reactorState.isSuccess, reactorState.isStabilized, reactorState.overshootCount]);
 
@@ -948,6 +1068,19 @@ function LabSessionContent() {
         )}
 
         <div className="flex items-center space-x-2">
+          {/* In-App 10 Experiments Map Trigger */}
+          <button
+            onClick={() => setIsSelectorOpen(true)}
+            className="px-2.5 py-1 rounded-full text-xs font-medium transition-all flex items-center gap-1.5 bg-[#16161A] hover:bg-[#222228] border border-white/8 text-white cursor-pointer"
+            title="Browse all 10 Science Experiments"
+          >
+            <Atom className="w-3.5 h-3.5 text-[#2997FF]" />
+            <span className="hidden sm:inline">10 Experiments</span>
+            <span className="px-1.5 py-0.2 rounded-full bg-[#2997FF]/20 text-[#2997FF] text-[10px] font-mono">
+              Map
+            </span>
+          </button>
+
           {/* Segmented Mode Switcher */}
           <div className="flex items-center p-0.5 rounded-full bg-[#16161A] border border-white/8">
             <button
@@ -1142,6 +1275,10 @@ function LabSessionContent() {
                 compound={compound || undefined}
                 userAName={userA.name}
                 userBName={userB.name}
+                onNextExperiment={() => {
+                  setStage('prediction');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'prediction' });
+                }}
                 onExploreActivities={() => {
                   setViewMode('hub');
                   syncChannel.broadcast('VIEW_MODE', { viewMode: 'hub' });
@@ -1168,6 +1305,127 @@ function LabSessionContent() {
                   setStage('conversation');
                   syncChannel.broadcast('STAGE_CHANGE', { stage: 'conversation' });
                 }}
+              />
+            )}
+
+            {stage === 'prediction' && (
+              <ReactionPredictionGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('memory');
+                }}
+                onNextExperiment={() => {
+                  setStage('memory');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'memory' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'memory' && (
+              <MolecularMemoryGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('synthesis');
+                }}
+                onNextExperiment={() => {
+                  setStage('synthesis');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'synthesis' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'synthesis' && (
+              <CollaborativeSynthesisGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('signal');
+                }}
+                onNextExperiment={() => {
+                  setStage('signal');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'signal' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'signal' && (
+              <SignalCommunicationGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('quiz');
+                }}
+                onNextExperiment={() => {
+                  setStage('quiz');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'quiz' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'quiz' && (
+              <ChemistryQuizBattleGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('discovery');
+                }}
+                onNextExperiment={() => {
+                  setStage('discovery');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'discovery' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'discovery' && (
+              <SharedDiscoveryGame
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                isSimulatedPartner={isSimulatedPartner}
+                onFinishGame={(rec) => {
+                  handleFinishActivityGame(rec);
+                  setStage('final');
+                }}
+                onNextExperiment={() => {
+                  setStage('final');
+                  syncChannel.broadcast('STAGE_CHANGE', { stage: 'final' });
+                }}
+                onExit={() => setStage('lobby')}
+              />
+            )}
+
+            {stage === 'final' && (
+              <FinalSynthesisReport
+                role={currentRole}
+                userAName={userA.name}
+                userBName={userB.name}
+                records={sessionRecords}
+                chemistryScore={chemistryScore}
+                compound={compound}
+                onLaunchExperiment={handleSelectExperiment}
+                onReturnToLobby={() => setStage('lobby')}
               />
             )}
 
@@ -1212,6 +1470,43 @@ function LabSessionContent() {
           </>
         )}
       </main>
+
+      {/* In-App 10 Experiments Map Modal */}
+      <InAppActivitySelector
+        isOpen={isSelectorOpen}
+        onClose={() => setIsSelectorOpen(false)}
+        activeExperimentId={
+          stage === 'bond'
+            ? 'element-bond'
+            : stage === 'reactor'
+            ? 'reaction-equilibrium'
+            : stage === 'dilemma'
+            ? 'synchronized-dilemmas'
+            : stage === 'prediction'
+            ? 'reaction-prediction'
+            : stage === 'memory'
+            ? 'molecular-memory'
+            : stage === 'synthesis'
+            ? 'collaborative-synthesis'
+            : stage === 'signal'
+            ? 'signal-communication'
+            : stage === 'quiz'
+            ? 'chemistry-quiz-battle'
+            : stage === 'discovery'
+            ? 'shared-discovery'
+            : stage === 'final'
+            ? 'final-synthesis'
+            : 'element-bond'
+        }
+        completedExperimentIds={[
+          ...(bondState.result ? ['element-bond'] : []),
+          ...(reactorState.isSuccess ? ['reaction-equilibrium'] : []),
+          ...(dilemmaState.history.length > 0 ? ['synchronized-dilemmas'] : []),
+          ...sessionRecords.map((r) => r.activityId),
+        ]}
+        onSelectExperiment={handleSelectExperiment}
+        onOpenSocialHub={() => handleSwitchView('hub')}
+      />
 
       {/* Presenter / Judge Controller Bar */}
       {(isDemoParam || isAutoDemo) && viewMode === 'chamber' && (

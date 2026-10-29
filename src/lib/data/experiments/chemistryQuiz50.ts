@@ -1,0 +1,543 @@
+export interface PureChemistryQuestion {
+  id: string;
+  discipline:
+    | 'Chemical Elements'
+    | 'Atomic Structure'
+    | 'Chemical Bonds'
+    | 'Acids & Bases'
+    | 'Chemical Reactions'
+    | 'Periodic Table'
+    | 'General Chemistry';
+  difficulty: 'easy' | 'medium' | 'hard';
+  question: string;
+  options: [string, string, string, string];
+  correctIndex: 0 | 1 | 2 | 3;
+  explanation: string;
+}
+
+export const CHEMISTRY_QUIZ_50: PureChemistryQuestion[] = [
+  // ==========================================
+  // 1. CHEMICAL ELEMENTS (8 questions)
+  // ==========================================
+  {
+    id: 'chem-el-1',
+    discipline: 'Chemical Elements',
+    difficulty: 'easy',
+    question: 'Which chemical element is the most abundant by mass in the human body?',
+    options: ['Carbon', 'Oxygen', 'Hydrogen', 'Nitrogen'],
+    correctIndex: 1,
+    explanation: 'Oxygen makes up roughly 65% of the human body’s total mass, primarily because water (H₂O) constitutes ~60% of body weight, and oxygen atoms account for 88.8% of water’s molecular mass.',
+  },
+  {
+    id: 'chem-el-2',
+    discipline: 'Chemical Elements',
+    difficulty: 'easy',
+    question: 'Which element is liquid at standard room temperature (25°C) and pressure alongside Mercury?',
+    options: ['Bromine', 'Gallium', 'Cesium', 'Iodine'],
+    correctIndex: 0,
+    explanation: 'Only two elements on the entire periodic table are liquid at standard laboratory conditions (25°C and 1 atm): Mercury (a metal) and Bromine (a halogen). Gallium and Cesium melt just slightly above room temperature.',
+  },
+  {
+    id: 'chem-el-3',
+    discipline: 'Chemical Elements',
+    difficulty: 'medium',
+    question: 'What element has the highest melting point of all known pure metallic elements (3,422°C)?',
+    options: ['Titanium', 'Tungsten', 'Platinum', 'Osmium'],
+    correctIndex: 1,
+    explanation: 'Tungsten (W, atomic number 74) has a melting point of 3,422°C (6,192°F), higher than any other metal, making it the historic material of choice for incandescent light bulb filaments and rocket nozzles.',
+  },
+  {
+    id: 'chem-el-4',
+    discipline: 'Chemical Elements',
+    difficulty: 'medium',
+    question: 'Which gas is responsible for the bright reddish-orange glow in vintage advertising signs?',
+    options: ['Argon', 'Krypton', 'Neon', 'Xenon'],
+    correctIndex: 2,
+    explanation: 'True neon gas discharges an intense, distinctive reddish-orange light. Signs displaying other colors use different noble gases or phosphor-coated tubes (e.g. Argon glows pale lavender, Krypton glows white-yellow).',
+  },
+  {
+    id: 'chem-el-5',
+    discipline: 'Chemical Elements',
+    difficulty: 'medium',
+    question: 'What is the densest naturally occurring element on Earth (density ~22.59 g/cm³)?',
+    options: ['Lead', 'Gold', 'Osmium', 'Uranium'],
+    correctIndex: 2,
+    explanation: 'Osmium (Os, atomic number 76) is the densest naturally occurring element, with a density of 22.59 g/cm³, closely rivaled by Iridium (22.56 g/cm³). A single standard one-liter carton filled with solid osmium would weigh over 22.5 kg (nearly 50 pounds)!',
+  },
+  {
+    id: 'chem-el-6',
+    discipline: 'Chemical Elements',
+    difficulty: 'hard',
+    question: 'What Latin word gives Potassium its atomic chemical symbol "K"?',
+    options: ['Kalium', 'Krypton', 'Kainite', 'Kermes'],
+    correctIndex: 0,
+    explanation: 'Potassium’s symbol "K" is derived from the neo-Latin word "Kalium", which stems from the Arabic "al-qalyah" (plant ashes), reflecting its historic extraction from potash plant ashes.',
+  },
+  {
+    id: 'chem-el-7',
+    discipline: 'Chemical Elements',
+    difficulty: 'easy',
+    question: 'Which chemical element makes up the vast majority of stellar mass in the Sun (~74%)?',
+    options: ['Helium', 'Hydrogen', 'Carbon', 'Oxygen'],
+    correctIndex: 1,
+    explanation: 'Hydrogen constitutes approximately 73.5% of the Sun’s mass, with Helium making up about 24.8%. The Sun generates energy by fusing roughly 600 million tons of hydrogen into helium every second.',
+  },
+  {
+    id: 'chem-el-8',
+    discipline: 'Chemical Elements',
+    difficulty: 'hard',
+    question: 'Which element is uniquely named after the celestial asteroid Ceres?',
+    options: ['Curium', 'Cesium', 'Cerium', 'Californium'],
+    correctIndex: 2,
+    explanation: 'Cerium (Ce, atomic number 58) was discovered in 1803 by Jöns Jakob Berzelius and Wilhelm Hisinger, named in honor of the dwarf planet Ceres, which had been discovered by Giuseppe Piazzi two years earlier in 1801.',
+  },
+
+  // ==========================================
+  // 2. ATOMIC STRUCTURE (8 questions)
+  // ==========================================
+  {
+    id: 'chem-atom-1',
+    discipline: 'Atomic Structure',
+    difficulty: 'easy',
+    question: 'Which subatomic particle orbits the nucleus and carries a negative electrical charge?',
+    options: ['Proton', 'Neutron', 'Electron', 'Quark'],
+    correctIndex: 2,
+    explanation: 'Electrons are elementary leptons with a negative charge of -1e and a mass roughly 1/1,836 that of a proton, occupying quantized probability orbitals surrounding the nucleus.',
+  },
+  {
+    id: 'chem-atom-2',
+    discipline: 'Atomic Structure',
+    difficulty: 'easy',
+    question: 'What defines the chemical atomic number (Z) of an element?',
+    options: ['Number of Neutrons', 'Number of Protons', 'Total Atomic Mass', 'Number of Valence Electrons'],
+    correctIndex: 1,
+    explanation: 'The atomic number (Z) is strictly defined by the number of protons in an atom’s nucleus. The proton count determines nuclear charge and dictates the chemical identity of the element.',
+  },
+  {
+    id: 'chem-atom-3',
+    discipline: 'Atomic Structure',
+    difficulty: 'medium',
+    question: 'Atoms of the same element that have identical numbers of protons but different numbers of neutrons are called:',
+    options: ['Isomers', 'Isotopes', 'Allotropes', 'Isobars'],
+    correctIndex: 1,
+    explanation: 'Isotopes are variants of a chemical element with identical proton numbers but differing numbers of neutrons (e.g. Carbon-12, Carbon-13, and radioactive Carbon-14).',
+  },
+  {
+    id: 'chem-atom-4',
+    discipline: 'Atomic Structure',
+    difficulty: 'medium',
+    question: 'What is the maximum number of electrons that can occupy a single d subshell (d orbitals)?',
+    options: ['2', '6', '10', '14'],
+    correctIndex: 2,
+    explanation: 'A d subshell contains 5 distinct spatial magnetic orbitals (mₗ = -2, -1, 0, +1, +2). By the Pauli exclusion principle, each orbital holds up to 2 electrons with opposite spins, yielding a maximum capacity of 5 × 2 = 10 electrons.',
+  },
+  {
+    id: 'chem-atom-5',
+    discipline: 'Atomic Structure',
+    difficulty: 'medium',
+    question: 'Which quantum principle states that no two electrons in an atom can have the exact same four quantum numbers?',
+    options: ['Aufbau Principle', 'Hund’s Rule', 'Pauli Exclusion Principle', 'Heisenberg Uncertainty Principle'],
+    correctIndex: 2,
+    explanation: 'Formulated by Wolfgang Pauli in 1925, the Pauli Exclusion Principle states that two or more identical fermions (such as electrons) cannot occupy the same quantum state simultaneously.',
+  },
+  {
+    id: 'chem-atom-6',
+    discipline: 'Atomic Structure',
+    difficulty: 'hard',
+    question: 'What quantum rule dictates that electrons occupy degenerate orbitals singly with parallel spins before pairing up?',
+    options: ['Hund’s Rule of Maximum Multiplicity', 'Bohr Orbital Rule', 'De Broglie Wavelength Law', 'Planck’s Energy Law'],
+    correctIndex: 0,
+    explanation: 'Hund’s Rule states that for degenerate orbitals of equal energy (such as the three p orbitals), electrons fill each orbital singly with parallel spins first to minimize electron-electron repulsion before pairing up.',
+  },
+  {
+    id: 'chem-atom-7',
+    discipline: 'Atomic Structure',
+    difficulty: 'hard',
+    question: 'What did Ernest Rutherford’s famous 1909 Gold Foil Experiment demonstrate about the atom?',
+    options: [
+      'Electrons are embedded evenly like plums in pudding',
+      'The positive charge and mass are concentrated in a tiny, dense central nucleus',
+      'Neutrons do not exist',
+      'Electrons have zero mass',
+    ],
+    correctIndex: 1,
+    explanation: 'When alpha particles fired at a thin gold foil unexpectedly deflected at angles greater than 90°, Rutherford deduced that the atom is mostly empty space with almost all its mass and positive charge concentrated in a tiny central nucleus.',
+  },
+  {
+    id: 'chem-atom-8',
+    discipline: 'Atomic Structure',
+    difficulty: 'medium',
+    question: 'What is the ground-state electron configuration of a neutral Carbon atom (Z = 6)?',
+    options: ['1s² 2s² 2p²', '1s² 2s⁴', '1s² 2s¹ 2p³', '1s⁶'],
+    correctIndex: 0,
+    explanation: 'Carbon has 6 electrons. Filling in increasing energy order by the Aufbau principle: 2 electrons in the 1s subshell, 2 in the 2s subshell, and 2 in the 2p subshell: 1s² 2s² 2p².',
+  },
+
+  // ==========================================
+  // 3. CHEMICAL BONDS (8 questions)
+  // ==========================================
+  {
+    id: 'chem-bond-1',
+    discipline: 'Chemical Bonds',
+    difficulty: 'easy',
+    question: 'What type of chemical bond is formed when two atoms share one or more pairs of electrons?',
+    options: ['Ionic Bond', 'Covalent Bond', 'Hydrogen Bond', 'Metallic Bond'],
+    correctIndex: 1,
+    explanation: 'A covalent bond forms when two nonmetal atoms share valence electrons to achieve stable, closed-shell electron configurations (such as H₂, O₂, and CH₄).',
+  },
+  {
+    id: 'chem-bond-2',
+    discipline: 'Chemical Bonds',
+    difficulty: 'easy',
+    question: 'What type of chemical bond holds sodium cations (Na⁺) and chloride anions (Cl⁻) together in salt crystals?',
+    options: ['Ionic Bond', 'Covalent Bond', 'Van der Waals Bond', 'Peptide Bond'],
+    correctIndex: 0,
+    explanation: 'An ionic bond is the strong electrostatic attraction between oppositely charged ions formed when one atom transfers valence electrons completely to another.',
+  },
+  {
+    id: 'chem-bond-3',
+    discipline: 'Chemical Bonds',
+    difficulty: 'medium',
+    question: 'What is the characteristic bond angle in a symmetrical tetrahedral molecule like Methane (CH₄)?',
+    options: ['90°', '109.5°', '120°', '180°'],
+    correctIndex: 1,
+    explanation: 'In sp³ hybridized carbon with four equivalent bonding pairs and zero lone pairs, VSEPR theory dictates that mutual electrostatic repulsion forces the bonds into a regular tetrahedron with 109.47° (≈109.5°) angles.',
+  },
+  {
+    id: 'chem-bond-4',
+    discipline: 'Chemical Bonds',
+    difficulty: 'medium',
+    question: 'Why does liquid water have a much higher boiling point (100°C) than hydrogen sulfide (H₂S, -60°C)?',
+    options: ['Water is heavier', 'Intermolecular Hydrogen Bonding', 'Ionic bonding in water', 'Covalent bond breaking'],
+    correctIndex: 1,
+    explanation: 'Oxygen is far more electronegative than sulfur, creating strong O-H dipoles. Water molecules form extensive 3D intermolecular hydrogen bonding networks that require substantial thermal energy to disrupt.',
+  },
+  {
+    id: 'chem-bond-5',
+    discipline: 'Chemical Bonds',
+    difficulty: 'hard',
+    question: 'How many sigma (σ) and pi (π) bonds exist in a standard carbon-carbon triple bond (C≡C)?',
+    options: ['3 sigma, 0 pi', '1 sigma, 2 pi', '2 sigma, 1 pi', '0 sigma, 3 pi'],
+    correctIndex: 1,
+    explanation: 'A triple bond consists of one strong head-on axial sigma (σ) bond formed by overlapping sp hybrid orbitals, and two mutually perpendicular side-by-side pi (π) bonds formed by unhybridized 2p orbitals.',
+  },
+  {
+    id: 'chem-bond-6',
+    discipline: 'Chemical Bonds',
+    difficulty: 'medium',
+    question: 'What model describes the electrical and thermal conductivity of metals as "cations floating in a sea of delocalized valence electrons"?',
+    options: ['The Metallic Sea Model', 'The Valence Shell Model', 'The Octet Lattice Model', 'The Solvation Model'],
+    correctIndex: 0,
+    explanation: 'The electron sea model describes metallic bonding: metal atoms lose their valence electrons to a shared pool that moves freely throughout the entire crystal lattice, explaining high electrical conductivity and ductility.',
+  },
+  {
+    id: 'chem-bond-7',
+    discipline: 'Chemical Bonds',
+    difficulty: 'hard',
+    question: 'According to VSEPR theory, what is the molecular geometry of sulfur hexafluoride (SF₆)?',
+    options: ['Trigonal Bipyramidal', 'Octahedral', 'Square Planar', 'Tetrahedral'],
+    correctIndex: 1,
+    explanation: 'Sulfur has 6 valence electrons and forms 6 single bonds to fluorine with zero lone pairs (sp³d² hybridization). The 6 electron domains point toward the vertices of a regular octahedron with 90° bond angles.',
+  },
+  {
+    id: 'chem-bond-8',
+    discipline: 'Chemical Bonds',
+    difficulty: 'medium',
+    question: 'Which of the following bonds has the greatest ionic character based on electronegativity difference?',
+    options: ['C-H (ΔEN = 0.35)', 'N-O (ΔEN = 0.40)', 'C-F (ΔEN = 1.43)', 'K-F (ΔEN = 3.16)'],
+    correctIndex: 3,
+    explanation: 'Ionic character increases with the electronegativity difference (ΔEN). Potassium (EN = 0.82) and Fluorine (EN = 3.98) produce an immense ΔEN of 3.16, making K-F one of the most purely ionic bonds known.',
+  },
+
+  // ==========================================
+  // 4. ACIDS AND BASES (8 questions)
+  // ==========================================
+  {
+    id: 'chem-ab-1',
+    discipline: 'Acids & Bases',
+    difficulty: 'easy',
+    question: 'What is the pH of pure neutral water at 25°C?',
+    options: ['0', '7.0', '14.0', '1.0'],
+    correctIndex: 1,
+    explanation: 'At 25°C, autoionization yields [H⁺] = [OH⁻] = 1.0 × 10⁻⁷ M. Since pH = -log[H⁺], the neutral point is exactly 7.0.',
+  },
+  {
+    id: 'chem-ab-2',
+    discipline: 'Acids & Bases',
+    difficulty: 'easy',
+    question: 'According to the Brønsted-Lowry acid-base definition, an acid is a:',
+    options: ['Proton (H⁺) Donor', 'Proton (H⁺) Acceptor', 'Electron Pair Acceptor', 'Hydroxide (OH⁻) Producer'],
+    correctIndex: 0,
+    explanation: 'The Brønsted-Lowry theory (1923) defines an acid as a proton (H⁺ ion) donor, and a base as a proton (H⁺ ion) acceptor.',
+  },
+  {
+    id: 'chem-ab-3',
+    discipline: 'Acids & Bases',
+    difficulty: 'medium',
+    question: 'If Solution A has a pH of 3 and Solution B has a pH of 5, how much more acidic is Solution A than Solution B?',
+    options: ['2 times', '20 times', '100 times', '1000 times'],
+    correctIndex: 2,
+    explanation: 'Because the pH scale is logarithmic (base 10), each unit represents a tenfold change in hydrogen ion concentration: ΔpH of 2 corresponds to 10² = 100 times higher [H⁺] concentration.',
+  },
+  {
+    id: 'chem-ab-4',
+    discipline: 'Acids & Bases',
+    difficulty: 'medium',
+    question: 'Which of the following is classified as a strong monoprotic acid that dissociates completely in water?',
+    options: ['Acetic acid (CH₃COOH)', 'Hydrochloric acid (HCl)', 'Carbonic acid (H₂CO₃)', 'Citric acid'],
+    correctIndex: 1,
+    explanation: 'Hydrochloric acid (HCl) is one of the classic strong mineral acids that ionizes virtually 100% in dilute aqueous solution: HCl → H⁺ + Cl⁻.',
+  },
+  {
+    id: 'chem-ab-5',
+    discipline: 'Acids & Bases',
+    difficulty: 'hard',
+    question: 'What chemical term describes a substance that can act as either an acid or a base (like water, H₂O)?',
+    options: ['Amphoteric', 'Azeotropic', 'Allotropic', 'Anisotropic'],
+    correctIndex: 0,
+    explanation: 'Amphoteric (or amphiprotic) substances can either donate a proton (acting as an acid) or accept a proton (acting as a base). Water is the classic example: H₂O + H₂O ⇌ H₃O⁺ + OH⁻.',
+  },
+  {
+    id: 'chem-ab-6',
+    discipline: 'Acids & Bases',
+    difficulty: 'medium',
+    question: 'What color does blue litmus paper turn when exposed to an acidic solution?',
+    options: ['Blue', 'Red', 'Bright Green', 'Colorless'],
+    correctIndex: 1,
+    explanation: 'Litmus is a natural dye extracted from lichens. Under acidic conditions (pH < 4.5), blue litmus paper turns red, while under alkaline conditions (pH > 8.3), red litmus paper turns blue.',
+  },
+  {
+    id: 'chem-ab-7',
+    discipline: 'Acids & Bases',
+    difficulty: 'hard',
+    question: 'What equation calculates the pH of a chemical buffer system from pKa and the ratio of conjugate base to acid?',
+    options: [
+      'Henderson-Hasselbalch Equation',
+      'Nernst Equation',
+      'Clausius-Clapeyron Equation',
+      'Arrhenius Equation',
+    ],
+    correctIndex: 0,
+    explanation: 'The Henderson-Hasselbalch equation (pH = pKa + log([A⁻]/[HA])) allows precise calculation of pH in buffer solutions based on the equilibrium constant of the weak acid and the concentrations of its components.',
+  },
+  {
+    id: 'chem-ab-8',
+    discipline: 'Acids & Bases',
+    difficulty: 'easy',
+    question: 'Which common household substance is a basic alkaline solution with a pH around 11 to 12?',
+    options: ['Lemon juice', 'Vinegar', 'Household Ammonia / Bleach', 'Black coffee'],
+    correctIndex: 2,
+    explanation: 'Household ammonia cleaner and sodium hypochlorite bleach are basic alkaline solutions (pH ~11–12.5), whereas lemon juice (pH ~2), vinegar (pH ~2.5), and black coffee (pH ~5) are all acidic.',
+  },
+
+  // ==========================================
+  // 5. CHEMICAL REACTIONS (8 questions)
+  // ==========================================
+  {
+    id: 'chem-rx-1',
+    discipline: 'Chemical Reactions',
+    difficulty: 'easy',
+    question: 'A chemical reaction that releases thermal heat energy into its surroundings is called:',
+    options: ['Endothermic', 'Exothermic', 'Isothermal', 'Adiabatic'],
+    correctIndex: 1,
+    explanation: 'An exothermic reaction has a negative change in enthalpy (ΔH < 0), releasing heat into the surrounding environment (like combustion or neutralization).',
+  },
+  {
+    id: 'chem-rx-2',
+    discipline: 'Chemical Reactions',
+    difficulty: 'easy',
+    question: 'What fundamental law states that matter cannot be created or destroyed in a closed chemical reaction?',
+    options: ['Law of Definite Proportions', 'Law of Conservation of Mass', 'Avogadro’s Law', 'Boyle’s Law'],
+    correctIndex: 1,
+    explanation: 'Antoine Lavoisier formulated the Law of Conservation of Mass in 1789: the total mass of the reactants must equal the total mass of the products in any closed chemical system.',
+  },
+  {
+    id: 'chem-rx-3',
+    discipline: 'Chemical Reactions',
+    difficulty: 'medium',
+    question: 'In a redox (oxidation-reduction) reaction, what happens to an atom that undergoes oxidation?',
+    options: ['It gains electrons', 'It loses electrons', 'It gains neutrons', 'Its mass doubles'],
+    correctIndex: 1,
+    explanation: 'Remember the classic mnemonic "OIL RIG": Oxidation Is Loss of electrons, Reduction Is Gain of electrons. An atom that is oxidized loses electrons and increases its oxidation state.',
+  },
+  {
+    id: 'chem-rx-4',
+    discipline: 'Chemical Reactions',
+    difficulty: 'medium',
+    question: 'What substance increases the speed of a chemical reaction without being consumed in the process?',
+    options: ['Catalyst', 'Solute', 'Inhibitor', 'Precipitate'],
+    correctIndex: 0,
+    explanation: 'A catalyst accelerates reaction kinetics by providing an alternative reaction pathway with a lower activation energy barrier, remaining chemically unchanged at the end of the cycle.',
+  },
+  {
+    id: 'chem-rx-5',
+    discipline: 'Chemical Reactions',
+    difficulty: 'hard',
+    question: 'What mathematical equation relates chemical reaction rate constant k to temperature and activation energy?',
+    options: ['Arrhenius Equation', 'Gibbs Free Energy Equation', 'Beer-Lambert Law', 'Van ’t Hoff Equation'],
+    correctIndex: 0,
+    explanation: 'The Arrhenius equation: k = A × exp(-Ea / RT), formulated by Svante Arrhenius in 1889, quantifies how temperature increases molecular kinetic energy to overcome the activation energy barrier Ea.',
+  },
+  {
+    id: 'chem-rx-6',
+    discipline: 'Chemical Reactions',
+    difficulty: 'medium',
+    question: 'According to Le Chatelier’s principle, what happens to an exothermic equilibrium if temperature is raised?',
+    options: [
+      'The equilibrium shifts toward the reactants (endothermic reverse direction)',
+      'The equilibrium shifts toward more products',
+      'The reaction stops completely',
+      'The pressure drops to zero',
+    ],
+    correctIndex: 0,
+    explanation: 'Le Chatelier’s principle states that a system at equilibrium will shift to counteract an applied stress. Because an exothermic reaction generates heat as a product, adding heat shifts the equilibrium in reverse toward the reactants to absorb excess thermal energy.',
+  },
+  {
+    id: 'chem-rx-7',
+    discipline: 'Chemical Reactions',
+    difficulty: 'hard',
+    question: 'What thermodynamic quantity must be negative (ΔG < 0) for a chemical process to occur spontaneously at constant temperature and pressure?',
+    options: ['Enthalpy (ΔH)', 'Gibbs Free Energy (ΔG)', 'Entropy (ΔS)', 'Activation Energy (Ea)'],
+    correctIndex: 1,
+    explanation: 'Gibbs Free Energy: ΔG = ΔH - TΔS. A process is spontaneous if and only if ΔG is negative, representing the maximum reversible work obtainable from the system.',
+  },
+  {
+    id: 'chem-rx-8',
+    discipline: 'Chemical Reactions',
+    difficulty: 'easy',
+    question: 'What are the two standard products of an acid-base neutralization reaction between HCl and NaOH?',
+    options: ['Salt (NaCl) and Water (H₂O)', 'Hydrogen gas and Oxygen gas', 'Chlorine gas and Sodium metal', 'Carbon dioxide and Water'],
+    correctIndex: 0,
+    explanation: 'Acid + Base → Salt + Water: HCl(aq) + NaOH(aq) → NaCl(aq) + H₂O(l). The hydrogen ion from the acid combines with the hydroxide ion from the base to form neutral water.',
+  },
+
+  // ==========================================
+  // 6. THE PERIODIC TABLE (8 questions)
+  // ==========================================
+  {
+    id: 'chem-pt-1',
+    discipline: 'Periodic Table',
+    difficulty: 'easy',
+    question: 'Who is widely recognized as the father of the modern Periodic Table for publishing the periodic law in 1869?',
+    options: ['Dmitri Mendeleev', 'Antoine Lavoisier', 'John Dalton', 'Marie Curie'],
+    correctIndex: 0,
+    explanation: 'Russian chemist Dmitri Mendeleev organized the elements by increasing atomic mass and valence patterns, famously leaving gaps and accurately predicting the discovery and properties of then-unknown elements like Gallium and Germanium.',
+  },
+  {
+    id: 'chem-pt-2',
+    discipline: 'Periodic Table',
+    difficulty: 'easy',
+    question: 'What column group in the periodic table (Group 18) contains Helium, Neon, Argon, and Xenon?',
+    options: ['Alkali Metals', 'Halogens', 'Noble Gases', 'Transition Metals'],
+    correctIndex: 2,
+    explanation: 'Group 18 comprises the Noble Gases, distinguished by full valence electron shells that make them remarkably unreactive and odorless, colorless monatomic gases under standard conditions.',
+  },
+  {
+    id: 'chem-pt-3',
+    discipline: 'Periodic Table',
+    difficulty: 'medium',
+    question: 'Which element possesses the highest Pauling electronegativity value (3.98) on the entire periodic table?',
+    options: ['Oxygen', 'Chlorine', 'Fluorine', 'Nitrogen'],
+    correctIndex: 2,
+    explanation: 'Fluorine (F, atomic number 9) has the highest electronegativity of all elements (3.98 on the Pauling scale), meaning it has the strongest pull for shared electrons in a covalent bond.',
+  },
+  {
+    id: 'chem-pt-4',
+    discipline: 'Periodic Table',
+    difficulty: 'medium',
+    question: 'As you move from left to right across a single period on the periodic table, what generally happens to atomic radius?',
+    options: [
+      'Atomic radius decreases (atoms get smaller)',
+      'Atomic radius increases dramatically',
+      'Atomic radius remains completely constant',
+      'Atomic radius doubles with each step',
+    ],
+    correctIndex: 0,
+    explanation: 'Across a period from left to right, protons are added to the nucleus, increasing effective nuclear charge (Zeff). Because electrons are added to the same principal energy shell, the stronger positive nucleus pulls the electron cloud tighter, decreasing atomic radius.',
+  },
+  {
+    id: 'chem-pt-5',
+    discipline: 'Periodic Table',
+    difficulty: 'hard',
+    question: 'Why are the Lanthanides and Actinides separated below the main body of the periodic table?',
+    options: [
+      'They represent the filling of the f-orbital subshells',
+      'They are all man-made elements',
+      'They are all liquids',
+      'They do not contain protons',
+    ],
+    correctIndex: 0,
+    explanation: 'The two separated rows at the bottom represent the f-block: the 4f subshell for the Lanthanides and the 5f subshell for the Actinides. Placing them inside the main table would make it 32 columns wide and unwieldy to print.',
+  },
+  {
+    id: 'chem-pt-6',
+    discipline: 'Periodic Table',
+    difficulty: 'medium',
+    question: 'What element group occupies Group 1 of the periodic table (Lithium, Sodium, Potassium)?',
+    options: ['Alkaline Earth Metals', 'Alkali Metals', 'Halogens', 'Chalcogens'],
+    correctIndex: 1,
+    explanation: 'Group 1 contains the Alkali Metals (Li, Na, K, Rb, Cs, Fr). They have a single s-orbital valence electron, making them soft, highly reactive metals that react vigorously with water.',
+  },
+  {
+    id: 'chem-pt-7',
+    discipline: 'Periodic Table',
+    difficulty: 'hard',
+    question: 'What property measures the energy required to remove the outermost electron from a neutral gaseous atom?',
+    options: ['Electron Affinity', 'Ionization Energy', 'Electronegativity', 'Lattice Enthalpy'],
+    correctIndex: 1,
+    explanation: 'First Ionization Energy is the minimum energy required to remove the most loosely bound valence electron from an isolated neutral gaseous atom (X(g) + energy → X⁺(g) + e⁻).',
+  },
+  {
+    id: 'chem-pt-8',
+    discipline: 'Periodic Table',
+    difficulty: 'easy',
+    question: 'How many naturally occurring horizontal rows (periods) currently exist on the standard periodic table?',
+    options: ['5', '7', '9', '12'],
+    correctIndex: 1,
+    explanation: 'There are 7 horizontal periods on the standard periodic table, corresponding to the principal quantum number (n = 1 to 7) of the highest occupied energy level in ground-state atoms.',
+  },
+
+  // ==========================================
+  // 7. GENERAL CHEMISTRY (4 questions)
+  // ==========================================
+  {
+    id: 'chem-gen-1',
+    discipline: 'General Chemistry',
+    difficulty: 'easy',
+    question: 'What is the precise value of Avogadro’s number (the number of particles in one mole)?',
+    options: ['3.14159 × 10²³', '6.022 × 10²³', '1.602 × 10⁻¹⁹', '9.81 × 10⁸'],
+    correctIndex: 1,
+    explanation: 'Avogadro’s constant (NA) is defined as exactly 6.02214076 × 10²³ particles per mole, bridging the microscopic atomic mass scale to macroscopic laboratory grams.',
+  },
+  {
+    id: 'chem-gen-2',
+    discipline: 'General Chemistry',
+    difficulty: 'medium',
+    question: 'What is the Ideal Gas Law equation that relates pressure, volume, moles, and temperature?',
+    options: ['PV = nRT', 'E = mc²', 'F = ma', 'P₁V₁ = P₂V₂'],
+    correctIndex: 0,
+    explanation: 'PV = nRT combines Boyle’s, Charles’s, and Avogadro’s laws into one unified equation of state for an ideal gas, where R is the universal gas constant (8.314 J/(mol·K)).',
+  },
+  {
+    id: 'chem-gen-3',
+    discipline: 'General Chemistry',
+    difficulty: 'hard',
+    question: 'What spectroscopic law states that light absorbance is directly proportional to both path length and solute concentration?',
+    options: ['Beer-Lambert Law', 'Bragg’s Law', 'Coulomb’s Law', 'Snell’s Law'],
+    correctIndex: 0,
+    explanation: 'The Beer-Lambert Law: A = ε · c · l, where A is absorbance, ε is the molar extinction coefficient, c is concentration, and l is optical path length. It is the cornerstone of spectrophotometric chemical quantification.',
+  },
+  {
+    id: 'chem-gen-4',
+    discipline: 'General Chemistry',
+    difficulty: 'medium',
+    question: 'What laboratory technique separates components of a liquid mixture based on differences in boiling points?',
+    options: ['Centrifugation', 'Fractional Distillation', 'Titration', 'Electrolysis'],
+    correctIndex: 1,
+    explanation: 'Distillation exploits differences in vapor pressures: heating a mixture vaporizes the more volatile component first, which travels up a column, condenses in a chilled condenser, and is collected as purified distillate.',
+  },
+];
+
+export function getQuestionsByDiscipline(discipline: string): PureChemistryQuestion[] {
+  return CHEMISTRY_QUIZ_50.filter((q) => q.discipline === discipline);
+}

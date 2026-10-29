@@ -154,6 +154,10 @@ class SoundEngine {
       // AudioContext policy catch
     }
   }
+
+  public playOverheatWarning() {
+    this.playWarningHum();
+  }
 }
 
 export const sound = new SoundEngine();

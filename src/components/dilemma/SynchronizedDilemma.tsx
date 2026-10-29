@@ -3,8 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DilemmaState, DilemmaOption, UserRole } from '@/lib/types/chemistry';
+import { DILEMMAS_40, ExtendedDilemmaScenario } from '@/lib/data/experiments/dilemmas40';
 import { sound } from '@/lib/sound/soundEffects';
-import { Compass, Flame, Heart, Zap, Sparkles, Check, ArrowRight } from 'lucide-react';
+import {
+  Compass,
+  Flame,
+  Heart,
+  Zap,
+  Sparkles,
+  Check,
+  ArrowRight,
+  MessageSquare,
+  ChevronRight,
+  ChevronLeft,
+  Users,
+} from 'lucide-react';
 
 interface SynchronizedDilemmaProps {
   role: UserRole;
@@ -31,22 +44,44 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
   const [revealed, setRevealed] = useState(false);
   const isCountingDownRef = useRef(false);
 
+  // Category filter state for 42 scenarios
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [scenarioIndexOffset, setScenarioIndexOffset] = useState<number>(0);
+
   const isExplore = role === 'explore' || role === 'observer';
   const myChoice = isExplore ? state.userAChoice : state.userBChoice;
   const partnerChoice = isExplore ? state.userBChoice : state.userAChoice;
   const partnerName = isExplore ? userBName : userAName;
 
   const bothSelected = Boolean(state.userAChoice && state.userBChoice);
-  const currentIndex = state.scenarioIndex ?? 0;
-  const totalCount = state.totalScenarios ?? 3;
-  const isFinalScenario = currentIndex >= totalCount - 1;
+  const currentIndex = (state.scenarioIndex ?? 0) + scenarioIndexOffset;
+
+  // Filtered pool from 42 dilemmas
+  const filteredDilemmas = React.useMemo(() => {
+    if (selectedCategory === 'All') return DILEMMAS_40;
+    return DILEMMAS_40.filter((d) => d.category === selectedCategory);
+  }, [selectedCategory]);
+
+  const activeDilemma: ExtendedDilemmaScenario =
+    filteredDilemmas[currentIndex % filteredDilemmas.length] || {
+      id: state.scenario.id,
+      prompt: state.scenario.prompt,
+      category: 'spontaneous',
+      categoryLabel: 'Curated Decision',
+      context: state.scenario.context,
+      options: state.scenario.options as any,
+      discussionSpark: 'What instinct drove your choice in this moment?',
+    };
+
+  const totalCount = Math.min(filteredDilemmas.length, 5);
+  const isFinalScenario = (state.scenarioIndex ?? 0) >= totalCount - 1;
 
   // Reset local state if scenarioIndex changes
   useEffect(() => {
     isCountingDownRef.current = false;
     setCountdown(null);
     setRevealed(false);
-  }, [state.scenarioIndex]);
+  }, [state.scenarioIndex, scenarioIndexOffset]);
 
   // When both users choose, start the 3-2-1 reveal countdown
   useEffect(() => {
@@ -80,7 +115,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
             setRevealed(false);
             onAdvanceScenario();
           }
-        }, 2400);
+        }, 3200);
       }, 2250);
 
       return () => {
@@ -97,7 +132,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
     onChoiceSelect(optionId, role);
   };
 
-  const getOptionIcon = (archetype: DilemmaOption['archetype']) => {
+  const getOptionIcon = (archetype: string) => {
     switch (archetype) {
       case 'spontaneous':
         return <Flame className="w-4 h-4 text-[#FF9F0A]" />;
@@ -106,12 +141,26 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
       case 'adventurous':
         return <Zap className="w-4 h-4 text-[#FF453A]" />;
       case 'intimate':
+      case 'collaborative':
         return <Heart className="w-4 h-4 text-[#BF5AF2]" />;
+      default:
+        return <Sparkles className="w-4 h-4 text-[#34C759]" />;
     }
   };
 
+  const categories = [
+    'All',
+    'spontaneous',
+    'communication',
+    'conflict',
+    'teamwork',
+    'lifestyle',
+    'travel',
+    'creative',
+  ];
+
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-5 select-none">
+    <div className="w-full max-w-3xl mx-auto space-y-4 select-none">
       {/* Experiment Header */}
       <div className="flex items-center justify-between pb-3 border-b border-white/8">
         <div className="flex items-center space-x-2.5">
@@ -119,7 +168,10 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
             03 Dilemma
           </span>
           <span className="text-white text-xs sm:text-sm font-semibold tracking-tight">
-            Decision {currentIndex + 1} of {totalCount}
+            Decision {(state.scenarioIndex ?? 0) + 1} of {totalCount}
+          </span>
+          <span className="text-[10px] font-mono text-[#86868B] px-1.5 py-0.2 rounded bg-white/5">
+            42 Dilemmas Bank
           </span>
         </div>
 
@@ -128,13 +180,37 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
         </div>
       </div>
 
+      {/* Category Filter Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => {
+              setSelectedCategory(cat);
+              setScenarioIndexOffset(0);
+              setRevealed(false);
+            }}
+            className={`px-2.5 py-1 rounded-full text-[11px] font-medium capitalize transition-all whitespace-nowrap ${
+              selectedCategory === cat
+                ? 'bg-white text-black font-semibold'
+                : 'bg-[#121216] text-[#86868B] hover:text-white border border-white/6'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       {/* Scenario Prompt */}
       <div className="text-center space-y-1.5 py-1">
-        <h2 className="text-2xl sm:text-3xl font-semibold text-white tracking-tight leading-snug max-w-xl mx-auto">
-          {state.scenario.prompt}
+        <div className="text-[10px] font-mono uppercase tracking-widest text-[#2997FF]">
+          {activeDilemma.categoryLabel || activeDilemma.category}
+        </div>
+        <h2 className="text-xl sm:text-2xl font-semibold text-white tracking-tight leading-snug max-w-xl mx-auto">
+          {activeDilemma.prompt}
         </h2>
         <p className="text-xs text-[#86868B] max-w-md mx-auto">
-          {state.scenario.context}
+          {activeDilemma.context}
         </p>
       </div>
 
@@ -175,7 +251,7 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
 
       {/* Decision 4-Quadrant Options */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {state.scenario.options.map((option) => {
+        {activeDilemma.options.map((option) => {
           const isMyPick = myChoice === option.id;
           const isPartnerPick = partnerChoice === option.id;
           const isRevealed = countdown === 0 || revealed;
@@ -239,22 +315,36 @@ export const SynchronizedDilemma: React.FC<SynchronizedDilemmaProps> = ({
         })}
       </div>
 
-      {/* Reveal Verdict Banner */}
+      {/* Reveal Verdict Banner & Post-Reveal Discussion Spark */}
       {countdown === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-2xl bg-[#141416] border border-white/10 text-center space-y-1"
+          className="p-4 sm:p-5 rounded-2xl bg-[#141416] border border-white/10 space-y-3 text-center"
         >
           <div className="text-sm font-semibold text-white tracking-tight flex items-center justify-center gap-2">
             <Sparkles className="w-3.5 h-3.5 text-[#2997FF]" />
             {myChoice === partnerChoice ? 'Direct Consensus Match' : 'Complementary Perspectives'}
           </div>
-          <p className="text-xs text-[#86868B]">
+
+          <p className="text-xs text-[#86868B] max-w-md mx-auto">
             {myChoice === partnerChoice
               ? 'Both participants made the identical instinctual choice independently.'
               : 'Different instincts create dynamic balance rather than friction.'}
           </p>
+
+          {/* Conversation Spark */}
+          {activeDilemma.discussionSpark && (
+            <div className="p-3 rounded-xl bg-white/5 border border-white/8 text-left space-y-1">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-[#2997FF]">
+                <MessageSquare className="w-3.5 h-3.5" />
+                <span>Discussion Spark</span>
+              </div>
+              <p className="text-xs text-white/90 italic">
+                &ldquo;{activeDilemma.discussionSpark}&rdquo;
+              </p>
+            </div>
+          )}
         </motion.div>
       )}
     </div>

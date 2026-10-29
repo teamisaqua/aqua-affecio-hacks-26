@@ -143,6 +143,6 @@ export function synthesizeBond(elementAId: string, elementBId: string): BondResu
     bondType: 'Covalent',
     formula: `${elA.symbol}${elB.symbol}-Dynamic`,
     compatibility: 88,
-    description: `Complementary pairing combining ${elA.tag.toLowerCase()} with ${elB.tag.toLowerCase()}.`,
+    description: `Complementary pairing combining ${(elA.tag || elA.category || 'elements').toLowerCase()} with ${(elB.tag || elB.category || 'elements').toLowerCase()}.`,
   };
 }

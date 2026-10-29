@@ -40,16 +40,21 @@ export interface ActivityDefinition {
 export interface ActivityRecord {
   activityId: string;
   activityTitle: string;
-  category: ActivityCategory;
+  category?: ActivityCategory;
   completedAt: number;
   durationSeconds: number;
-  roundsCompleted: number;
+  roundsCompleted?: number;
   userAScore?: number;
   userBScore?: number;
   consensusCount?: number;
   totalDecisions?: number;
-  summaryText: string;
+  summaryText?: string;
+  summary?: string;
   details?: Record<string, unknown>;
+  metrics?: Record<string, unknown>;
+  participantA?: string;
+  participantB?: string;
+  highlights?: string[];
 }
 
 export interface CumulativeSessionStats {

@@ -5,6 +5,13 @@ export type ExperienceStage =
   | 'bond'
   | 'reactor'
   | 'dilemma'
+  | 'prediction'
+  | 'memory'
+  | 'synthesis'
+  | 'signal'
+  | 'quiz'
+  | 'discovery'
+  | 'final'
   | 'engine'
   | 'compound'
   | 'card'
@@ -21,17 +28,18 @@ export interface ElementItem {
   id: string;
   symbol: string;
   name: string;
-  category: 'reactive' | 'stable' | 'magnetic' | 'catalytic';
+  category: string;
   tag: string;
   color: string;
   valence: number;
+  atomicNumber?: number;
 }
 
 export interface BondResult {
   elementA: ElementItem;
   elementB: ElementItem;
   bondName: string;
-  bondType: 'Covalent' | 'Ionic' | 'Resonance' | 'Hydrogen Polar';
+  bondType: string;
   formula: string;
   compatibility: number;
   description: string;
@@ -140,6 +148,9 @@ export interface ChemistryScore {
   teamwork: number;
   adaptability: number;
   balance: number;
+  resonanceScore?: number;
+  kineticsScore?: number;
+  harmonyScore?: number;
 }
 
 export interface FictionalCompound {
@@ -148,6 +159,8 @@ export interface FictionalCompound {
   classification: string;   // e.g. "Exothermic Resonance Polymer"
   tagline: string;          // e.g. "High Reactivity · Rapid Consensus"
   loreDescription: string;  // AI / Deterministic generated
+  description?: string;
+  crystalSystem?: string;
   colorGradient: [string, string];
   nodes: { x: number; y: number; size: number; pulseDelay: number }[];
 }
